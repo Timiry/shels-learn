@@ -1,0 +1,17 @@
+# Build
+.next
+out
+dist
+
+# Git
+.git
+node_modules
+
+# Env
+.env.local
+.env.development.local
+.env
+
+# Configs
+*.svg
+*.json
