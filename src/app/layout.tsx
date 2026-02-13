@@ -1,14 +1,11 @@
+import theme from "@/shared/config/theme";
+import CssBaseline from "@mui/material/CssBaseline";
+import { ThemeProvider } from "@mui/material/styles";
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Montserrat } from "next/font/google";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
+const montserrat = Montserrat({
+  subsets: ["cyrillic", "latin"],
 });
 
 export const metadata: Metadata = {
@@ -23,8 +20,11 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="ru">
-      <body className={`${geistSans.variable} ${geistMono.variable}`}>
-        {children}
+      <body className={`${montserrat.className}`}>
+        <ThemeProvider theme={theme}>
+          <CssBaseline />
+          <main>{children}</main>
+        </ThemeProvider>
       </body>
     </html>
   );
