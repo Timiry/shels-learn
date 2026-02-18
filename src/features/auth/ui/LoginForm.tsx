@@ -20,6 +20,7 @@ import { Visibility, VisibilityOff } from "@mui/icons-material";
 import { useLoginMutation } from "../api/authApi";
 import { loginSchema } from "../lib/validation/loginSchema";
 import FormLayout from "@/shared/ui/FormLayout";
+import { routes } from "@/shared/config/routes";
 
 // Типы для формы
 type LoginFormValues = z.infer<typeof loginSchema>;
@@ -102,7 +103,7 @@ export function LoginForm({ onSubmit, isLoading = false }: LoginFormProps) {
 
         <Link
           component={NextLink}
-          href="/forgot-password"
+          href={routes.auth.forgotPassword}
           variant="body2"
           color="primary"
           align="center"

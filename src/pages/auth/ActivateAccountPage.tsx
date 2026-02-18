@@ -29,7 +29,7 @@ export default function ActivateAccountPage() {
 
     try {
       await activateAccount({ password }).unwrap();
-      router.push(routes.login);
+      router.push(routes.auth.login);
     } catch (err) {
       console.error("Ошибка активации:", err);
       alert("Ошибка активации");
