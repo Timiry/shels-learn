@@ -1,21 +1,32 @@
 "use client";
 
-import { createTheme } from "@mui/material/styles";
+import { createTheme, alpha } from "@mui/material/styles";
+import { buttonClasses } from "@mui/material/Button";
+
+const mainBlue = "#2F85C6";
+const mainRed = "#B83D3D";
+const mainGrey = "#bebebe";
 
 const theme = createTheme({
   palette: {
     primary: {
-      main: "#1976d2",
-      light: "#42a5f5",
-      dark: "#1565c0",
+      main: mainBlue,
+      light: alpha(mainBlue, 0.7),
+      dark: "#0e6eb7",
     },
     secondary: {
-      main: "#dc004e",
-      light: "#f50057",
-      dark: "#c51162",
+      main: mainGrey,
+      light: alpha(mainGrey, 0.7),
+      dark: "#6e6e6e",
+      contrastText: "#111",
+    },
+    error: {
+      main: mainRed,
+      light: alpha(mainRed, 0.7),
+      dark: "#a02d2d",
     },
     background: {
-      default: "#f5f5f5",
+      default: "#EAF2F7",
       paper: "#ffffff",
     },
   },
@@ -39,9 +50,27 @@ const theme = createTheme({
       styleOverrides: {
         root: {
           textTransform: "none",
-          borderRadius: 8,
+          borderRadius: 3,
         },
       },
+      variants: [
+        {
+          props: {},
+          style: ({ theme }) => ({
+            [`&.${buttonClasses.outlined}`]: {
+              borderColor: theme.palette.secondary.main,
+              color: theme.palette.secondary.contrastText,
+              "&:hover": {
+                borderColor: theme.palette.secondary.dark,
+              },
+              "&.Mui-disabled": {
+                borderColor: theme.palette.secondary.main,
+                color: theme.palette.secondary.main,
+              },
+            },
+          }),
+        },
+      ],
     },
     MuiCard: {
       styleOverrides: {
