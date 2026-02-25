@@ -11,7 +11,7 @@ const FormLayout = (props: PropsWithChildren & BoxProps) => {
       width="500px"
       m="40px auto"
       position="relative"
-      sx={{ bgcolor: "background.default" }}
+      sx={{ bgcolor: "#EAF2F7" }}
     >
       <Paper
         elevation={6}
