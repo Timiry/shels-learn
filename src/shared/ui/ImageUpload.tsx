@@ -6,10 +6,12 @@ import PhotoCameraRoundedIcon from "@mui/icons-material/PhotoCameraRounded";
 
 interface ImageUploadProps {
   onChange?: (file: File | null) => void;
-  value?: File | null;
+  value?: File | string | null;
   disabled?: boolean;
   width: string;
   height: string;
+
+  isCover?: boolean;
 }
 
 export default function ImageUpload({
@@ -18,6 +20,7 @@ export default function ImageUpload({
   disabled = false,
   width,
   height,
+  isCover,
 }: ImageUploadProps) {
   const [isDragging, setIsDragging] = useState(false);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
@@ -25,13 +28,22 @@ export default function ImageUpload({
 
   // Обновляем предварительный просмотр при изменении значения
   useEffect(() => {
-    if (value) {
-      const url = URL.createObjectURL(value);
-      setImagePreview(url);
-      return () => URL.revokeObjectURL(url);
-    } else {
+    if (!value) {
       setImagePreview(null);
+      return;
     }
+
+    // Если value - строка (URL), используем её напрямую
+    if (typeof value === "string") {
+      setImagePreview(value);
+      return;
+    }
+
+    // Если value - File, создаём объектный URL
+    const url = URL.createObjectURL(value);
+    setImagePreview(url);
+
+    return () => URL.revokeObjectURL(url);
   }, [value]);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -79,10 +91,6 @@ export default function ImageUpload({
     setIsDragging(false);
   };
 
-  const handleRemove = () => {
-    if (onChange) onChange(null);
-  };
-
   return (
     <Box
       width={width}
@@ -90,7 +98,7 @@ export default function ImageUpload({
       sx={{
         border: "2px dashed",
         borderColor: isDragging ? "primary.main" : "divider",
-        borderRadius: 2,
+        borderRadius: 1,
         p: 2,
         textAlign: "center",
         cursor: disabled ? "default" : "pointer",
@@ -149,7 +157,7 @@ export default function ImageUpload({
           {/* Круглое изображение */}
           <Box
             sx={{
-              borderRadius: "50%",
+              borderRadius: isCover ? "3px" : "50%",
               overflow: "hidden",
               width: "100%",
               paddingTop: "100%",
@@ -181,9 +189,11 @@ export default function ImageUpload({
 
           {/* Название файла и подсказка */}
           <Box sx={{ mt: 1, textAlign: "center" }}>
-            <Typography variant="body1" component="div">
-              {value.name}
-            </Typography>
+            {value && typeof value !== "string" && (
+              <Typography variant="body1" component="div">
+                {value.name}
+              </Typography>
+            )}
             <Typography variant="caption" color="text.secondary">
               Нажмите для замены
             </Typography>

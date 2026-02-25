@@ -1,0 +1,100 @@
+"use client";
+
+import HeaderBox from "@/shared/ui/HeaderBox";
+import Box from "@mui/material/Box";
+import IconButton from "@mui/material/IconButton";
+import Tooltip from "@mui/material/Tooltip";
+import Typography from "@mui/material/Typography";
+import BookmarkAddOutlinedIcon from "@mui/icons-material/BookmarkAddOutlined";
+
+import { useRouter } from "next/navigation";
+import { routes } from "@/shared/config/routes";
+import { CourseDto } from "@/entities/course/model/types";
+import CourseInfoCard from "@/entities/course/ui/CourseInfoCard";
+import { Stack } from "@mui/material";
+
+export default function CoursesPage() {
+  const router = useRouter();
+  // const {currentData: courses} = useGetCoursesQuery(); //TODO: заменить а реальный хук
+  // мок:
+  const courses: CourseDto[] = [
+    {
+      courseId: 1,
+      title: "Основы программирования на JavaScript",
+      discription:
+        "Изучите основы программирования на JavaScript: синтаксис, структуры данных, объектно-ориентированное программирование и современные фреймворки.",
+      coverUrl: "/cover.png",
+    },
+    {
+      courseId: 2,
+      title: "Проектирование пользовательских интерфейсов",
+      discription:
+        "Освойте принципы создания удобных и эстетичных пользовательских интерфейсов. Изучите методы UX/UI дизайна, прототипирование и тестирование.",
+      coverUrl: "/cover.png",
+    },
+    {
+      courseId: 3,
+      title: "Управление проектами по методологии Agile",
+      discription:
+        "Изучите методологию Agile и её применение в управлении проектами. Освойте техники планирования, оценки и контроля проектов. Изучите методологию Agile и её применение в управлении проектами. Освойте техники планирования, оценки и контроля проектов.",
+      coverUrl: "/cover.png",
+    },
+    {
+      courseId: 4,
+      title: "Машинное обучение для начинающих",
+      discription:
+        "Основы машинного обучения: алгоритмы, модели, инструменты и практика. Изучите, как создавать и обучать модели машинного обучения.",
+      coverUrl: "/cover.png",
+    },
+    {
+      courseId: 5,
+      title: "Цифровой маркетинг: от теории к практике",
+      discription:
+        "Изучите современные методы цифрового маркетинга: SEO, контекстная реклама, социальные сети, email-маркетинг и анализ данных.",
+      coverUrl: "/cover.png",
+    },
+    {
+      courseId: 6,
+      title: "Финансовая грамотность для начинающих",
+      discription:
+        "Освойте основы личных финансов: бюджетирование, инвестирование, кредиты, сбережения и планирование финансового будущего.",
+      coverUrl: "/cover.png",
+    },
+  ];
+
+  return (
+    <Box>
+      <HeaderBox>
+        <Typography variant="h1" display={"inline"}>
+          Курсы
+        </Typography>
+        <Tooltip arrow title={"Создать курс"}>
+          <IconButton
+            onClick={() => {
+              router.push(routes.admin.courses.createCourse);
+            }}
+          >
+            <BookmarkAddOutlinedIcon fontSize="large" />
+          </IconButton>
+        </Tooltip>
+      </HeaderBox>
+      <Box
+        sx={{
+          display: "grid",
+          gridTemplateColumns: {
+            xs: "1fr",
+            sm: "repeat(3, 1fr)",
+            md: "repeat(4, 1fr)",
+            lg: "repeat(5, 1fr)",
+          },
+          gap: 3, // Одинаковое расстояние между карточками
+          p: 2,
+        }}
+      >
+        {courses.map((course) => (
+          <CourseInfoCard courseInfo={course} key={course.courseId} />
+        ))}
+      </Box>
+    </Box>
+  );
+}

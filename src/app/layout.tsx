@@ -27,12 +27,7 @@ export default function RootLayout({
         <ReduxProvider>
           <ThemeProvider theme={theme}>
             <CssBaseline />
-            <Box sx={{ display: "flex" }}>
-              <Sidebar />
-              <Box component="main" sx={{ flexGrow: 1 }}>
-                {children}
-              </Box>
-            </Box>
+            {children}
           </ThemeProvider>
         </ReduxProvider>
       </body>

@@ -155,15 +155,17 @@ export default function Sidebar() {
         transformOrigin={{ vertical: "top", horizontal: "right" }}
         sx={{ minWidth: 200 }}
       >
-        <MenuItem onClick={() => handleMenuClick("/admin/profile")}>
+        <MenuItem onClick={() => handleMenuClick(routes.admin.profile)}>
           <AccountCircleOutlinedIcon sx={{ mr: 1.5 }} />
           <Typography variant="body2">Профиль</Typography>
         </MenuItem>
-        <MenuItem onClick={() => handleMenuClick("/admin/catalog")}>
+        <MenuItem
+          onClick={() => handleMenuClick(routes.admin.courses.allCourses)}
+        >
           <SettingsOutlinedIcon sx={{ mr: 1.5 }} />
           <Typography variant="body2">Администратор</Typography>
         </MenuItem>
-        <MenuItem onClick={() => handleMenuClick("/student/learning")}>
+        <MenuItem onClick={() => handleMenuClick(routes.student.learning)}>
           <SchoolOutlinedIcon sx={{ mr: 1.5 }} />
           <Typography variant="body2">Студент</Typography>
         </MenuItem>

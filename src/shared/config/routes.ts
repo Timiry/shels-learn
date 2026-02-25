@@ -11,6 +11,9 @@ export const routes = {
     },
     courses: {
       allCourses: "/admin/courses",
+      createCourse: "/admin/courses/create",
+      courseById: (id: string | number) => `/admin/courses/${id}`,
+      editCourseById: (id: string | number) => `/admin/courses/${id}/edit`,
     },
     groups: "/admin/groups",
     profile: "/admin/profile",
