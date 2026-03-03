@@ -1,6 +1,6 @@
 "use client";
 
-import { CourseDto } from "../model/types";
+import { CourseDto, CourseSummaryDto } from "../model/types";
 import Card from "@mui/material/Card";
 import CardContent from "@mui/material/CardContent";
 import CardMedia from "@mui/material/CardMedia";
@@ -8,11 +8,12 @@ import Typography from "@mui/material/Typography";
 import CardActionArea from "@mui/material/CardActionArea";
 import { useRouter } from "next/navigation";
 import { routes } from "@/shared/config/routes";
+import { Divider } from "@mui/material";
 
 export default function CourseInfoCard({
   courseInfo,
 }: {
-  courseInfo: CourseDto;
+  courseInfo: CourseSummaryDto;
 }) {
   const router = useRouter();
 
@@ -20,13 +21,13 @@ export default function CourseInfoCard({
     <Card sx={{ maxWidth: 270 }}>
       <CardActionArea
         onClick={() =>
-          router.push(routes.admin.courses.courseById(courseInfo.courseId))
+          router.push(routes.admin.courses.courseById(courseInfo.id))
         }
       >
         <CardMedia
           component="img"
           height="140"
-          image={courseInfo.coverUrl}
+          image={courseInfo.coverFilePath} //TODO: добавить филлерное изображение
           alt={courseInfo.title}
         />
         <CardContent>
@@ -53,7 +54,14 @@ export default function CourseInfoCard({
               textOverflow: "ellipsis",
             }}
           >
-            {courseInfo.discription}
+            {courseInfo.description}
+          </Typography>
+          <Divider sx={{ my: "16px" }} />
+          <Typography variant="caption" mr={3}>
+            Теория: {courseInfo.theoryLessonsCount}
+          </Typography>
+          <Typography variant="caption">
+            Практика: {courseInfo.practiceLessonsCount}
           </Typography>
         </CardContent>
       </CardActionArea>

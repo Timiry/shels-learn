@@ -5,7 +5,7 @@ import { Box, Typography, Skeleton } from "@mui/material";
 import PhotoCameraRoundedIcon from "@mui/icons-material/PhotoCameraRounded";
 
 interface ImageUploadProps {
-  onChange?: (file: File | null) => void;
+  onChange?: (file: File) => void;
   value?: File | string | null;
   disabled?: boolean;
   width: string;

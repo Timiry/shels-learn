@@ -9,9 +9,7 @@ export default function MainLayout({
   return (
     <Box sx={{ display: "flex" }}>
       <Sidebar />
-      <Box component="main" sx={{ flexGrow: 1 }}>
-        {children}
-      </Box>
+      <Box sx={{ flexGrow: 1 }}>{children}</Box>
     </Box>
   );
 }

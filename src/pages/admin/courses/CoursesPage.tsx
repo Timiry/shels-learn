@@ -9,56 +9,69 @@ import BookmarkAddOutlinedIcon from "@mui/icons-material/BookmarkAddOutlined";
 
 import { useRouter } from "next/navigation";
 import { routes } from "@/shared/config/routes";
-import { CourseDto } from "@/entities/course/model/types";
+import { CourseSummaryDto } from "@/entities/course/model/types";
 import CourseInfoCard from "@/entities/course/ui/CourseInfoCard";
 import { Stack } from "@mui/material";
+import { useGetAllCoursesQuery } from "@/entities/course/model/coursesApi";
 
 export default function CoursesPage() {
   const router = useRouter();
-  // const {currentData: courses} = useGetCoursesQuery(); //TODO: заменить а реальный хук
+  // const { currentData: courses } = useGetAllCoursesQuery();
   // мок:
-  const courses: CourseDto[] = [
+  const courses: CourseSummaryDto[] = [
     {
-      courseId: 1,
+      id: 1,
       title: "Основы программирования на JavaScript",
-      discription:
+      description:
         "Изучите основы программирования на JavaScript: синтаксис, структуры данных, объектно-ориентированное программирование и современные фреймворки.",
-      coverUrl: "/cover.png",
+      coverFilePath: "/cover.png",
+      theoryLessonsCount: 1,
+      practiceLessonsCount: 2,
     },
     {
-      courseId: 2,
+      id: 2,
       title: "Проектирование пользовательских интерфейсов",
-      discription:
-        "Освойте принципы создания удобных и эстетичных пользовательских интерфейсов. Изучите методы UX/UI дизайна, прототипирование и тестирование.",
-      coverUrl: "/cover.png",
+      description:
+        "Освойте принципы создания удобных и эстетичных пользовательских интерфейсов.",
+      coverFilePath: "/cover.png",
+      theoryLessonsCount: 1,
+      practiceLessonsCount: 2,
     },
     {
-      courseId: 3,
+      id: 3,
       title: "Управление проектами по методологии Agile",
-      discription:
+      description:
         "Изучите методологию Agile и её применение в управлении проектами. Освойте техники планирования, оценки и контроля проектов. Изучите методологию Agile и её применение в управлении проектами. Освойте техники планирования, оценки и контроля проектов.",
-      coverUrl: "/cover.png",
+      coverFilePath: "/cover.png",
+      theoryLessonsCount: 1,
+      practiceLessonsCount: 2,
     },
     {
-      courseId: 4,
+      id: 4,
       title: "Машинное обучение для начинающих",
-      discription:
+      description:
         "Основы машинного обучения: алгоритмы, модели, инструменты и практика. Изучите, как создавать и обучать модели машинного обучения.",
-      coverUrl: "/cover.png",
+      coverFilePath: "/cover.png",
+      theoryLessonsCount: 1,
+      practiceLessonsCount: 2,
     },
     {
-      courseId: 5,
+      id: 5,
       title: "Цифровой маркетинг: от теории к практике",
-      discription:
+      description:
         "Изучите современные методы цифрового маркетинга: SEO, контекстная реклама, социальные сети, email-маркетинг и анализ данных.",
-      coverUrl: "/cover.png",
+      coverFilePath: "/cover.png",
+      theoryLessonsCount: 1,
+      practiceLessonsCount: 2,
     },
     {
-      courseId: 6,
+      id: 6,
       title: "Финансовая грамотность для начинающих",
-      discription:
+      description:
         "Освойте основы личных финансов: бюджетирование, инвестирование, кредиты, сбережения и планирование финансового будущего.",
-      coverUrl: "/cover.png",
+      coverFilePath: "/cover.png",
+      theoryLessonsCount: 1,
+      practiceLessonsCount: 2,
     },
   ];
 
@@ -87,12 +100,12 @@ export default function CoursesPage() {
             md: "repeat(4, 1fr)",
             lg: "repeat(5, 1fr)",
           },
-          gap: 3, // Одинаковое расстояние между карточками
+          gap: 3,
           p: 2,
         }}
       >
-        {courses.map((course) => (
-          <CourseInfoCard courseInfo={course} key={course.courseId} />
+        {courses?.map((course) => (
+          <CourseInfoCard courseInfo={course} key={course.id} />
         ))}
       </Box>
     </Box>

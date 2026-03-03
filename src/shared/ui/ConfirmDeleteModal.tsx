@@ -8,7 +8,7 @@ import {
   Typography,
   Box,
 } from "@mui/material";
-import { DeleteOutline } from "@mui/icons-material";
+import DeleteOutline from "@mui/icons-material/DeleteOutline";
 
 type ObjectType = "user" | "course" | "lesson"; //TODO: дополнить всеми типами сущностей
 
@@ -30,7 +30,7 @@ export default function ConfirmDeleteModal({
   const words = {
     user: ["пользователя", "Пользователь"],
     course: ["курса", "Курс"],
-    lesson: [],
+    lesson: ["урока", "Урок"],
     //TODO: дополнить всеми типами сущностей
   };
 

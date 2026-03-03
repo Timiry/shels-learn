@@ -1,7 +1,9 @@
 "use client";
 
-import { CourseCreateEditInfo, CourseDto } from "@/entities/course/model/types";
+import { useCreateCourseMutation } from "@/entities/course/model/coursesApi";
+import { CreateCourseRequest, CourseDto } from "@/entities/course/model/types";
 import EditCourseForm from "@/features/coursesManagement/ui/EditCourseForm";
+import { useUploadMutation } from "@/shared/api/filesApi";
 import { routes } from "@/shared/config/routes";
 import HeaderBox from "@/shared/ui/HeaderBox";
 import ImageUpload from "@/shared/ui/ImageUpload";
@@ -10,18 +12,19 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 
 export default function CreateCoursePage() {
-  const [photo, setPhoto] = useState<File | null>();
+  const [photo, setPhoto] = useState<File | null>(null);
   const router = useRouter();
   const formId = "course-create-form";
-  // const [createCourse] = useCreateCourseMutation();
+  const [uploadImage] = useUploadMutation();
+  const [createCourse] = useCreateCourseMutation();
   // мок:
-  const createCourse = (courseInfo: CourseCreateEditInfo): CourseDto => ({
-    courseId: 1,
-    title: "Основы программирования на JavaScript",
-    discription:
-      "Изучите основы программирования на JavaScript: синтаксис, структуры данных, объектно-ориентированное программирование и современные фреймворки.",
-    coverUrl: "/cover.png",
-  });
+  // const createCourse = (courseInfo: CreateCourseRequest): CourseDto => ({
+  //   courseId: 1,
+  //   title: "Основы программирования на JavaScript",
+  //   discription:
+  //     "Изучите основы программирования на JavaScript: синтаксис, структуры данных, объектно-ориентированное программирование и современные фреймворки.",
+  //   coverUrl: "/cover.png",
+  // });
 
   return (
     <Box>
@@ -48,10 +51,20 @@ export default function CreateCoursePage() {
         </Box>
         <Box pl={"50px"} flex={1}>
           <EditCourseForm
-            onSubmit={(courseInfo: CourseCreateEditInfo) => {
-              //TODO: добавление фото
-              const course = createCourse(courseInfo);
-              router.push(routes.admin.courses.courseById(course.courseId));
+            onSubmit={async (courseInfo: CreateCourseRequest) => {
+              let course: CourseDto;
+              if (photo === null) {
+                course = await createCourse(courseInfo).unwrap();
+              } else {
+                const cover = await uploadImage({
+                  file: photo,
+                }).unwrap();
+                course = await createCourse({
+                  coverFilePath: cover.path,
+                  ...courseInfo,
+                }).unwrap();
+              }
+              router.push(routes.admin.courses.courseById(course.id));
             }}
             formId={formId}
             isCreation={true}

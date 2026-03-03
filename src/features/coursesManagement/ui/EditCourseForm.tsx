@@ -1,11 +1,11 @@
 "use client";
 
 import { useForm } from "react-hook-form";
-import { Box, Typography, TextField, Stack } from "@mui/material";
-import { CourseCreateEditInfo, CourseDto } from "@/entities/course/model/types";
+import { Box, Typography, TextField, Stack, MenuItem } from "@mui/material";
+import { CourseDto, CreateCourseRequest } from "@/entities/course/model/types";
 
 interface EditCourseFormProps {
-  onSubmit: (userInfo: CourseCreateEditInfo) => void;
+  onSubmit: (courseInfo: CreateCourseRequest) => void;
   formId: string;
   isCreation: boolean;
   currentValues?: CourseDto;
@@ -24,19 +24,23 @@ export default function EditCourseForm({
     watch,
     setValue,
     formState: { errors },
-  } = useForm<CourseCreateEditInfo>({
+  } = useForm<CreateCourseRequest>({
     defaultValues: isCreation
       ? {
           title: "",
-          discription: "",
+          description: "",
+          authorFullName: "",
+          passingThresholdPercent: 100,
         }
       : {
           title: currentValues?.title,
-          discription: currentValues?.discription,
+          description: currentValues?.description,
+          authorFullName: currentValues?.authorFullName,
+          passingThresholdPercent: currentValues?.passingThresholdPercent,
         },
   });
 
-  const onSubmitForm = (courseInfo: CourseCreateEditInfo) => {
+  const onSubmitForm = (courseInfo: CreateCourseRequest) => {
     if (courseInfo.title === "") {
       setError("title", { message: "Название должно быть заполнено" });
       return;
@@ -58,12 +62,39 @@ export default function EditCourseForm({
 
         <Typography variant="body1">Описание</Typography>
         <TextField
-          {...register("discription")}
+          {...register("description")}
           placeholder="Описание"
           fullWidth
           multiline
           rows={8}
         />
+
+        <Typography variant="body1">Автор курса</Typography>
+        <TextField
+          {...register("authorFullName")}
+          placeholder="Автор курса"
+          fullWidth
+        />
+
+        <Typography variant="body1">Порог прохождения</Typography>
+        <TextField
+          {...register("passingThresholdPercent", {
+            valueAsNumber: true,
+          })}
+          select
+          helperText={
+            "Выберите минимальный процент для успешного прохождения курса"
+          }
+          defaultValue={90}
+          sx={{ maxWidth: 400 }}
+        >
+          <MenuItem value={50}>50%</MenuItem>
+          <MenuItem value={60}>60%</MenuItem>
+          <MenuItem value={70}>70%</MenuItem>
+          <MenuItem value={80}>80%</MenuItem>
+          <MenuItem value={90}>90%</MenuItem>
+          <MenuItem value={100}>100%</MenuItem>
+        </TextField>
       </Stack>
     </Box>
   );
