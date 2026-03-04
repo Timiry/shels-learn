@@ -5,10 +5,30 @@ import TextLessonContent from "./TextLessonContent";
 import VideoLessonContent from "./VideoLessonContent";
 import TestLessonContent from "./TestLessonContent";
 import TasLessonContent from "./TaskLessonContent";
+import { Typography } from "@mui/material";
 
 export default function LessonContent({ lesson }: { lesson: LessonDto }) {
   return (
-    <Box>
+    <Box mb={5}>
+      <Box mb={4}>
+        <Box
+          p={1}
+          border={"1px solid"}
+          borderColor={"divider"}
+          borderRadius={1}
+          display={"inline"}
+        >
+          <Typography variant="body1" display={"inline"}>
+            Баллы:{" "}
+          </Typography>
+          <Typography variant="body1" color="secondary" display={"inline"}>
+            {lesson.fullPoints}
+          </Typography>
+        </Box>
+      </Box>
+      <Typography variant="h1" sx={{ mb: 4 }}>
+        {lesson.title}
+      </Typography>
       {lesson.lessonType === "THEORY_PDF" && (
         <PdfLessonContent lesson={lesson} />
       )}

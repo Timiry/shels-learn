@@ -4,7 +4,7 @@ import {
   LessonDto,
   LessonType,
 } from "@/entities/course/model/types";
-import { Box, IconButton, Typography } from "@mui/material";
+import { Box, IconButton, Stack, Typography } from "@mui/material";
 import LessonsList from "./LessonsList";
 import { useState } from "react";
 import LessonContent from "@/entities/lesson/ui/lessonContent";
@@ -17,7 +17,6 @@ import {
   useUpdatePracticeLessonMutation,
   useUpdateTheoryLessonMutation,
 } from "@/entities/course/model/coursesApi";
-import HeaderBox from "@/shared/ui/HeaderBox";
 import EditIcon from "@mui/icons-material/EditOutlined";
 import DeleteIcon from "@mui/icons-material/DeleteOutline";
 import ConfirmDeleteModal from "@/shared/ui/ConfirmDeleteModal";
@@ -59,11 +58,17 @@ export default function EditCourseLessons({
           setActiveLesson(lesson);
         }}
       />
-      <Box flexGrow={1}>
+      <Box
+        flexGrow={1}
+        sx={{
+          height: "calc(100vh - 165px)",
+          overflowY: "auto",
+        }}
+      >
         {/* содержание выбранного урока */}
         {activeLesson && !isEdit && (
-          <Box width={"80%"} mx={"auto"}>
-            <HeaderBox>
+          <Box maxWidth={"80%"} mx={"auto"}>
+            <Stack justifyContent={"space-between"} direction={"row"} pb={3}>
               <Typography variant="caption">
                 {lessonTypeToWord[activeLesson.lessonType]}
               </Typography>
@@ -96,20 +101,20 @@ export default function EditCourseLessons({
                   <DeleteIcon color="error" fontSize="small" />
                 </IconButton>
               </Box>
-            </HeaderBox>
+            </Stack>
             <LessonContent lesson={activeLesson} />
           </Box>
         )}
 
         {/* редактирование выбранного урока */}
         {activeLesson && isEdit && (
-          <Box width={"80%"} mx={"auto"}>
-            <HeaderBox>
+          <Box maxWidth={"80%"} mx={"auto"}>
+            <Box pb={3}>
               <Typography variant="caption">
                 РЕДАКТИРОВАНИЕ УРОКА {" > "}
                 {lessonTypeToWord[activeLesson.lessonType]}
               </Typography>
-            </HeaderBox>
+            </Box>
             <EditLesson
               onSubmit={(lessonInfo) => {
                 activeLesson.lessonType.startsWith("THEORY")
@@ -127,6 +132,10 @@ export default function EditCourseLessons({
                     });
                 setIsEdit(false);
               }}
+              onCancel={() => {
+                setIsEdit(false);
+                setLessonType(undefined);
+              }}
               isCreation={false}
               lessonType={activeLesson.lessonType}
               currentValues={activeLesson}
@@ -136,13 +145,13 @@ export default function EditCourseLessons({
 
         {/* создание нового урока */}
         {!activeLesson && lessonType && (
-          <Box width={"80%"} mx={"auto"}>
-            <HeaderBox>
+          <Box maxWidth={"80%"} mx={"auto"}>
+            <Box pb={3}>
               <Typography variant="caption">
                 СОЗДАНИЕ УРОКА {" > "}
                 {lessonTypeToWord[lessonType]}
               </Typography>
-            </HeaderBox>
+            </Box>
             <EditLesson
               onSubmit={(lessonInfo) => {
                 lessonType.startsWith("THEORY")
@@ -159,6 +168,10 @@ export default function EditCourseLessons({
                 // TODO: после создания урока получить его dto, обновить список и показать созданный урок
                 // пока что просто перекидываем на меню содания урока
                 setIsEdit(false);
+              }}
+              onCancel={() => {
+                setIsEdit(false);
+                setLessonType(undefined);
               }}
               isCreation={false}
               lessonType={lessonType}

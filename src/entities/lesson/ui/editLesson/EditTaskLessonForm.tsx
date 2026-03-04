@@ -9,11 +9,14 @@ interface EditLessonFormProps {
   onSubmit: (
     lessonInfo: CreateTheoryLessonRequest | CreatePracticeLessonRequest
   ) => void;
+  onCancel: () => void;
+
   currentValues?: LessonDto;
   isCreation: boolean;
 }
 export default function EditTaskLessonForm({
   onSubmit,
+  onCancel,
   currentValues,
   isCreation,
 }: EditLessonFormProps) {

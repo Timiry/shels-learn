@@ -4,8 +4,7 @@ import { ThemeProvider } from "@mui/material/styles";
 import type { Metadata } from "next";
 import { Montserrat } from "next/font/google";
 import { ReduxProvider } from "./provider";
-import Sidebar from "@/widgets/Sidebar";
-import Box from "@mui/material/Box";
+import "./globals.css";
 
 const montserrat = Montserrat({
   subsets: ["cyrillic", "latin"],

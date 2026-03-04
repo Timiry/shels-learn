@@ -3,5 +3,14 @@ import { Typography } from "@mui/material";
 import Box from "@mui/material/Box";
 
 export default function PdfLessonContent({ lesson }: { lesson: LessonDto }) {
-  return <Box></Box>;
+  return (
+    <Box>
+      <embed
+        src={lesson.theoryContent}
+        type="application/pdf"
+        width="100%"
+        height="700px"
+      />
+    </Box>
+  );
 }

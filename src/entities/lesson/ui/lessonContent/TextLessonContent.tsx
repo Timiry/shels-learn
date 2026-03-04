@@ -1,7 +1,8 @@
 import { LessonDto } from "@/entities/course/model/types";
 import Box from "@mui/material/Box";
-import Typography from "@mui/material/Typography";
 
 export default function TextLessonContent({ lesson }: { lesson: LessonDto }) {
-  return <Box></Box>;
+  return (
+    <Box dangerouslySetInnerHTML={{ __html: lesson.theoryContent || "" }}></Box>
+  );
 }

@@ -27,7 +27,8 @@ export default function LessonsList({
   return (
     <Box
       sx={{
-        width: "350px",
+        minWidth: "300px",
+        maxWidth: "300px",
         height: "calc(100vh - 165px)",
         borderRight: 1,
         borderColor: "divider",
@@ -64,7 +65,9 @@ export default function LessonsList({
                   </IconBorderWrapper>
                 </ListItemIcon>
                 <ListItemText>
-                  <Typography variant="body2">{lesson.title}</Typography>
+                  <Typography noWrap variant="body2">
+                    {lesson.title}
+                  </Typography>
                 </ListItemText>
               </ListItem>
             ))}

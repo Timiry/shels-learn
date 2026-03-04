@@ -15,6 +15,8 @@ interface EditLessonFormProps {
   onSubmit: (
     lessonInfo: CreateTheoryLessonRequest | CreatePracticeLessonRequest
   ) => void;
+  onCancel: () => void;
+
   isCreation: boolean;
   currentValues?: LessonDto;
   lessonType: LessonType;
@@ -22,6 +24,7 @@ interface EditLessonFormProps {
 
 export default function EditLesson({
   onSubmit,
+  onCancel,
   isCreation,
   currentValues,
   lessonType,
@@ -31,6 +34,7 @@ export default function EditLesson({
       {lessonType === "THEORY_PDF" && (
         <EditPdfLesson
           onSubmit={onSubmit}
+          onCancel={onCancel}
           currentValues={currentValues}
           isCreation={isCreation}
         />
@@ -39,6 +43,7 @@ export default function EditLesson({
       {lessonType === "THEORY_TEXT" && (
         <EditTextLesson
           onSubmit={onSubmit}
+          onCancel={onCancel}
           currentValues={currentValues}
           isCreation={isCreation}
         />
@@ -47,6 +52,7 @@ export default function EditLesson({
       {lessonType === "THEORY_VIDEO" && (
         <EditVideoLesson
           onSubmit={onSubmit}
+          onCancel={onCancel}
           currentValues={currentValues}
           isCreation={isCreation}
         />
@@ -55,6 +61,7 @@ export default function EditLesson({
       {lessonType === "PRACTICE_TEST" && (
         <EditTestLesson
           onSubmit={onSubmit}
+          onCancel={onCancel}
           currentValues={currentValues}
           isCreation={isCreation}
         />
@@ -63,6 +70,7 @@ export default function EditLesson({
       {lessonType === "PRACTICE_OPEN_ANSWER" && (
         <EditTaskLesson
           onSubmit={onSubmit}
+          onCancel={onCancel}
           currentValues={currentValues}
           isCreation={isCreation}
         />
