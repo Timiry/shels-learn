@@ -1,48 +1,38 @@
-interface User {
-  /// убрать ///
-  email: string;
-  name: string;
-  role: string;
-}
-
-// Вход в систему
-export interface LoginCredentials {
-  email: string;
-  password: string;
-}
-
-export interface LoginResponse {
+export type SetPasswordApiArg = {
   token: string;
-  user: User;
-}
+  setPasswordRequest: SetPasswordRequest;
+};
 
-// Активация аккаунта
-export interface ActivateAccountPayload {
+export type ApiResponse = {
+  message?: string;
+};
+export type SetPasswordRequest = {
+  /** Новый пароль */
   password: string;
-}
-
-export interface ActivateAccountResponse {
-  message: string;
-  // Опционально: можно вернуть данные пользователя для автоматического входа
-  // user?: User;
-  // token?: string;
-}
-
-// Восстановление пароля
-export interface ForgotPasswordPayload {
+};
+export type RecoverPasswordRequest = {
+  /** Email пользователя для восстановления */
   email: string;
-}
-
-export interface ForgotPasswordResponse {
-  message: string;
-}
-
-// Сброс пароля
-export interface ResetPasswordPayload {
+};
+export type LoginResponse = {
+  /** JWT access token */
   token: string;
+  /** ID пользователя */
+  userId: number;
+  /** Email пользователя */
+  email: string;
+  /** Роль пользователя */
+  role: "ADMIN" | "STUDENT";
+};
+export type LoginRequest = {
+  /** Email пользователя */
+  email: string;
+  /** Пароль пользователя */
   password: string;
-}
-
-export interface ResetPasswordResponse {
-  message: string;
-}
+};
+export type ChangePasswordRequest = {
+  /** Текущий пароль */
+  currentPassword: string;
+  /** Новый пароль */
+  newPassword: string;
+};

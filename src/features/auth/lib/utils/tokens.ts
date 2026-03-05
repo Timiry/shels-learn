@@ -23,19 +23,9 @@ export const isTokenValid = (): boolean => {
 export const parseTokenFromUrl = (
   searchParams: URLSearchParams | null
 ): string | null => {
-  // Приоритет: сначала ищем в параметрах, потом в хэше (для email-ссылок)
   const token = searchParams?.get("token");
-
   if (!token || token.length < 10) return null;
 
-  // Базовая валидация формата токена (можно расширить)
-  // const tokenRegex = /^[a-zA-Z0-9_-]{20,}$/;
-  // if (tokenRegex.test(token)) {
-  //   localStorage.setItem("token", token);
-  //   return token;
-  // } else {
-  //   return null;
-  // }
   return token;
 };
 
@@ -46,15 +36,7 @@ export const cleanupAuthParams = () => {
   if (typeof window === "undefined") return;
 
   // Удаляем токены из URL после обработки
-  if (
-    window.location.search.includes("token") ||
-    window.location.hash.includes("token")
-  ) {
-    window.history.replaceState(
-      null,
-      "",
-      window.location.pathname +
-        window.location.hash.replace(/#token=[^&]*/, "")
-    );
+  if (window.location.search.includes("token")) {
+    window.history.replaceState(null, "", window.location.pathname);
   }
 };

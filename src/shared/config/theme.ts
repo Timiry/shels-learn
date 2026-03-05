@@ -26,24 +26,45 @@ const theme = createTheme({
       dark: "#a02d2d",
     },
     background: {
-      default: "#EAF2F7",
+      default: "#ffffff",
       paper: "#ffffff",
     },
   },
   typography: {
+    htmlFontSize: 14,
+    fontSize: 14,
     fontFamily: ["Montserrat", "sans-serif"].join(","),
     h1: {
       fontSize: "2.5rem",
-      fontWeight: 700,
+      fontWeight: 600,
     },
     h2: {
       fontSize: "2rem",
       fontWeight: 600,
     },
     h3: {
-      fontSize: "1.75rem",
+      fontSize: "2rem",
+      fontWeight: 400,
+    },
+    subtitle1: {
+      fontSize: "1.35rem",
+      fontWeight: 300,
+      textTransform: "uppercase",
+    },
+    subtitle2: {
+      fontSize: "0.85rem",
+      fontWeight: 600,
+      textTransform: "uppercase",
+    },
+    body1: {
+      fontSize: "1rem",
       fontWeight: 600,
     },
+    body2: {
+      fontSize: "1rem",
+      fontWeight: 400,
+    },
+    caption: { fontSize: "0.85rem" },
   },
   components: {
     MuiButton: {

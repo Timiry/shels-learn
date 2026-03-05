@@ -1,11 +1,10 @@
 import theme from "@/shared/config/theme";
-import { store } from "@/shared/redux/store";
 import CssBaseline from "@mui/material/CssBaseline";
 import { ThemeProvider } from "@mui/material/styles";
 import type { Metadata } from "next";
 import { Montserrat } from "next/font/google";
-import { Provider } from "react-redux";
 import { ReduxProvider } from "./provider";
+import "./globals.css";
 
 const montserrat = Montserrat({
   subsets: ["cyrillic", "latin"],
@@ -22,12 +21,12 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="ru">
+    <html lang="ru" style={{ fontSize: "14px" }}>
       <body className={`${montserrat.className}`}>
         <ReduxProvider>
           <ThemeProvider theme={theme}>
             <CssBaseline />
-            <main>{children}</main>
+            {children}
           </ThemeProvider>
         </ReduxProvider>
       </body>

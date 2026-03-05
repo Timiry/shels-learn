@@ -7,12 +7,7 @@ import type { PropsWithChildren } from "react";
 
 const FormLayout = (props: PropsWithChildren & BoxProps) => {
   return (
-    <Box
-      width="500px"
-      m="40px auto"
-      position="relative"
-      sx={{ bgcolor: "background.default" }}
-    >
+    <Box width="500px" m="0 auto" position="relative">
       <Paper
         elevation={6}
         sx={{

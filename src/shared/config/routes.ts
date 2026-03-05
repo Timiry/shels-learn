@@ -6,15 +6,30 @@ export const routes = {
     resetPassword: "/reset-password",
   },
   admin: {
-    checking: "/admin/checking",
-    courses: "/admin/courses",
+    checking: {
+      allTasks: "/admin/checking",
+    },
+    courses: {
+      allCourses: "/admin/courses",
+      createCourse: "/admin/courses/create",
+      courseById: (id: string | number) => `/admin/courses/${id}`,
+      editCourseById: (id: string | number) => `/admin/courses/${id}/edit`,
+    },
     groups: "/admin/groups",
     profile: "/admin/profile",
+    editProfile: "/admin/profile/edit",
+    users: {
+      allUsers: "/admin/users",
+      createUser: "/admin/users/create",
+      userById: (id: string | number) => `/admin/users/${id}`,
+      editUserById: (id: string | number) => `/admin/users/${id}/edit`,
+    },
   },
   student: {
     courses: "/student/courses",
     learning: "/student/learning",
     profile: "/student/profile",
+    editProfile: "/student/profile/edit",
     programs: "/student/programs",
   },
 };
