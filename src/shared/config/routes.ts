@@ -17,6 +17,7 @@ export const routes = {
     },
     groups: "/admin/groups",
     profile: "/admin/profile",
+    editProfile: "/admin/profile/edit",
     users: {
       allUsers: "/admin/users",
       createUser: "/admin/users/create",
@@ -28,6 +29,7 @@ export const routes = {
     courses: "/student/courses",
     learning: "/student/learning",
     profile: "/student/profile",
+    editProfile: "/student/profile/edit",
     programs: "/student/programs",
   },
 };

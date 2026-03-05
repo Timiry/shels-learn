@@ -9,10 +9,10 @@ import {
   FormControlLabel,
   Switch,
 } from "@mui/material";
-import type { UserCreateEditInfo, UserDto } from "@/entities/user/model/types";
+import { UpdateUserRequest, UserDto } from "@/entities/user/model/usersApi";
 
 interface EditUserFormProps {
-  onSubmit: (userInfo: UserCreateEditInfo) => void;
+  onSubmit: (userInfo: UpdateUserRequest) => void;
   formId: string;
   isCreation: boolean;
   isAdmin: boolean;
@@ -33,7 +33,7 @@ export default function EditUserForm({
     watch,
     setValue,
     formState: { errors },
-  } = useForm<UserCreateEditInfo>({
+  } = useForm<UpdateUserRequest>({
     defaultValues: isCreation
       ? {
           fullName: "",
@@ -61,12 +61,15 @@ export default function EditUserForm({
     setValue("role", checked ? "ADMIN" : "STUDENT");
   };
 
-  const onSubmitForm = (userInfo: UserCreateEditInfo) => {
+  const onSubmitForm = (userInfo: UpdateUserRequest) => {
     if (userInfo.fullName === "") {
       setError("fullName", { message: "ФИО должно быть заполнено" });
       return;
     }
-    if (!/^[\w-.]+@([\w-]+\.)+[\w-]{2,4}$/.test(userInfo.email)) {
+    if (
+      !userInfo.email ||
+      !/^[\w-.]+@([\w-]+\.)+[\w-]{2,4}$/.test(userInfo.email)
+    ) {
       setError("email", { message: "Невалидная почта" });
       return;
     }
@@ -109,6 +112,7 @@ export default function EditUserForm({
               checked={role === "ADMIN"}
               onChange={(e) => handleAdminToggle(e.target.checked)}
               color="primary"
+              disabled={!isAdmin}
             />
           }
           label={

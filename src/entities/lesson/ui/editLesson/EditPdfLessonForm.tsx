@@ -91,9 +91,9 @@ export default function EditPdfLessonForm({
       // Загружаем файл на сервер
       const result = await uploadFile({ file }).unwrap();
 
-      if (result.path) {
-        setPdfUrl(result.path);
-        setValue("content", result.path);
+      if (result.link) {
+        setPdfUrl(result.link);
+        setValue("content", result.link);
         setUploadError(null);
       } else {
         throw new Error("Не получен путь к файлу");

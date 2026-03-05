@@ -16,64 +16,7 @@ import { useGetAllCoursesQuery } from "@/entities/course/model/coursesApi";
 
 export default function CoursesPage() {
   const router = useRouter();
-  // const { currentData: courses } = useGetAllCoursesQuery();
-  // мок:
-  const courses: CourseSummaryDto[] = [
-    {
-      id: 1,
-      title: "Основы программирования на JavaScript",
-      description:
-        "Изучите основы программирования на JavaScript: синтаксис, структуры данных, объектно-ориентированное программирование и современные фреймворки.",
-      coverFilePath: "/cover.png",
-      theoryLessonsCount: 1,
-      practiceLessonsCount: 2,
-    },
-    {
-      id: 2,
-      title: "Проектирование пользовательских интерфейсов",
-      description:
-        "Освойте принципы создания удобных и эстетичных пользовательских интерфейсов.",
-      coverFilePath: "/cover.png",
-      theoryLessonsCount: 1,
-      practiceLessonsCount: 2,
-    },
-    {
-      id: 3,
-      title: "Управление проектами по методологии Agile",
-      description:
-        "Изучите методологию Agile и её применение в управлении проектами. Освойте техники планирования, оценки и контроля проектов. Изучите методологию Agile и её применение в управлении проектами. Освойте техники планирования, оценки и контроля проектов.",
-      coverFilePath: "/cover.png",
-      theoryLessonsCount: 1,
-      practiceLessonsCount: 2,
-    },
-    {
-      id: 4,
-      title: "Машинное обучение для начинающих",
-      description:
-        "Основы машинного обучения: алгоритмы, модели, инструменты и практика. Изучите, как создавать и обучать модели машинного обучения.",
-      coverFilePath: "/cover.png",
-      theoryLessonsCount: 1,
-      practiceLessonsCount: 2,
-    },
-    {
-      id: 5,
-      title: "Цифровой маркетинг: от теории к практике",
-      description:
-        "Изучите современные методы цифрового маркетинга: SEO, контекстная реклама, социальные сети, email-маркетинг и анализ данных.",
-      coverFilePath: "/cover.png",
-      theoryLessonsCount: 1,
-      practiceLessonsCount: 2,
-    },
-    {
-      id: 6,
-      title: "Финансовая грамотность для начинающих",
-      description:
-        "Освойте основы личных финансов: бюджетирование, инвестирование, кредиты, сбережения и планирование финансового будущего.",
-      coverFilePath: "/cover.png",
-      theoryLessonsCount: 1,
-      practiceLessonsCount: 2,
-    },
-  ];
+  const { currentData: courses } = useGetAllCoursesQuery();
 
   return (
     <Box>

@@ -20,7 +20,7 @@ export type UploadApiArg = {
   file: File;
 };
 export type FileUploadResponse = {
-  path?: string;
+  link?: string;
 };
 export type ApiResponse = {
   message?: string;

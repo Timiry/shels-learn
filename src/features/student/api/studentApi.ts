@@ -11,11 +11,16 @@ const injectedRtkApi = api.injectEndpoints({
       UploadMyAvatarApiResponse,
       UploadMyAvatarApiArg
     >({
-      query: (queryArg) => ({
-        url: `/api/v1/student/my/avatar`,
-        method: "POST",
-        body: queryArg,
-      }),
+      query: (queryArg) => {
+        const formData = new FormData();
+        formData.append("file", queryArg.file);
+        return {
+          url: `/api/v1/student/my/avatar`,
+          method: "POST",
+          body: formData,
+        };
+      },
+      invalidatesTags: ["Profile"],
     }),
     submitPractice: build.mutation<
       SubmitPracticeApiResponse,
@@ -29,6 +34,7 @@ const injectedRtkApi = api.injectEndpoints({
     }),
     myProfile: build.query<MyProfileApiResponse, MyProfileApiArg>({
       query: () => ({ url: `/api/v1/student/my/profile` }),
+      providesTags: ["Profile"],
     }),
     updateMyProfile: build.mutation<
       UpdateMyProfileApiResponse,
@@ -39,6 +45,7 @@ const injectedRtkApi = api.injectEndpoints({
         method: "PATCH",
         body: queryArg,
       }),
+      invalidatesTags: ["Profile"],
     }),
     myStats: build.query<MyStatsApiResponse, MyStatsApiArg>({
       query: () => ({ url: `/api/v1/student/my/stats` }),
@@ -74,7 +81,7 @@ export type UpdateMyLastVisitApiArg = void;
 export type UploadMyAvatarApiResponse =
   /** status 200 Аватар обновлен */ UserDto;
 export type UploadMyAvatarApiArg = {
-  file: Blob;
+  file: File;
 };
 export type SubmitPracticeApiResponse =
   /** status 200 Ответы отправлены */ SubmissionResultDto;
@@ -89,7 +96,7 @@ export type UpdateMyProfileApiResponse =
   /** status 200 Профиль обновлён */ StudentProfileDto;
 export type UpdateMyProfileApiArg = UpdateMyProfileRequest;
 export type MyStatsApiResponse =
-  /** status 200 Личная статистика */ StudentCourseStatDto;
+  /** status 200 Личная статистика */ StudentCourseStatDto[];
 export type MyStatsApiArg = void;
 export type MyProgramsApiResponse = unknown;
 export type MyProgramsApiArg = void;

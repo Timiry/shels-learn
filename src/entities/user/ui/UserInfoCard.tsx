@@ -1,5 +1,5 @@
-import { UserDto } from "../model/types";
 import { Avatar, Button, Stack, Typography } from "@mui/material";
+import { UserDto } from "../model/usersApi";
 
 export default function UserInfoCard({
   user,
@@ -18,7 +18,7 @@ export default function UserInfoCard({
     >
       <Avatar
         sx={{ width: 140, height: 140, m: "14px" }}
-        src={user.avatarUrl}
+        src={user.avatarFilePath}
       />
       <Typography variant="subtitle2" color="text.secondary">
         {user.role === "ADMIN" ? "АДМИНИСТРАТОР" : "СТУДЕНТ"}

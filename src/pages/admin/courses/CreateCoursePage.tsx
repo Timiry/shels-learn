@@ -17,14 +17,6 @@ export default function CreateCoursePage() {
   const formId = "course-create-form";
   const [uploadImage] = useUploadMutation();
   const [createCourse] = useCreateCourseMutation();
-  // мок:
-  // const createCourse = (courseInfo: CreateCourseRequest): CourseDto => ({
-  //   courseId: 1,
-  //   title: "Основы программирования на JavaScript",
-  //   discription:
-  //     "Изучите основы программирования на JavaScript: синтаксис, структуры данных, объектно-ориентированное программирование и современные фреймворки.",
-  //   coverUrl: "/cover.png",
-  // });
 
   return (
     <Box>
@@ -60,8 +52,8 @@ export default function CreateCoursePage() {
                   file: photo,
                 }).unwrap();
                 course = await createCourse({
-                  coverFilePath: cover.path,
                   ...courseInfo,
+                  coverFilePath: cover.link,
                 }).unwrap();
               }
               router.push(routes.admin.courses.courseById(course.id));

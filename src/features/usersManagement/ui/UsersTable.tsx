@@ -7,13 +7,13 @@ import {
   GridRowSelectionModel,
 } from "@mui/x-data-grid/models";
 import Paper from "@mui/material/Paper";
-import { UserDto } from "@/entities/user/model/types";
 import { useState } from "react";
 import Box from "@mui/material/Box";
 import { Button, Stack, Typography } from "@mui/material";
 import { useRouter } from "next/navigation";
 import { routes } from "@/shared/config/routes";
 import usersTableColumns from "../model/usersTableColumns";
+import { UserDto } from "@/entities/user/model/usersApi";
 
 const makeUsersRows = (users: UserDto[]) =>
   users.map((user) => ({

@@ -2,17 +2,31 @@ module.exports = {
   schemaFile: "./api-docs.json", // Путь к вашему OpenAPI JSON
   apiFile: "./src/shared/api/baseApi.ts",
   apiImport: "baseApi",
-  outputFile: "./src/features/auth/api/authApi.ts",
-  exportName: "authApi",
+  outputFile: "./src/entities/user/model/usersApi.ts",
+  exportName: "usersApi",
   hooks: true, // Генерировать хуки (useGetUserQuery и т.д.)
   // tag: true, // Автоматические теги для кэширования
   flattenArg: true, // Упростить аргументы запросов
   // Дополнительно:
   filterEndpoints: [
-    "setPassword",
-    "recoverPassword",
-    "login",
-    "changePassword",
+    "getUser",
+    "updateUser",
+    "deleteUser",
+    "updateGroup",
+    "deleteGroup",
+    "getUsers",
+    "createUser",
+    "deleteUsers",
+    "importUsersCsv",
+    "setUsersActivation",
+    "groups",
+    "createGroup",
+    "addUserToGroup",
+    "removeUsersFromGroup",
+    "getUserStats",
+    "exportUsersCsv",
+    "groupUsersById",
+    "groupUsersByTitle",
   ], // Фильтрация эндпоинтов
   // endpointOverrides: [...] // Кастомизация отдельных методов
 };

@@ -15,54 +15,8 @@ export default function CourseInfoPage() {
   const router = useRouter();
   const params = useParams();
   const courseId = params?.id as string;
-  // const { currentData: courseInfo } = useGetCourseQuery(+courseId);
-  // мок:
-  const courseInfo: CourseAdminDetailsDto = {
-    course: {
-      id: 1,
-      title: "Основы программирования на JavaScript",
-      description:
-        "Изучите основы программирования на JavaScript: синтаксис, структуры данных, объектно-ориентированное программирование и современные фреймворки.",
-      coverFilePath: "/cover.png",
-    },
-    lessons: [
-      {
-        title: "Текст",
-        id: 0,
-        courseId: 0,
-        position: 0,
-        lessonType: "THEORY_TEXT",
-      },
-      {
-        title: "PDF",
-        id: 1,
-        courseId: 0,
-        position: 1,
-        lessonType: "THEORY_PDF",
-      },
-      {
-        title: "Видео",
-        id: 2,
-        courseId: 0,
-        position: 2,
-        lessonType: "THEORY_VIDEO",
-      },
-      {
-        title: "Тест",
-        id: 3,
-        courseId: 0,
-        position: 3,
-        lessonType: "PRACTICE_TEST",
-      },
-      {
-        title: "Задание",
-        id: 4,
-        courseId: 0,
-        position: 4,
-        lessonType: "PRACTICE_OPEN_ANSWER",
-      },
-    ],
-  };
+  const { currentData: courseInfo } = useGetCourseQuery(+courseId);
+
   const [activeTab, setActiveTab] = useState("description");
 
   return (
@@ -71,9 +25,9 @@ export default function CourseInfoPage() {
         <Box>
           <Typography variant="caption" color="secondary">
             Курсы{" > "}
-            {courseInfo.course.title}
+            {courseInfo?.course.title}
           </Typography>
-          <Typography variant="h1">{courseInfo.course.title}</Typography>
+          <Typography variant="h1">{courseInfo?.course.title}</Typography>
         </Box>
         <Tooltip arrow title={"Редактировать курс"}>
           <IconButton
@@ -94,7 +48,7 @@ export default function CourseInfoPage() {
         activeTab={activeTab}
         onTabChange={setActiveTab}
       >
-        {activeTab === "description" && (
+        {activeTab === "description" && courseInfo && (
           <CourseContent courseInfo={courseInfo} />
         )}
         {activeTab === "reviewers" && <Box></Box>}

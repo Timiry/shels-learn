@@ -12,11 +12,7 @@ import { Box, Typography, Stack, Button } from "@mui/material";
 import EditCourseForm from "./EditCourseForm";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import {
-  FileUploadResponse,
-  UploadApiArg,
-  useUploadMutation,
-} from "@/shared/api/filesApi";
+import { useUploadMutation } from "@/shared/api/filesApi";
 
 interface EditCourseInfoProps {
   courseInfo: CourseDto;
@@ -63,8 +59,8 @@ export default function EditCourseInfo({
               await onUpdate({
                 courseId: courseInfo.id,
                 createCourseRequest: {
-                  coverFilePath: cover.path,
                   ...course,
+                  coverFilePath: cover.link,
                 },
               });
             } else {
