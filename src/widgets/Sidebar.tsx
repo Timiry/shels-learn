@@ -20,13 +20,13 @@ import {
   Menu,
   MenuItem,
   IconButton,
-  Divider,
   Typography,
 } from "@mui/material";
 
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useState } from "react";
 import { routes } from "@/shared/config/routes";
+import { useMyProfileQuery } from "@/features/student/api/studentApi";
 
 interface NavigationItem {
   id: string;
@@ -42,11 +42,9 @@ export default function Sidebar() {
   const router = useRouter();
   const pathname = usePathname();
 
-  // Получаем глобальную роль из localStorage
-  const globalRole =
-    typeof window !== "undefined"
-      ? localStorage.getItem("userRole")
-      : "STUDENT";
+  const { currentData: myProfile } = useMyProfileQuery();
+
+  const globalRole = myProfile?.user.role;
   const activeRole = pathname?.includes("admin") ? "ADMIN" : "STUDENT";
 
   // Определяем, какие разделы показывать
@@ -121,15 +119,12 @@ export default function Sidebar() {
       <Box sx={{ pt: 2, textAlign: "center" }}>
         <IconButton onClick={handleAvatarClick} sx={{ p: 0 }}>
           <Avatar
+            src={myProfile?.user.avatarFilePath}
             sx={{
               width: 40,
               height: 40,
-              // bgcolor: "primary.light",
-              // color: "primary.main",
             }}
-          >
-            {/* //TODO: добавить аватар */}
-          </Avatar>
+          ></Avatar>
         </IconButton>
       </Box>
 
@@ -153,21 +148,26 @@ export default function Sidebar() {
         onClose={handleMenuClose}
         anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
         transformOrigin={{ vertical: "top", horizontal: "right" }}
-        sx={{ minWidth: 200 }}
+        sx={{ minWidth: 250 }}
       >
+        <MenuItem>
+          <Typography variant="subtitle2">
+            {myProfile?.user.fullName}
+          </Typography>
+        </MenuItem>
         <MenuItem onClick={() => handleMenuClick(routes.admin.profile)}>
           <AccountCircleOutlinedIcon sx={{ mr: 1.5 }} />
-          <Typography variant="body2">Профиль</Typography>
+          <Typography variant="body2">Перейти в профиль</Typography>
         </MenuItem>
         <MenuItem
           onClick={() => handleMenuClick(routes.admin.courses.allCourses)}
         >
           <SettingsOutlinedIcon sx={{ mr: 1.5 }} />
-          <Typography variant="body2">Администратор</Typography>
+          <Typography variant="body2">Войти как администратор</Typography>
         </MenuItem>
         <MenuItem onClick={() => handleMenuClick(routes.student.learning)}>
           <SchoolOutlinedIcon sx={{ mr: 1.5 }} />
-          <Typography variant="body2">Студент</Typography>
+          <Typography variant="body2">Войти как студент</Typography>
         </MenuItem>
       </Menu>
       {/* Навигация */}
@@ -197,7 +197,6 @@ export default function Sidebar() {
               <ListItemIcon
                 sx={{
                   minWidth: 0,
-                  // mr: 3,
                   justifyContent: "center",
                   color: isActive(item.path)
                     ? "primary.main"
