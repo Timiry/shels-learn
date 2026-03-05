@@ -17,7 +17,6 @@ import {
 import NextLink from "next/link";
 import Image from "next/image";
 import { Visibility, VisibilityOff } from "@mui/icons-material";
-import { useLoginMutation } from "../api/authApi";
 import { loginSchema } from "../lib/validation/loginSchema";
 import FormLayout from "@/shared/ui/FormLayout";
 import { routes } from "@/shared/config/routes";
@@ -44,8 +43,6 @@ export function LoginForm({ onSubmit, isLoading = false }: LoginFormProps) {
       password: "",
     },
   });
-
-  const [login] = useLoginMutation();
 
   const onSubmitForm = async (data: LoginFormValues) => {
     onSubmit(data.email, data.password);

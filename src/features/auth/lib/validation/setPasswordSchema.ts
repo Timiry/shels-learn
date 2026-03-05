@@ -1,6 +1,6 @@
 import * as z from "zod";
 
-export const activateAccountSchema = z
+export const setPasswordSchema = z
   .object({
     password: z
       .string()

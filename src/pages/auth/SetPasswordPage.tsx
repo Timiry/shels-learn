@@ -5,15 +5,15 @@ import {
   parseTokenFromUrl,
   cleanupAuthParams,
 } from "@/features/auth/lib/utils/tokens";
-import { ActivateAccountForm } from "@/features/auth/ui/ActivateAccountForm";
-import { useActivateAccountMutation } from "@/features/auth/api/authApi";
+import { SetPasswordForm } from "@/features/auth/ui/SetPasswordForm";
+import { useSetPasswordMutation } from "@/features/auth/model/authApi";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 import { routes } from "@/shared/config/routes";
-export default function ActivateAccountPage() {
+export default function SetPasswordPage() {
   const searchParams = useSearchParams();
   const router = useRouter();
-  const [activateAccount, { isLoading }] = useActivateAccountMutation();
+  const [setPassword, { isLoading }] = useSetPasswordMutation();
 
   const token = parseTokenFromUrl(searchParams);
 
@@ -28,13 +28,13 @@ export default function ActivateAccountPage() {
     if (!token) return;
 
     try {
-      await activateAccount({ password }).unwrap();
+      await setPassword({ token, setPasswordRequest: { password } }).unwrap();
       router.push(routes.auth.login);
     } catch (err) {
-      console.error("Ошибка активации:", err);
-      alert("Ошибка активации");
+      console.error("Ошибка установления пароля:", err);
+      alert("Ошибка установления пароля");
     }
   };
 
-  return <ActivateAccountForm onSubmit={handleSubmit} isLoading={isLoading} />;
+  return <SetPasswordForm onSubmit={handleSubmit} isLoading={isLoading} />;
 }

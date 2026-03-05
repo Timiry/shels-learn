@@ -13,22 +13,22 @@ import {
   IconButton,
 } from "@mui/material/";
 import { Visibility, VisibilityOff } from "@mui/icons-material";
-import { activateAccountSchema } from "../lib/validation/activateAccountSchema";
+import { setPasswordSchema } from "../lib/validation/setPasswordSchema";
 import z from "zod";
 import Image from "next/image";
 import FormLayout from "@/shared/ui/FormLayout";
 
-type ActivateAccountFormData = z.infer<typeof activateAccountSchema>;
+type SetPasswordFormData = z.infer<typeof setPasswordSchema>;
 
-interface ActivateAccountFormProps {
+interface SetPasswordFormProps {
   onSubmit: (password: string) => void;
   isLoading?: boolean;
 }
 
-export function ActivateAccountForm({
+export function SetPasswordForm({
   onSubmit,
   isLoading = false,
-}: ActivateAccountFormProps) {
+}: SetPasswordFormProps) {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
@@ -36,15 +36,15 @@ export function ActivateAccountForm({
     register,
     handleSubmit,
     formState: { errors },
-  } = useForm<ActivateAccountFormData>({
-    resolver: zodResolver(activateAccountSchema),
+  } = useForm<SetPasswordFormData>({
+    resolver: zodResolver(setPasswordSchema),
     defaultValues: {
       password: "",
       confirmPassword: "",
     },
   });
 
-  const onSubmitForm = async (data: ActivateAccountFormData) => {
+  const onSubmitForm = async (data: SetPasswordFormData) => {
     onSubmit(data.password);
   };
 
@@ -53,11 +53,8 @@ export function ActivateAccountForm({
       <Stack spacing={2}>
         <Box sx={{ textAlign: "center", mb: 4 }}>
           <Image src="/logo.png" alt="Shels logo" width={115} height={85} />
-          <Typography variant="h3" component="h1" mt={3} mb={1}>
-            Добро пожаловать!
-          </Typography>
-          <Typography variant="body1" mb={4}>
-            Для активации учетной записи укажите пароль
+          <Typography variant="h6" my={4}>
+            Для доступа к учетной записи установите пароль
           </Typography>
         </Box>
 
@@ -110,7 +107,7 @@ export function ActivateAccountForm({
           {isLoading ? (
             <CircularProgress size={24} color="inherit" />
           ) : (
-            "Активировать"
+            "Установить пароль"
           )}
         </Button>
       </Stack>
