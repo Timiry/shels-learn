@@ -30,9 +30,9 @@ export default function SetPasswordPage() {
     try {
       await setPassword({ token, setPasswordRequest: { password } }).unwrap();
       router.push(routes.auth.login);
-    } catch (err) {
+    } catch (err: any) {
       console.error("Ошибка установления пароля:", err);
-      alert("Ошибка установления пароля");
+      alert(`Ошибка установления пароля: ${err?.data?.message}`);
     }
   };
 

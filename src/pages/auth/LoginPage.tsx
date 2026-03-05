@@ -17,9 +17,9 @@ export default function LoginPage() {
       } else {
         router.push(routes.student.learning);
       }
-    } catch (err) {
-      alert("Ошибка авторизации");
+    } catch (err: any) {
       console.error("Ошибка авторизации:", err);
+      alert(`Ошибка авторизации: ${err?.data?.message}`);
     }
   };
 

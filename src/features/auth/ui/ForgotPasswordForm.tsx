@@ -53,7 +53,8 @@ export function ForgotPasswordForm({
             Восстановление доступа
           </Typography>
           <Typography variant="body2" mb={4}>
-            Введите адрес электронной почты, указанной при регистрации в системе
+            Введите адрес электронной почты, указанной при регистрации в
+            системе. На эту почту вам придет ссылка для смены пароля.
           </Typography>
         </Box>
 
@@ -77,7 +78,7 @@ export function ForgotPasswordForm({
           {isLoading ? (
             <CircularProgress size={24} color="inherit" />
           ) : (
-            "Восстановить"
+            "Получить ссылку"
           )}
         </Button>
         <Link

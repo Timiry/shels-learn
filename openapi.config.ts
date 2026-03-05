@@ -2,18 +2,17 @@ module.exports = {
   schemaFile: "./api-docs.json", // Путь к вашему OpenAPI JSON
   apiFile: "./src/shared/api/baseApi.ts",
   apiImport: "baseApi",
-  outputFile: "./src/shared/api/CoursesApi.ts",
-  exportName: "coursesApi",
+  outputFile: "./src/features/auth/api/authApi.ts",
+  exportName: "authApi",
   hooks: true, // Генерировать хуки (useGetUserQuery и т.д.)
   // tag: true, // Автоматические теги для кэширования
   flattenArg: true, // Упростить аргументы запросов
   // Дополнительно:
   filterEndpoints: [
-    "getCourseReviewers",
-    "assignReviewer",
-    "unassignReviewer",
-    "getEnrollmentLists",
-    "assignStudent",
+    "setPassword",
+    "recoverPassword",
+    "login",
+    "changePassword",
   ], // Фильтрация эндпоинтов
   // endpointOverrides: [...] // Кастомизация отдельных методов
 };

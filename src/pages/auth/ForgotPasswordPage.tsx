@@ -9,9 +9,9 @@ export default function ForgotPasswordPage() {
   const handleSubmit = async (email: string) => {
     try {
       await recoverPassword({ email });
-    } catch (err) {
-      alert("Ошибка смены пароля");
+    } catch (err: any) {
       console.error("Ошибка смены пароля:", err);
+      alert(`Ошибка смены пароля: ${err?.data?.message}`);
     }
   };
 
