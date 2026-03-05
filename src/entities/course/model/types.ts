@@ -163,6 +163,14 @@ export type ProgramCourseSettingsRequest = {
 export type CourseSummaryDto = {
   id: number;
   title: string;
+  description: string;
+  ptiority: number;
+  courses: CourseMiniInfo[];
+};
+
+export type CourseMiniInfo = {
+  id: number;
+  title: string;
   description?: string;
   coverFilePath?: string;
   sectionId?: number;

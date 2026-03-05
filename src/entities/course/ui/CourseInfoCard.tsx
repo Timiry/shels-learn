@@ -1,6 +1,6 @@
 "use client";
 
-import { CourseDto, CourseSummaryDto } from "../model/types";
+import { CourseDto, CourseMiniInfo } from "../model/types";
 import Card from "@mui/material/Card";
 import CardContent from "@mui/material/CardContent";
 import CardMedia from "@mui/material/CardMedia";
@@ -13,7 +13,7 @@ import { Divider } from "@mui/material";
 export default function CourseInfoCard({
   courseInfo,
 }: {
-  courseInfo: CourseSummaryDto;
+  courseInfo: CourseMiniInfo;
 }) {
   const router = useRouter();
 
@@ -27,7 +27,7 @@ export default function CourseInfoCard({
         <CardMedia
           component="img"
           height="140"
-          image={courseInfo.coverFilePath} //TODO: добавить филлерное изображение
+          image={courseInfo.coverFilePath || "/coverFiller.png"}
           alt={courseInfo.title}
         />
         <CardContent>

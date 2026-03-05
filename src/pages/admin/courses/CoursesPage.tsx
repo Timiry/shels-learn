@@ -9,9 +9,7 @@ import BookmarkAddOutlinedIcon from "@mui/icons-material/BookmarkAddOutlined";
 
 import { useRouter } from "next/navigation";
 import { routes } from "@/shared/config/routes";
-import { CourseSummaryDto } from "@/entities/course/model/types";
 import CourseInfoCard from "@/entities/course/ui/CourseInfoCard";
-import { Stack } from "@mui/material";
 import { useGetAllCoursesQuery } from "@/entities/course/model/coursesApi";
 
 export default function CoursesPage() {
@@ -47,9 +45,10 @@ export default function CoursesPage() {
           p: 2,
         }}
       >
-        {courses?.map((course) => (
-          <CourseInfoCard courseInfo={course} key={course.id} />
-        ))}
+        {courses &&
+          courses[0].courses.map((course) => (
+            <CourseInfoCard courseInfo={course} key={course.id} />
+          ))}
       </Box>
     </Box>
   );
