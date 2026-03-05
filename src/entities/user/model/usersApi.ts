@@ -189,7 +189,7 @@ export type RemoveUsersFromGroupApiArg = {
   groupUsersRequest: GroupUsersRequest;
 };
 export type GetUserStatsApiResponse =
-  /** status 200 Статистика пользователя */ StudentCourseStatDto;
+  /** status 200 Статистика пользователя */ StudentCourseStatDto[];
 export type GetUserStatsApiArg = number;
 export type ExportUsersCsvApiResponse = unknown;
 export type ExportUsersCsvApiArg = void;
