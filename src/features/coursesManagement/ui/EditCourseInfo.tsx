@@ -39,7 +39,13 @@ export default function EditCourseInfo({
           Обложка
         </Typography>
         <ImageUpload
-          value={photo === null ? courseInfo.coverFilePath : photo}
+          value={
+            photo === null
+              ? courseInfo.coverFilePath
+                ? process.env.NEXT_PUBLIC_API_URL + courseInfo.coverFilePath
+                : courseInfo.coverFilePath
+              : photo
+          }
           onChange={(file: File) => {
             setPhoto(file);
             setPhotoWasChange(true);
@@ -56,7 +62,7 @@ export default function EditCourseInfo({
               const cover = await uploadImage({
                 file: photo,
               }).unwrap();
-              await onUpdate({
+              onUpdate({
                 courseId: courseInfo.id,
                 createCourseRequest: {
                   ...course,

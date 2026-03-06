@@ -1,13 +1,12 @@
 "use client";
 
-import { UpdateUserRequest } from "@/entities/user/model/usersApi";
 import {
   UpdateMyProfileRequest,
   useMyProfileQuery,
   useUpdateMyProfileMutation,
-  useUploadMyAvatarMutation,
 } from "@/features/student/api/studentApi";
 import EditUserForm from "@/features/usersManagement/ui/EditUserForm";
+import { useUploadMutation } from "@/shared/api/filesApi";
 import { routes } from "@/shared/config/routes";
 import ConfirmDeleteModal from "@/shared/ui/ConfirmDeleteModal";
 import HeaderBox from "@/shared/ui/HeaderBox";
@@ -28,7 +27,7 @@ export default function EditProfilePage() {
   const { currentData: profileInfo } = useMyProfileQuery();
 
   const [updateProfile] = useUpdateMyProfileMutation();
-  const [uploadImage] = useUploadMyAvatarMutation();
+  const [uploadImage] = useUploadMutation();
 
   return (
     profileInfo && (
@@ -47,7 +46,14 @@ export default function EditProfilePage() {
               Фотография
             </Typography>
             <ImageUpload
-              value={photo === null ? profileInfo.user.avatarFilePath : photo}
+              value={
+                photo === null
+                  ? profileInfo.user.avatarFilePath
+                    ? process.env.NEXT_PUBLIC_API_URL +
+                      profileInfo.user.avatarFilePath
+                    : profileInfo.user.avatarFilePath
+                  : photo
+              }
               onChange={(file: File) => {
                 setPhoto(file);
                 setPhotoWasChange(true);
@@ -58,13 +64,17 @@ export default function EditProfilePage() {
           </Box>
           <Box pl={"50px"} flex={1}>
             <EditUserForm
-              onSubmit={async (userInfo: UpdateUserRequest) => {
-                await updateProfile(userInfo);
+              onSubmit={async (userInfo: UpdateMyProfileRequest) => {
                 if (photoWasChange && photo) {
-                  await uploadImage({
+                  const avatar = await uploadImage({
                     file: photo,
+                  }).unwrap();
+                  updateProfile({
+                    ...userInfo,
+                    avatarFilePath: avatar.link,
                   });
-                }
+                } else await updateProfile(userInfo);
+
                 router.push(
                   activeRole === "ADMIN"
                     ? routes.admin.profile

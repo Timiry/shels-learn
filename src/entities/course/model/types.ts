@@ -67,20 +67,20 @@ export type CourseDto = {
   sectionPriority?: number;
 };
 export type PracticeQuestionDto = {
-  id?: number;
+  id: number;
   index?: number;
-  questionType?:
+  questionType:
     | "SINGLE_CHOICE"
     | "MULTIPLE_CHOICE"
     | "MATCHING"
     | "ORDERING"
     | "OPEN_ANSWER";
-  questionText?: string;
+  questionText: string;
   trainerHint?: string;
-  options?: string[];
-  correctAnswers?: string[];
-  fullPoints?: number;
-  partialPoints?: number;
+  options: string[];
+  correctAnswers: string[];
+  fullPoints: number;
+  partialPoints: number;
 };
 export type LessonDto = {
   id: number;
@@ -95,7 +95,7 @@ export type LessonDto = {
   lessonType: LessonType;
   theoryContentType?: "HTML_TEXT" | "VIDEO_URL" | "PDF_FILE";
   theoryContent?: string;
-  fullPoints?: number;
+  fullPoints: number;
   partialPoints?: number;
   passingThresholdPercent?: number;
   evaluateByCorrectCount?: boolean;
@@ -194,7 +194,7 @@ export type CreateTheoryLessonRequest = {
   timeLimitMinutes?: number;
   contentType: "HTML_TEXT" | "VIDEO_URL" | "PDF_FILE";
   content: string;
-  fullPoints?: number;
+  fullPoints: number;
   questionIdToPosition?: {
     [key: string]: number;
   };

@@ -11,9 +11,11 @@ import {
   Paper,
   CircularProgress,
   Alert,
+  IconButton,
 } from "@mui/material";
 import FileIcon from "@mui/icons-material/DescriptionOutlined";
 import DownloadIcon from "@mui/icons-material/FileDownloadOutlined";
+import DeleteIcon from "@mui/icons-material/Delete";
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
 import { useState } from "react";
@@ -24,7 +26,6 @@ interface EditLessonFormProps {
     lessonInfo: CreateTheoryLessonRequest | CreatePracticeLessonRequest
   ) => void;
   onCancel: () => void;
-
   currentValues?: LessonDto;
   isCreation: boolean;
 }
@@ -35,12 +36,12 @@ export default function EditPdfLessonForm({
   currentValues,
   isCreation,
 }: EditLessonFormProps) {
-  const [pdfFile, setPdfFile] = useState<File | null>(null);
-  const [pdfUrl, setPdfUrl] = useState<string | null>(
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [existingPdfUrl, setExistingPdfUrl] = useState<string | null>(
     currentValues?.theoryContent || null
   );
-  const [isUploading, setIsUploading] = useState(false);
-  const [uploadError, setUploadError] = useState<string | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState<string | null>(null);
 
   const [uploadFile] = useUploadMutation();
 
@@ -48,6 +49,7 @@ export default function EditPdfLessonForm({
     register,
     handleSubmit,
     setValue,
+    watch,
     formState: { errors },
   } = useForm<CreateTheoryLessonRequest>({
     defaultValues: isCreation
@@ -65,76 +67,104 @@ export default function EditPdfLessonForm({
         },
   });
 
-  const handleFileChange = async (
-    event: React.ChangeEvent<HTMLInputElement>
-  ) => {
+  const title = watch("title");
+  const fullPoints = watch("fullPoints");
+
+  // Обработчик выбора файла (только сохраняем в состояние, не загружаем)
+  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (!file) return;
 
     // Валидация типа файла
     if (file.type !== "application/pdf") {
-      setUploadError("Пожалуйста, выберите файл в формате PDF");
+      setSubmitError("Пожалуйста, выберите файл в формате PDF");
       return;
     }
 
     // Валидация размера файла (максимум 20 МБ)
     if (file.size > 20 * 1024 * 1024) {
-      setUploadError("Размер файла не должен превышать 20 МБ");
+      setSubmitError("Размер файла не должен превышать 20 МБ");
       return;
     }
 
-    setUploadError(null);
-    setPdfFile(file);
-    setIsUploading(true);
+    setSubmitError(null);
+    setSelectedFile(file);
+    // Сбрасываем поле ввода для возможности повторной загрузки того же файла
+    event.target.value = "";
+  };
+
+  // Обработчик удаления существующего файла (только при редактировании)
+  const handleRemoveExistingFile = () => {
+    setExistingPdfUrl(null);
+    setSelectedFile(null);
+    setValue("content", "");
+  };
+
+  // Обработчик сабмита формы
+  const onSubmitForm = async (lessonInfo: CreateTheoryLessonRequest) => {
+    setIsSubmitting(true);
+    setSubmitError(null);
 
     try {
-      // Загружаем файл на сервер
-      const result = await uploadFile({ file }).unwrap();
-
-      if (result.link) {
-        setPdfUrl(result.link);
-        setValue("content", result.link);
-        setUploadError(null);
-      } else {
-        throw new Error("Не получен путь к файлу");
+      // Проверка обязательных полей
+      if (!lessonInfo.title.trim()) {
+        setSubmitError("Название урока обязательно");
+        return;
       }
+
+      if (lessonInfo?.fullPoints <= 0) {
+        setSubmitError("Баллы за прохождение должны быть больше 0");
+        return;
+      }
+
+      let fileUrl = existingPdfUrl || "";
+
+      if (!fileUrl && isCreation) {
+        setSubmitError("Пожалуйста, загрузите PDF файл");
+        return;
+      }
+
+      // Если выбран новый файл - загружаем его
+      if (selectedFile) {
+        const uploadResult = await uploadFile({ file: selectedFile }).unwrap();
+
+        if (!uploadResult.link) {
+          throw new Error("Не получен путь к файлу");
+        }
+
+        fileUrl = uploadResult.link;
+      }
+
+      // Отправляем данные формы с ссылкой на файл
+      onSubmit({
+        ...lessonInfo,
+        content: fileUrl,
+        contentType: "PDF_FILE",
+      });
+      setIsSubmitting(false);
     } catch (err) {
-      console.error("Ошибка загрузки PDF:", err);
-      setUploadError(
+      console.error("Ошибка при сохранении урока:", err);
+      setSubmitError(
         (err as any)?.data?.message ||
-          "Ошибка загрузки файла. Попробуйте еще раз."
+          "Ошибка при сохранении урока. Попробуйте еще раз."
       );
-    } finally {
-      setIsUploading(false);
-      // Сбрасываем поле ввода для возможности повторной загрузки того же файла
-      event.target.value = "";
     }
   };
 
-  const onSubmitForm = (lessonInfo: CreateTheoryLessonRequest) => {
-    if (!lessonInfo.title.trim()) {
-      setValue("title", lessonInfo.title.trim(), { shouldValidate: true });
-      return;
-    }
-    if (!pdfUrl) {
-      setUploadError("Пожалуйста, загрузите PDF файл");
-      return;
-    }
-
-    onSubmit({
-      ...lessonInfo,
-      content: pdfUrl,
-    });
-  };
+  // Определяем текущее состояние файла
+  const hasExistingFile = !!existingPdfUrl && !selectedFile;
+  const hasNewFile = !!selectedFile;
+  const isFileRequired = isCreation && !hasExistingFile && !hasNewFile;
 
   return (
     <Box component="form" onSubmit={handleSubmit(onSubmitForm)}>
       <Stack spacing={3}>
-        {uploadError && (
+        {submitError && (
           <Alert severity="error" sx={{ mb: 2 }}>
-            {uploadError}
+            {submitError}
           </Alert>
         )}
+
         <Box>
           <Typography variant="body1" gutterBottom>
             Название урока
@@ -148,6 +178,7 @@ export default function EditPdfLessonForm({
             fullWidth
             error={!!errors.title}
             helperText={errors.title?.message}
+            disabled={isSubmitting}
           />
         </Box>
 
@@ -171,12 +202,13 @@ export default function EditPdfLessonForm({
               "Укажите количество баллов, которое получит студент за прохождение урока"
             }
             inputProps={{ min: 1, max: 100 }}
+            disabled={isSubmitting}
           />
         </Box>
 
         <Box>
           <Typography variant="body1" gutterBottom>
-            Содержание урока
+            PDF файл урока
           </Typography>
           <Paper
             variant="outlined"
@@ -185,18 +217,25 @@ export default function EditPdfLessonForm({
               textAlign: "center",
               bgcolor: "background.default",
               borderStyle: "dashed",
-              borderColor: pdfUrl ? "success.main" : "divider",
+              borderColor:
+                hasExistingFile || hasNewFile ? "success.main" : "divider",
               borderWidth: 2,
               borderRadius: 2,
               cursor: "pointer",
               transition: "all 0.2s",
               "&:hover": {
-                borderColor: pdfUrl ? "success.dark" : "primary.main",
-                bgcolor: pdfUrl ? "success.light" : "action.hover",
+                borderColor:
+                  hasExistingFile || hasNewFile
+                    ? "success.dark"
+                    : "primary.main",
+                bgcolor:
+                  hasExistingFile || hasNewFile
+                    ? "success.light"
+                    : "action.hover",
               },
             }}
             onClick={() =>
-              !isUploading && document.getElementById("pdf-upload")?.click()
+              !isSubmitting && document.getElementById("pdf-upload")?.click()
             }
           >
             <input
@@ -205,11 +244,11 @@ export default function EditPdfLessonForm({
               accept="application/pdf"
               onChange={handleFileChange}
               style={{ display: "none" }}
-              disabled={isUploading}
+              disabled={isSubmitting}
             />
 
-            {isUploading ? (
-              // Состояние загрузки
+            {isSubmitting ? (
+              // Состояние загрузки при сабмите
               <Box
                 sx={{
                   display: "flex",
@@ -220,11 +259,11 @@ export default function EditPdfLessonForm({
               >
                 <CircularProgress size={48} color="primary" />
                 <Typography variant="body1" color="text.secondary">
-                  Загрузка файла...
+                  Загрузка файла и сохранение урока...
                 </Typography>
               </Box>
-            ) : pdfUrl ? (
-              // Предпросмотр загруженного файла
+            ) : hasExistingFile ? (
+              // Состояние: файл уже загружен ранее (при редактировании)
               <Box
                 sx={{
                   display: "flex",
@@ -233,7 +272,7 @@ export default function EditPdfLessonForm({
                   gap: 2,
                 }}
               >
-                <FileIcon sx={{ fontSize: 64, color: "error.main" }} />
+                <FileIcon sx={{ fontSize: 64, color: "primary.main" }} />
                 <Box sx={{ maxWidth: "100%" }}>
                   <Typography
                     variant="subtitle1"
@@ -247,14 +286,69 @@ export default function EditPdfLessonForm({
                       WebkitBoxOrient: "vertical",
                     }}
                   >
-                    {pdfFile?.name || pdfUrl.split("/").pop() || "PDF файл"}
+                    {existingPdfUrl.split("/").pop() || "PDF файл"}
                   </Typography>
                   <Typography variant="caption" color="text.secondary">
-                    {pdfFile?.size
-                      ? `${(pdfFile.size / 1024 / 1024).toFixed(2)} МБ`
-                      : "Файл загружен на сервер"}
+                    Файл уже загружен на сервер
                   </Typography>
                 </Box>
+                {!isCreation && (
+                  <IconButton
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleRemoveExistingFile();
+                    }}
+                    color="error"
+                    size="small"
+                    sx={{ mt: 1 }}
+                  >
+                    <DeleteIcon />
+                  </IconButton>
+                )}
+              </Box>
+            ) : hasNewFile ? (
+              // Состояние: выбран новый файл для загрузки
+              <Box
+                sx={{
+                  display: "flex",
+                  flexDirection: "column",
+                  alignItems: "center",
+                  gap: 2,
+                }}
+              >
+                <FileIcon sx={{ fontSize: 64, color: "primary.main" }} />
+                <Box sx={{ maxWidth: "100%" }}>
+                  <Typography
+                    variant="subtitle1"
+                    fontWeight={600}
+                    color="text.primary"
+                    sx={{
+                      overflow: "hidden",
+                      textOverflow: "ellipsis",
+                      display: "-webkit-box",
+                      WebkitLineClamp: 2,
+                      WebkitBoxOrient: "vertical",
+                    }}
+                  >
+                    {selectedFile.name}
+                  </Typography>
+                  <Typography variant="caption" color="text.secondary">
+                    {`${(selectedFile.size / 1024 / 1024).toFixed(2)} МБ`} •
+                    Файл будет загружен при сохранении
+                  </Typography>
+                </Box>
+                <Button
+                  variant="text"
+                  color="error"
+                  size="small"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setSelectedFile(null);
+                  }}
+                  sx={{ mt: 1 }}
+                >
+                  Отменить выбор
+                </Button>
               </Box>
             ) : (
               // Состояние ожидания загрузки
@@ -266,7 +360,7 @@ export default function EditPdfLessonForm({
                   gap: 2,
                 }}
               >
-                <DownloadIcon sx={{ fontSize: 64 }} />
+                <DownloadIcon sx={{ fontSize: 64, color: "primary.main" }} />
                 <Typography variant="h6" fontWeight={600}>
                   Загрузить PDF файл
                 </Typography>
@@ -289,13 +383,14 @@ export default function EditPdfLessonForm({
               </Box>
             )}
           </Paper>
-          {errors.content && (
+
+          {isFileRequired && (
             <Typography
               color="error"
               variant="caption"
               sx={{ mt: 1, display: "block" }}
             >
-              {errors.content.message}
+              PDF файл обязателен для создания урока
             </Typography>
           )}
         </Box>
@@ -307,13 +402,24 @@ export default function EditPdfLessonForm({
             justifyContent: "flex-end",
             gap: 2,
             py: 3,
+            borderTop: "1px solid",
+            borderColor: "divider",
           }}
         >
-          <Button type="submit" variant="contained">
-            {isCreation ? "Создать" : "Сохранить изменения"}
-          </Button>
-          <Button type="button" variant="outlined" onClick={onCancel}>
+          <Button
+            type="button"
+            variant="outlined"
+            onClick={onCancel}
+            disabled={isSubmitting}
+          >
             Отмена
+          </Button>
+          <Button type="submit" variant="contained">
+            {isSubmitting ? (
+              <CircularProgress size={24} color="inherit" />
+            ) : (
+              "Сохранить изменения"
+            )}
           </Button>
         </Box>
       </Stack>

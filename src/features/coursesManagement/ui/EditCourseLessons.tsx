@@ -153,21 +153,21 @@ export default function EditCourseLessons({
               </Typography>
             </Box>
             <EditLesson
-              onSubmit={(lessonInfo) => {
-                lessonType.startsWith("THEORY")
-                  ? createTheoryLesson({
+              onSubmit={async (lessonInfo) => {
+                const newLesson = lessonType.startsWith("THEORY")
+                  ? await createTheoryLesson({
                       courseId: courseId,
                       createTheoryLessonRequest:
                         lessonInfo as CreateTheoryLessonRequest,
-                    })
-                  : createPracticeLesson({
+                    }).unwrap()
+                  : await createPracticeLesson({
                       courseId: courseId,
                       createPracticeLessonRequest:
                         lessonInfo as CreatePracticeLessonRequest,
-                    });
-                // TODO: после создания урока получить его dto, обновить список и показать созданный урок
-                // пока что просто перекидываем на меню содания урока
+                    }).unwrap();
                 setIsEdit(false);
+                setLessonType(undefined);
+                setActiveLesson(newLesson);
               }}
               onCancel={() => {
                 setIsEdit(false);

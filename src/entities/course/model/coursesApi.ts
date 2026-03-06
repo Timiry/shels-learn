@@ -22,6 +22,7 @@ const injectedRtkApi = api.injectEndpoints({
   endpoints: (build) => ({
     getCourse: build.query<CourseAdminDetailsDto, number>({
       query: (queryArg) => ({ url: `/api/v1/admin/courses/${queryArg}` }),
+      providesTags: ["Course"],
     }),
     updateCourse: build.mutation<CourseDto, UpdateCourseApiArg>({
       query: (queryArg) => ({
@@ -29,12 +30,14 @@ const injectedRtkApi = api.injectEndpoints({
         method: "PUT",
         body: queryArg.createCourseRequest,
       }),
+      invalidatesTags: ["Course"],
     }),
     deleteCourse: build.mutation<ApiResponse, number>({
       query: (queryArg) => ({
         url: `/api/v1/admin/courses/${queryArg}`,
         method: "DELETE",
       }),
+      invalidatesTags: ["Course"],
     }),
     updateTheoryLesson: build.mutation<LessonDto, UpdateTheoryLessonApiArg>({
       query: (queryArg) => ({
@@ -42,6 +45,7 @@ const injectedRtkApi = api.injectEndpoints({
         method: "PUT",
         body: queryArg.updateTheoryLessonRequest,
       }),
+      invalidatesTags: ["Course"],
     }),
     updatePracticeLesson: build.mutation<LessonDto, UpdatePracticeLessonApiArg>(
       {
@@ -50,11 +54,13 @@ const injectedRtkApi = api.injectEndpoints({
           method: "PUT",
           body: queryArg.updatePracticeLessonRequest,
         }),
+        invalidatesTags: ["Course"],
       }
     ),
 
     getAllCourses: build.query<CourseSummaryDto[], void>({
       query: () => ({ url: `/api/v1/admin/courses` }),
+      providesTags: ["Course"],
     }),
     createCourse: build.mutation<CourseDto, CreateCourseRequest>({
       query: (queryArg) => ({
@@ -62,6 +68,7 @@ const injectedRtkApi = api.injectEndpoints({
         method: "POST",
         body: queryArg,
       }),
+      invalidatesTags: ["Course"],
     }),
     getCourseReviewers: build.query<ApiResponse, number>({
       query: (queryArg) => ({
@@ -81,6 +88,7 @@ const injectedRtkApi = api.injectEndpoints({
         method: "POST",
         body: queryArg.createTheoryLessonRequest,
       }),
+      invalidatesTags: ["Course"],
     }),
     createPracticeLesson: build.mutation<LessonDto, CreatePracticeLessonApiArg>(
       {
@@ -89,6 +97,7 @@ const injectedRtkApi = api.injectEndpoints({
           method: "POST",
           body: queryArg.createPracticeLessonRequest,
         }),
+        invalidatesTags: ["Course"],
       }
     ),
     getEnrollmentLists: build.query<UserInNotInListsDto, number>({
@@ -113,6 +122,7 @@ const injectedRtkApi = api.injectEndpoints({
         url: `/api/v1/admin/courses/${queryArg.courseId}/lessons/${queryArg.lessonId}`,
         method: "DELETE",
       }),
+      invalidatesTags: ["Course"],
     }),
   }),
   overrideExisting: false,
