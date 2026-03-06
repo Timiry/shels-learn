@@ -4,28 +4,22 @@ import PdfLessonContent from "./PdfLessonContent";
 import TextLessonContent from "./TextLessonContent";
 import VideoLessonContent from "./VideoLessonContent";
 import TestLessonContent from "./TestLessonContent";
-import TasLessonContent from "./TaskLessonContent";
-import { Typography } from "@mui/material";
+import { Stack, Typography } from "@mui/material";
+import LessonOption from "./lessonOption";
+import TaskLessonContent from "./TaskLessonContent";
 
 export default function LessonContent({ lesson }: { lesson: LessonDto }) {
   return (
     <Box mb={5}>
-      <Box mb={4}>
-        <Box
-          p={1}
-          border={"1px solid"}
-          borderColor={"divider"}
-          borderRadius={1}
-          display={"inline"}
-        >
-          <Typography variant="body1" display={"inline"}>
-            Баллы:{" "}
-          </Typography>
-          <Typography variant="body1" color="secondary" display={"inline"}>
-            {lesson.fullPoints}
-          </Typography>
-        </Box>
-      </Box>
+      <Stack direction={"row"} spacing={2} mb={4}>
+        <LessonOption name="Баллы" value={lesson.fullPoints.toString()} />
+        {lesson.passingThresholdPercent && (
+          <LessonOption
+            name="Порог прохождения"
+            value={lesson.passingThresholdPercent.toString() + "%"}
+          />
+        )}
+      </Stack>
       <Typography variant="h1" sx={{ mb: 4 }}>
         {lesson.title}
       </Typography>
@@ -46,7 +40,7 @@ export default function LessonContent({ lesson }: { lesson: LessonDto }) {
       )}
 
       {lesson.lessonType === "PRACTICE_OPEN_ANSWER" && (
-        <TasLessonContent lesson={lesson} />
+        <TaskLessonContent lesson={lesson} />
       )}
     </Box>
   );

@@ -20,6 +20,9 @@ const theme = createTheme({
       dark: "#6e6e6e",
       contrastText: "#111",
     },
+    success: {
+      main: "#EFF7DE",
+    },
     error: {
       main: mainRed,
       light: alpha(mainRed, 0.7),
