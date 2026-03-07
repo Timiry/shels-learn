@@ -10,7 +10,7 @@ permissions:
   packages: write
 
 env:
-  IMAGE_NAME: ghcr.io/${{ github.repository }}/frontend
+  IMAGE_NAME: ghcr.io/timiry/shels-learn/frontend
 
 jobs:
   build-and-deploy:
