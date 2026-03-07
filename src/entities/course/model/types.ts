@@ -69,12 +69,7 @@ export type CourseDto = {
 export type PracticeQuestionDto = {
   id: number;
   index?: number;
-  questionType:
-    | "SINGLE_CHOICE"
-    | "MULTIPLE_CHOICE"
-    | "MATCHING"
-    | "ORDERING"
-    | "OPEN_ANSWER";
+  questionType: PracticeQuestionType;
   questionText: string;
   trainerHint?: string;
   options: string[];
@@ -129,14 +124,16 @@ export type CreateCourseRequest = {
   };
 };
 
+export type PracticeQuestionType =
+  | "SINGLE_CHOICE"
+  | "MULTIPLE_CHOICE"
+  | "MATCHING"
+  | "ORDERING"
+  | "OPEN_ANSWER";
+
 export type PracticeQuestionRequest = {
   position?: number;
-  questionType?:
-    | "SINGLE_CHOICE"
-    | "MULTIPLE_CHOICE"
-    | "MATCHING"
-    | "ORDERING"
-    | "OPEN_ANSWER";
+  questionType?: PracticeQuestionType;
   questionText: string;
   trainerHint?: string;
   options?: string[];

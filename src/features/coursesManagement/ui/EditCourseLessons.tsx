@@ -173,7 +173,7 @@ export default function EditCourseLessons({
                 setIsEdit(false);
                 setLessonType(undefined);
               }}
-              isCreation={false}
+              isCreation={true}
               lessonType={lessonType}
             />
           </Box>

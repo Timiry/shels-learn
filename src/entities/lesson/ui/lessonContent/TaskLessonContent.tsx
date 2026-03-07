@@ -12,7 +12,7 @@ export default function TaskLessonContent({ lesson }: { lesson: LessonDto }) {
   return (
     <Box>
       {lesson.questions && (
-        <Stack spacing={4}>
+        <Stack spacing={5}>
           {lesson.questions.map((question, index) => (
             <Stack spacing={1} key={question.id}>
               <Box
@@ -30,6 +30,24 @@ export default function TaskLessonContent({ lesson }: { lesson: LessonDto }) {
               </Box>
               <Divider />
               <Typography variant="body2">{question.questionText}</Typography>
+              {question.trainerHint && (
+                <Box pt={2}>
+                  <Typography
+                    variant="caption"
+                    display="inline"
+                    sx={{
+                      bgcolor: "divider",
+                      borderRadius: "5px",
+                      p: "5px 10px",
+                    }}
+                  >
+                    ? Подсказка
+                  </Typography>
+                  <Typography variant="body2" pt={1}>
+                    {question.trainerHint}
+                  </Typography>
+                </Box>
+              )}
             </Stack>
           ))}
         </Stack>
