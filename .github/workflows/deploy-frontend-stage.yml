@@ -63,17 +63,6 @@ jobs:
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
 
-      - name: Copy deploy scripts to server
-        uses: appleboy/scp-action@v0.1.7
-        with:
-          host: ${{ secrets.SSH_HOST }}
-          username: ${{ secrets.SSH_USER }}
-          key: ${{ secrets.SSH_PRIVATE_KEY }}
-          port: ${{ secrets.SSH_PORT || 22 }}
-          source: scripts/deploy/frontend/deploy-frontend-container.sh,scripts/deploy/install-nginx-reverse-proxy.sh
-          target: ${{ env.DEPLOY_PATH }}
-          overwrite: true
-
       - name: Deploy on stage host over SSH
         uses: appleboy/ssh-action@v1.2.0
         with:
@@ -97,12 +86,21 @@ jobs:
 
             echo "$GHCR_TOKEN" | docker login ghcr.io -u "$GHCR_USERNAME" --password-stdin
 
-            mkdir -p "${{ env.DEPLOY_PATH }}/scripts/deploy/frontend"
-            chmod +x "${{ env.DEPLOY_PATH }}/scripts/deploy/frontend/deploy-frontend-container.sh"
+            mkdir -p "$FRONTEND_DEPLOY_DIR"
+            docker pull "$FRONTEND_IMAGE"
 
-            if [ ! -f "${{ env.DEPLOY_PATH }}/scripts/deploy/frontend/deploy-frontend-container.sh" ]; then
-              echo "deploy script not found: ${{ env.DEPLOY_PATH }}/scripts/deploy/frontend/deploy-frontend-container.sh"
-              exit 1
+            if docker ps -a --format '{{.Names}}' | grep -qx "$FRONTEND_CONTAINER"; then
+              docker rm -f "$FRONTEND_CONTAINER"
             fi
 
-            sh "${{ env.DEPLOY_PATH }}/scripts/deploy/frontend/deploy-frontend-container.sh"
+            docker run -d \
+              --name "$FRONTEND_CONTAINER" \
+              --restart unless-stopped \
+              -e NODE_ENV=production \
+              -e PORT=3000 \
+              -e NEXT_PUBLIC_API_URL="$NEXT_PUBLIC_API_URL" \
+              -p "127.0.0.1:${FRONTEND_HOST_PORT}:3000" \
+              "$FRONTEND_IMAGE"
+
+            sleep 5
+            docker ps --filter "name=$FRONTEND_CONTAINER" --format "table {{.Names}}\t{{.Image}}\t{{.Status}}"
