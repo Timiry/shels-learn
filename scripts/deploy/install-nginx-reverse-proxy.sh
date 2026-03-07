@@ -8,17 +8,19 @@ set -eu
 #   /api/   -> backend
 #   /files/ -> backend
 #
-# Usage example:
-#   sudo DOMAIN=stage.example.com \
-#        FRONTEND_UPSTREAM=127.0.0.1:3000 \
-#        BACKEND_UPSTREAM=127.0.0.1:8080 \
-#        sh scripts/deploy/install-nginx-reverse-proxy.sh
+# Usage example (HTTP):
+#   sudo sh scripts/deploy/install-nginx-reverse-proxy.sh \
+#     --domain stage.example.com \
+#     --frontend-upstream 127.0.0.1:3000 \
+#     --backend-upstream 127.0.0.1:8080
 #
-# Optional TLS bootstrap (Let's Encrypt):
-#   sudo DOMAIN=stage.example.com \
-#        ENABLE_HTTPS=true \
-#        CERTBOT_EMAIL=devops@example.com \
-#        sh scripts/deploy/install-nginx-reverse-proxy.sh
+# Usage example (HTTPS + Let's Encrypt):
+#   sudo sh scripts/deploy/install-nginx-reverse-proxy.sh \
+#     --domain stage.example.com \
+#     --frontend-upstream 127.0.0.1:3000 \
+#     --backend-upstream 127.0.0.1:8080 \
+#     --enable-https \
+#     --certbot-email devops@example.com
 # ----------------------------------------------------------------------------
 
 if [ "$(id -u)" -ne 0 ]; then
@@ -26,15 +28,93 @@ if [ "$(id -u)" -ne 0 ]; then
   exit 1
 fi
 
-DOMAIN="${DOMAIN:-}"
-SITE_NAME="${SITE_NAME:-courses-stage}"
-FRONTEND_UPSTREAM="${FRONTEND_UPSTREAM:-127.0.0.1:3000}"
-BACKEND_UPSTREAM="${BACKEND_UPSTREAM:-127.0.0.1:8080}"
-ENABLE_HTTPS="${ENABLE_HTTPS:-false}"
-CERTBOT_EMAIL="${CERTBOT_EMAIL:-}"
+print_usage() {
+  cat <<'EOF'
+Usage:
+  sh scripts/deploy/install-nginx-reverse-proxy.sh \
+    --domain <domain-or-ip> \
+    [--site-name <name>] \
+    [--frontend-upstream <host:port>] \
+    [--backend-upstream <host:port>] \
+    [--enable-https] \
+    [--certbot-email <email>]
+
+Required:
+  --domain <domain-or-ip>
+
+Optional (with defaults):
+  --site-name <name>                 default: courses-stage
+  --frontend-upstream <host:port>    default: 127.0.0.1:3000
+  --backend-upstream <host:port>     default: 127.0.0.1:8080
+  --enable-https                     default: disabled
+  --certbot-email <email>            required only with --enable-https
+
+Examples:
+  sh scripts/deploy/install-nginx-reverse-proxy.sh \
+    --domain 203.0.113.10
+
+  sh scripts/deploy/install-nginx-reverse-proxy.sh \
+    --domain stage.example.com \
+    --frontend-upstream 127.0.0.1:3000 \
+    --backend-upstream 127.0.0.1:8080 \
+    --enable-https \
+    --certbot-email devops@example.com
+EOF
+}
+
+DOMAIN=""
+SITE_NAME="courses-stage"
+FRONTEND_UPSTREAM="127.0.0.1:3000"
+BACKEND_UPSTREAM="127.0.0.1:8080"
+ENABLE_HTTPS="false"
+CERTBOT_EMAIL=""
+
+while [ "$#" -gt 0 ]; do
+  case "$1" in
+    --domain)
+      [ "$#" -ge 2 ] || { echo "[nginx-setup] --domain requires a value"; print_usage; exit 1; }
+      DOMAIN="$2"
+      shift 2
+      ;;
+    --site-name)
+      [ "$#" -ge 2 ] || { echo "[nginx-setup] --site-name requires a value"; print_usage; exit 1; }
+      SITE_NAME="$2"
+      shift 2
+      ;;
+    --frontend-upstream)
+      [ "$#" -ge 2 ] || { echo "[nginx-setup] --frontend-upstream requires a value"; print_usage; exit 1; }
+      FRONTEND_UPSTREAM="$2"
+      shift 2
+      ;;
+    --backend-upstream)
+      [ "$#" -ge 2 ] || { echo "[nginx-setup] --backend-upstream requires a value"; print_usage; exit 1; }
+      BACKEND_UPSTREAM="$2"
+      shift 2
+      ;;
+    --enable-https)
+      ENABLE_HTTPS="true"
+      shift
+      ;;
+    --certbot-email)
+      [ "$#" -ge 2 ] || { echo "[nginx-setup] --certbot-email requires a value"; print_usage; exit 1; }
+      CERTBOT_EMAIL="$2"
+      shift 2
+      ;;
+    -h|--help)
+      print_usage
+      exit 0
+      ;;
+    *)
+      echo "[nginx-setup] unknown argument: $1"
+      print_usage
+      exit 1
+      ;;
+  esac
+done
 
 if [ -z "${DOMAIN}" ]; then
-  echo "[nginx-setup] DOMAIN is required, e.g. DOMAIN=stage.example.com"
+  echo "[nginx-setup] --domain is required"
+  print_usage
   exit 1
 fi
 

@@ -66,15 +66,15 @@ jobs:
       - name: Deploy on stage host over SSH
         uses: appleboy/ssh-action@v1.2.0
         with:
-          host: ${{ secrets.SSH_HOST }}
-          username: ${{ secrets.SSH_USER }}
+          host: ${{ vars.SSH_HOST }}
+          username: ${{ vars.SSH_USER }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           port: ${{ secrets.SSH_PORT || 22 }}
           script_stop: true
           script: |
             set -eu
             FRONTEND_IMAGE="${{ env.IMAGE_NAME }}:stage"
-            NEXT_PUBLIC_API_URL="${{ secrets.STAGE_PUBLIC_BASE_URL }}"
+            NEXT_PUBLIC_API_URL="${{ vars.STAGE_PUBLIC_BASE_URL }}"
             GHCR_USERNAME="${{ github.actor }}"
             GHCR_TOKEN="${{ secrets.GITHUB_TOKEN }}"
 
