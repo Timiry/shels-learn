@@ -68,7 +68,7 @@ export type CourseDto = {
 };
 export type PracticeQuestionDto = {
   id: number;
-  index?: number;
+  position?: number;
   questionType: PracticeQuestionType;
   questionText: string;
   trainerHint?: string;

@@ -70,17 +70,19 @@ const injectedRtkApi = api.injectEndpoints({
       }),
       invalidatesTags: ["Course"],
     }),
-    getCourseReviewers: build.query<ApiResponse, number>({
+    getCourseReviewers: build.query<UserInNotInListsDto, number>({
       query: (queryArg) => ({
         url: `/api/v1/admin/courses/${queryArg}/reviewers`,
       }),
+      providesTags: ["Course"],
     }),
-    assignReviewer: build.mutation<ApiResponse, AssignReviewerApiArg>({
+    assignReviewers: build.mutation<ApiResponse, AssignReviewerApiArg>({
       query: (queryArg) => ({
         url: `/api/v1/admin/courses/${queryArg.courseId}/reviewers`,
         method: "POST",
         body: queryArg.userInNotInRequest,
       }),
+      invalidatesTags: ["Course"],
     }),
     createTheoryLesson: build.mutation<LessonDto, CreateTheoryLessonApiArg>({
       query: (queryArg) => ({
@@ -104,18 +106,21 @@ const injectedRtkApi = api.injectEndpoints({
       query: (queryArg) => ({
         url: `/api/v1/admin/courses/${queryArg}/enrollments`,
       }),
+      providesTags: ["Course"],
     }),
-    assignStudent: build.mutation<ApiResponse, AssignStudentApiArg>({
+    assignStudents: build.mutation<ApiResponse, AssignStudentApiArg>({
       query: (queryArg) => ({
         url: `/api/v1/admin/courses/${queryArg.courseId}/enrollments`,
         method: "POST",
         body: queryArg.userInNotInRequest,
       }),
+      invalidatesTags: ["Course"],
     }),
     getLesson: build.query<LessonDto, GetLessonApiArg>({
       query: (queryArg) => ({
         url: `/api/v1/admin/courses/${queryArg.courseId}/lessons/${queryArg.lessonId}`,
       }),
+      providesTags: ["Course"],
     }),
     deleteLesson: build.mutation<ApiResponse, DeleteLessonApiArg>({
       query: (queryArg) => ({
@@ -138,11 +143,11 @@ export const {
   useGetAllCoursesQuery,
   useCreateCourseMutation,
   useGetCourseReviewersQuery,
-  useAssignReviewerMutation,
+  useAssignReviewersMutation,
   useCreateTheoryLessonMutation,
   useCreatePracticeLessonMutation,
   useGetEnrollmentListsQuery,
-  useAssignStudentMutation,
+  useAssignStudentsMutation,
   useGetLessonQuery,
   useDeleteLessonMutation,
 } = injectedRtkApi;
