@@ -14,6 +14,10 @@ export const routes = {
       createCourse: "/admin/courses/create",
       courseById: (id: string | number) => `/admin/courses/${id}`,
       editCourseById: (id: string | number) => `/admin/courses/${id}/edit`,
+      manageStudents: (id: string | number) =>
+        `/admin/courses/${id}/manage-students`,
+      manageReviewers: (id: string | number) =>
+        `/admin/courses/${id}/manage-reviewers`,
     },
     groups: "/admin/groups",
     profile: "/admin/profile",

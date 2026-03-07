@@ -10,9 +10,10 @@ import {
   Switch,
 } from "@mui/material";
 import { UpdateUserRequest, UserDto } from "@/entities/user/model/usersApi";
+import { UpdateMyProfileRequest } from "@/features/student/api/studentApi";
 
 interface EditUserFormProps {
-  onSubmit: (userInfo: UpdateUserRequest) => void;
+  onSubmit: (userInfo: UpdateUserRequest | UpdateMyProfileRequest) => void;
   formId: string;
   isCreation: boolean;
   isAdmin: boolean;

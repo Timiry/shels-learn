@@ -18,7 +18,11 @@ export default function UserInfoCard({
     >
       <Avatar
         sx={{ width: 140, height: 140, m: "14px" }}
-        src={user.avatarFilePath}
+        src={
+          user.avatarFilePath
+            ? process.env.NEXT_PUBLIC_API_URL + user.avatarFilePath
+            : ""
+        }
       />
       <Typography variant="subtitle2" color="text.secondary">
         {user.role === "ADMIN" ? "АДМИНИСТРАТОР" : "СТУДЕНТ"}

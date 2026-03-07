@@ -7,21 +7,6 @@ const injectedRtkApi = api.injectEndpoints({
     >({
       query: () => ({ url: `/api/v1/student/my/last-visit`, method: "POST" }),
     }),
-    uploadMyAvatar: build.mutation<
-      UploadMyAvatarApiResponse,
-      UploadMyAvatarApiArg
-    >({
-      query: (queryArg) => {
-        const formData = new FormData();
-        formData.append("file", queryArg.file);
-        return {
-          url: `/api/v1/student/my/avatar`,
-          method: "POST",
-          body: formData,
-        };
-      },
-      invalidatesTags: ["Profile"],
-    }),
     submitPractice: build.mutation<
       SubmitPracticeApiResponse,
       SubmitPracticeApiArg
@@ -155,9 +140,13 @@ export type StudentProfileDto = {
   groups: GroupDto[];
 };
 export type UpdateMyProfileRequest = {
-  fullName?: string;
+  fullName: string;
   phone?: string;
   comment?: string;
+  email: string;
+  role: "ADMIN" | "STUDENT";
+  avatarFilePath?: string;
+  password?: string;
 };
 export type StudentCourseStatDto = {
   courseId?: number;
@@ -238,7 +227,6 @@ export type CourseLearnerDto = {
 };
 export const {
   useUpdateMyLastVisitMutation,
-  useUploadMyAvatarMutation,
   useSubmitPracticeMutation,
   useMyProfileQuery,
   useUpdateMyProfileMutation,

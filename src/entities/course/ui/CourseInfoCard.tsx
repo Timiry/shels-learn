@@ -27,7 +27,11 @@ export default function CourseInfoCard({
         <CardMedia
           component="img"
           height="140"
-          image={courseInfo.coverFilePath || "/coverFiller.png"}
+          image={
+            courseInfo.coverFilePath
+              ? process.env.NEXT_PUBLIC_API_URL + courseInfo.coverFilePath
+              : "/coverFiller.png"
+          }
           alt={courseInfo.title}
         />
         <CardContent>

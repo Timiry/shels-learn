@@ -2,20 +2,38 @@
 
 import { routes } from "@/shared/config/routes";
 import HeaderBox from "@/shared/ui/HeaderBox";
-import { Box, IconButton, Tooltip, Typography } from "@mui/material";
+import {
+  Box,
+  Button,
+  IconButton,
+  List,
+  ListItem,
+  ListItemText,
+  Stack,
+  Tooltip,
+  Typography,
+} from "@mui/material";
 import EditOutlinedIcon from "@mui/icons-material/EditOutlined";
 import { useRouter, useParams } from "next/navigation";
 import TabNavigation from "@/shared/ui/TabNavigation";
 import { useState } from "react";
-import { useGetCourseQuery } from "@/entities/course/model/coursesApi";
+import {
+  useGetCourseQuery,
+  useGetCourseReviewersQuery,
+} from "@/entities/course/model/coursesApi";
 import { CourseAdminDetailsDto } from "@/entities/course/model/types";
 import CourseContent from "@/features/coursesManagement/ui/CourseContent";
+import CourseStatsTable from "@/features/coursesManagement/ui/CourseStatsTable";
+import { useCourseStatsQuery } from "@/features/statisticsAndReports/api/statistiksAndReportsApi";
 
 export default function CourseInfoPage() {
   const router = useRouter();
   const params = useParams();
   const courseId = params?.id as string;
   const { currentData: courseInfo } = useGetCourseQuery(+courseId);
+  const { currentData: courseReviewers } =
+    useGetCourseReviewersQuery(+courseId);
+  const { currentData: courseStats } = useCourseStatsQuery(+courseId);
 
   const [activeTab, setActiveTab] = useState("description");
 
@@ -51,8 +69,61 @@ export default function CourseInfoPage() {
         {activeTab === "description" && courseInfo && (
           <CourseContent courseInfo={courseInfo} />
         )}
-        {activeTab === "reviewers" && <Box></Box>}
-        {activeTab === "students" && <Box></Box>}
+        {activeTab === "reviewers" && (
+          <Box>
+            <Box pb={2} display={"flex"} justifyContent={"end"}>
+              <Button
+                variant="outlined"
+                onClick={() =>
+                  router.push(routes.admin.courses.manageReviewers(courseId))
+                }
+              >
+                Управление тренерами
+              </Button>
+            </Box>
+            {courseReviewers?.in?.length ? (
+              <Stack spacing={3}>
+                <List sx={{ p: 0 }}>
+                  {courseReviewers.in.map((user) => (
+                    <ListItem
+                      key={user.id}
+                      sx={{
+                        borderBottom: "1px solid",
+                        borderColor: "divider",
+                      }}
+                    >
+                      <ListItemText
+                        primary={user.fullName}
+                        secondary={user.email}
+                      />
+                    </ListItem>
+                  ))}
+                </List>
+              </Stack>
+            ) : (
+              <Box display={"flex"} justifyContent={"center"} mt={5}>
+                <Typography variant="subtitle1">
+                  Тренеры не назначены
+                </Typography>
+              </Box>
+            )}
+          </Box>
+        )}
+        {activeTab === "students" && (
+          <Box>
+            <Box pb={2} display={"flex"} justifyContent={"end"}>
+              <Button
+                variant="outlined"
+                onClick={() =>
+                  router.push(routes.admin.courses.manageStudents(courseId))
+                }
+              >
+                Управление студентами
+              </Button>
+            </Box>
+            <CourseStatsTable stats={courseStats || []} />
+          </Box>
+        )}
       </TabNavigation>
     </Box>
   );

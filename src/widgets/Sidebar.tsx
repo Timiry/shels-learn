@@ -119,7 +119,12 @@ export default function Sidebar() {
       <Box sx={{ pt: 2, textAlign: "center" }}>
         <IconButton onClick={handleAvatarClick} sx={{ p: 0 }}>
           <Avatar
-            src={myProfile?.user.avatarFilePath}
+            src={
+              myProfile?.user.avatarFilePath
+                ? process.env.NEXT_PUBLIC_API_URL +
+                  myProfile.user.avatarFilePath
+                : ""
+            }
             sx={{
               width: 40,
               height: 40,
