@@ -144,7 +144,7 @@ export type UpdateMyProfileRequest = {
   phone?: string;
   comment?: string;
   email: string;
-  role: string;
+  role: "ADMIN" | "STUDENT";
   avatarFilePath?: string;
   password?: string;
 };
