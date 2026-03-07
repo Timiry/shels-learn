@@ -1,0 +1,107 @@
+name: Deploy Frontend to Stage
+
+on:
+  push:
+    branches: ["main"]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  packages: write
+
+env:
+  IMAGE_NAME: ghcr.io/${{ github.repository }}/frontend
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    env:
+      DEPLOY_PATH: /root/frontend
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Build
+        run: npm run build
+
+      - name: Log in to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Extract Docker metadata
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.IMAGE_NAME }}
+          tags: |
+            type=sha
+            type=raw,value=stage
+
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: ./Dockerfile
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+
+      - name: Copy deploy scripts to server
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          port: ${{ secrets.SSH_PORT || 22 }}
+          source: scripts/deploy/frontend/deploy-frontend-container.sh,scripts/deploy/install-nginx-reverse-proxy.sh
+          target: ${{ env.DEPLOY_PATH }}
+          overwrite: true
+
+      - name: Deploy on stage host over SSH
+        uses: appleboy/ssh-action@v1.2.0
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          port: ${{ secrets.SSH_PORT || 22 }}
+          script_stop: true
+          script: |
+            set -eu
+            FRONTEND_IMAGE="${{ env.IMAGE_NAME }}:stage"
+            NEXT_PUBLIC_API_URL="${{ secrets.STAGE_PUBLIC_BASE_URL }}"
+            GHCR_USERNAME="${{ github.actor }}"
+            GHCR_TOKEN="${{ secrets.GITHUB_TOKEN }}"
+
+            export FRONTEND_IMAGE
+            export NEXT_PUBLIC_API_URL
+            export FRONTEND_CONTAINER="courses-frontend"
+            export FRONTEND_HOST_PORT="3000"
+            export FRONTEND_DEPLOY_DIR="${{ env.DEPLOY_PATH }}"
+
+            echo "$GHCR_TOKEN" | docker login ghcr.io -u "$GHCR_USERNAME" --password-stdin
+
+            mkdir -p "${{ env.DEPLOY_PATH }}/scripts/deploy/frontend"
+            chmod +x "${{ env.DEPLOY_PATH }}/scripts/deploy/frontend/deploy-frontend-container.sh"
+
+            if [ ! -f "${{ env.DEPLOY_PATH }}/scripts/deploy/frontend/deploy-frontend-container.sh" ]; then
+              echo "deploy script not found: ${{ env.DEPLOY_PATH }}/scripts/deploy/frontend/deploy-frontend-container.sh"
+              exit 1
+            fi
+
+            sh "${{ env.DEPLOY_PATH }}/scripts/deploy/frontend/deploy-frontend-container.sh"
