@@ -7,6 +7,16 @@ const injectedRtkApi = api.injectEndpoints({
     >({
       query: () => ({ url: `/api/v1/student/my/last-visit`, method: "POST" }),
     }),
+    completeTheoryLesson: build.mutation<
+      CompleteTheoryLessonApiResponse,
+      CompleteTheoryLessonApiArg
+    >({
+      query: (queryArg) => ({
+        url: `/api/v1/student/lessons/${queryArg}/complete-theory`,
+        method: "POST",
+      }),
+      invalidatesTags: ["Learning"],
+    }),
     submitPractice: build.mutation<
       SubmitPracticeApiResponse,
       SubmitPracticeApiArg
@@ -16,6 +26,7 @@ const injectedRtkApi = api.injectEndpoints({
         method: "POST",
         body: queryArg.practiceSubmissionRequest,
       }),
+      invalidatesTags: ["Learning"],
     }),
     myProfile: build.query<MyProfileApiResponse, MyProfileApiArg>({
       query: () => ({ url: `/api/v1/student/my/profile` }),
@@ -34,27 +45,42 @@ const injectedRtkApi = api.injectEndpoints({
     }),
     myStats: build.query<MyStatsApiResponse, MyStatsApiArg>({
       query: () => ({ url: `/api/v1/student/my/stats` }),
+      providesTags: ["Learning"],
     }),
     myPrograms: build.query<MyProgramsApiResponse, MyProgramsApiArg>({
       query: () => ({ url: `/api/v1/student/my/programs` }),
+      providesTags: ["Learning"],
     }),
     myProgram: build.query<MyProgramApiResponse, MyProgramApiArg>({
       query: (queryArg) => ({ url: `/api/v1/student/my/programs/${queryArg}` }),
+      providesTags: ["Learning"],
     }),
     myCourses: build.query<MyCoursesApiResponse, MyCoursesApiArg>({
       query: () => ({ url: `/api/v1/student/my/courses` }),
+      providesTags: ["Learning"],
     }),
     getLessonForLearner: build.query<
       GetLessonForLearnerApiResponse,
       GetLessonForLearnerApiArg
     >({
       query: (queryArg) => ({ url: `/api/v1/student/lessons/${queryArg}` }),
+      providesTags: ["Learning"],
     }),
     courseForLearner: build.query<
       CourseForLearnerApiResponse,
       CourseForLearnerApiArg
     >({
       query: (queryArg) => ({ url: `/api/v1/student/courses/${queryArg}` }),
+      providesTags: ["Learning"],
+    }),
+    nextLessonForLearner: build.query<
+      NextLessonForLearnerApiResponse,
+      NextLessonForLearnerApiArg
+    >({
+      query: (queryArg) => ({
+        url: `/api/v1/student/courses/${queryArg}/lessons/next`,
+      }),
+      providesTags: ["Learning"],
     }),
   }),
   overrideExisting: false,
@@ -88,7 +114,7 @@ export type MyProgramsApiArg = void;
 export type MyProgramApiResponse = unknown;
 export type MyProgramApiArg = number;
 export type MyCoursesApiResponse =
-  /** status 200 Список назначенных курсов */ CourseDto;
+  /** status 200 Список назначенных курсов */ CourseDto[];
 export type MyCoursesApiArg = void;
 export type GetLessonForLearnerApiResponse =
   /** status 200 Урок для прохождения */ LearnerLessonDto;
@@ -162,7 +188,7 @@ export type StudentCourseStatDto = {
   completedAt?: string;
 };
 export type CourseDto = {
-  id?: number;
+  id: number;
   title?: string;
   description?: string;
   authorFullName?: string;
@@ -179,7 +205,7 @@ export type CourseDto = {
   sectionPriority?: number;
 };
 export type LearnerPracticeQuestionDto = {
-  index?: number;
+  position: number;
   questionType?:
     | "SINGLE_CHOICE"
     | "MULTIPLE_CHOICE"
@@ -192,11 +218,11 @@ export type LearnerPracticeQuestionDto = {
   partialPoints?: number;
 };
 export type LearnerLessonDto = {
-  id?: number;
-  position?: number;
-  title?: string;
+  id: number;
+  position: number;
+  title: string;
   description?: string;
-  lessonType?:
+  lessonType:
     | "THEORY_TEXT"
     | "THEORY_VIDEO"
     | "THEORY_PDF"
@@ -207,26 +233,45 @@ export type LearnerLessonDto = {
   questions?: LearnerPracticeQuestionDto[];
 };
 export type LearnerLessonSummaryDto = {
-  id?: number;
+  id: number;
   position?: number;
   title?: string;
-  lessonType?:
+  lessonType:
     | "THEORY_TEXT"
     | "THEORY_VIDEO"
     | "THEORY_PDF"
     | "PRACTICE_TEST"
     | "PRACTICE_OPEN_ANSWER";
+  passed?: boolean;
+  pointsAwarded?: number;
+  blocked?: boolean;
+  blockReason?: string;
 };
 export type CourseLearnerDto = {
-  id?: number;
+  id: number;
   title?: string;
   description?: string;
   coverFilePath?: string;
   deadlineDays?: number;
+  completionPercent?: number;
+  completedLessons?: number;
+  remainingLessons?: number;
+  totalLessons?: number;
+  courseCompleted?: boolean;
   lessons?: LearnerLessonSummaryDto[];
 };
+
+export type NextLessonForLearnerApiResponse =
+  /** status 200 Следующий доступный урок */ LearnerLessonDto;
+export type NextLessonForLearnerApiArg = number;
+
+export type CompleteTheoryLessonApiResponse =
+  /** status 200 Теоретический урок отмечен как пройденный */ SubmissionResultDto;
+export type CompleteTheoryLessonApiArg = number;
+
 export const {
   useUpdateMyLastVisitMutation,
+  useCompleteTheoryLessonMutation,
   useSubmitPracticeMutation,
   useMyProfileQuery,
   useUpdateMyProfileMutation,
@@ -236,4 +281,5 @@ export const {
   useMyCoursesQuery,
   useGetLessonForLearnerQuery,
   useCourseForLearnerQuery,
+  useNextLessonForLearnerQuery,
 } = injectedRtkApi;

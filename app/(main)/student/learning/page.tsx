@@ -1,3 +1,3 @@
-export default function LearningPage() {
-  return <p>Страница обучения</p>;
-}
+import LearningPage from "@/pages/student/LearningPage";
+
+export default LearningPage;

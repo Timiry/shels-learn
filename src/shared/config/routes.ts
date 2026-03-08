@@ -30,7 +30,9 @@ export const routes = {
     },
   },
   student: {
-    courses: "/student/courses",
+    courseById: (id: string | number) => `/student/learning/course/${id}`,
+    lessonById: (courseId: string | number, lessonId: string | number) =>
+      `/student/learning/course/${courseId}/lesson/${lessonId}`,
     learning: "/student/learning",
     profile: "/student/profile",
     editProfile: "/student/profile/edit",
