@@ -7,6 +7,7 @@ import AutoStoriesOutlinedIcon from "@mui/icons-material/AutoStoriesOutlined"; /
 import SettingsOutlinedIcon from "@mui/icons-material/SettingsOutlined"; //админ
 import SchoolOutlinedIcon from "@mui/icons-material/SchoolOutlined"; //студент
 import AccountCircleOutlinedIcon from "@mui/icons-material/AccountCircleOutlined"; // профиль
+import LogoutOutlinedIcon from "@mui/icons-material/LogoutOutlined"; // выход
 
 import {
   Box,
@@ -27,6 +28,7 @@ import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useState } from "react";
 import { routes } from "@/shared/config/routes";
 import { useMyProfileQuery } from "@/features/student/api/studentApi";
+import { removeAuthToken } from "@/shared/lib/auth/cookies";
 
 interface NavigationItem {
   id: string;
@@ -173,6 +175,15 @@ export default function Sidebar() {
         <MenuItem onClick={() => handleMenuClick(routes.student.learning)}>
           <SchoolOutlinedIcon sx={{ mr: 1.5 }} />
           <Typography variant="body2">Войти как студент</Typography>
+        </MenuItem>
+        <MenuItem
+          onClick={() => {
+            removeAuthToken();
+            handleMenuClick(routes.auth.login);
+          }}
+        >
+          <LogoutOutlinedIcon sx={{ mr: 1.5 }} />
+          <Typography variant="body2">Выйти из аккаунта</Typography>
         </MenuItem>
       </Menu>
       {/* Навигация */}
