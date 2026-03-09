@@ -1,7 +1,7 @@
 import { Box, Paper, Typography, Tooltip } from "@mui/material";
 import { DataGrid, GridColDef } from "@mui/x-data-grid";
 import { useMemo } from "react";
-import { CourseStudentStatDto } from "@/features/statisticsAndReports/api/statistiksAndReportsApi";
+import { CourseStudentStatDto } from "@/features/statisticsAndReports/api/statisticsAndReportsApi";
 
 interface CourseStatsTableProps {
   stats: CourseStudentStatDto[];
