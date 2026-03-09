@@ -95,7 +95,7 @@ export default function LearnTestLessonForm({
     // Форматируем данные для отправки
     const submissionData: SubmitPracticeApiArg = {
       lessonId: lesson.id,
-      practiceSubmissionRequest: answers,
+      practiceSubmissionRequest: { questionAnswers: answers },
     };
 
     onSubmit(submissionData);

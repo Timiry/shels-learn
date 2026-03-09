@@ -8,6 +8,7 @@ export const routes = {
   admin: {
     checking: {
       allTasks: "/admin/checking",
+      checkTaskById: (id: string | number) => `/admin/checking/${id}`,
     },
     courses: {
       allCourses: "/admin/courses",

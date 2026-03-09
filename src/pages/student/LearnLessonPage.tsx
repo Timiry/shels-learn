@@ -9,6 +9,7 @@ import VideoLessonContent from "@/entities/lesson/ui/lessonContent/VideoLessonCo
 import lessonTypeToIcon from "@/entities/lesson/ui/lessonTypeToIcon";
 import {
   LearnerLessonSummaryDto,
+  SubmitPracticeApiArg,
   useCompleteTheoryLessonMutation,
   useCourseForLearnerQuery,
   useGetLessonForLearnerQuery,
@@ -58,9 +59,9 @@ export default function LearnLessonPage() {
   const [completeTheory] = useCompleteTheoryLessonMutation();
   const [completePractice] = useSubmitPracticeMutation();
 
-  const [isLessonCompleted, setIsLessonCompleted] = useState(
-    course?.lessons?.find((item) => item.id === lesson?.id)?.passed
-  );
+  const isLessonCompleted = course?.lessons?.find(
+    (item) => item.id === lesson?.id
+  )?.passed;
 
   const videoUrl = lesson?.theoryContent || "";
   const youtubeId = extractYouTubeVideoId(videoUrl);
@@ -76,7 +77,6 @@ export default function LearnLessonPage() {
       } else {
         // completePractice();
       }
-      setIsLessonCompleted(true);
     } catch (err) {
       console.error("Ошибка завершения урока:", err);
     }
@@ -213,6 +213,20 @@ export default function LearnLessonPage() {
           <Typography variant="h1" sx={{ mx: "auto", mb: 4 }}>
             {lesson?.title}
           </Typography>
+
+          {isLessonCompleted && (
+            <Box p={1} my={2} sx={{ bgcolor: "#EFF7DE", borderRadius: "5px" }}>
+              <Typography variant="body1">Урок пройден</Typography>
+              <Typography variant="body2">
+                Получено баллов:{" "}
+                {
+                  course.lessons?.find((item) => item?.id === lesson?.id)
+                    ?.pointsAwarded
+                }
+              </Typography>
+            </Box>
+          )}
+
           {/* Контент урока */}
           <Box
             sx={{
@@ -276,7 +290,16 @@ export default function LearnLessonPage() {
               <LearnTaskLessonForm
                 lesson={lesson}
                 formId={taskFormId}
-                onSubmit={completePractice}
+                onSubmit={(data: SubmitPracticeApiArg) => {
+                  try {
+                    completePractice(data);
+                    alert(
+                      "Ваши ответы на это задание отправлены тренеру и ожидают проверки"
+                    );
+                  } catch (err: any) {
+                    console.log("Ошибка отправки ответов на задания");
+                  }
+                }}
               />
             )}
           </Box>

@@ -148,9 +148,6 @@ export type SubmissionResultDto = {
   message?: string;
 };
 export type PracticeSubmissionRequest = {
-  /** Текст open-ended ответа (для соответствующего типа вопроса) */
-  openAnswer?: string;
-  selectedAnswers?: string[];
   /** Ответы по индексам вопросов: questionIndex -> список ответов */
   questionAnswers?: {
     [key: string]: string[];
