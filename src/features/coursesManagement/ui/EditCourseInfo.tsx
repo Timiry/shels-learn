@@ -42,7 +42,7 @@ export default function EditCourseInfo({
           value={
             photo === null
               ? courseInfo.coverFilePath
-                ? process.env.NEXT_PUBLIC_API_URL + courseInfo.coverFilePath
+                ? "http://217.26.31.189" + courseInfo.coverFilePath
                 : courseInfo.coverFilePath
               : photo
           }

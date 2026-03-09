@@ -48,7 +48,7 @@ export default function LearningPage() {
                   height="140"
                   image={
                     course.coverFilePath
-                      ? process.env.NEXT_PUBLIC_API_URL + course.coverFilePath
+                      ? "http://217.26.31.189" + course.coverFilePath
                       : "/coverFiller.png"
                   }
                   alt={course.title}

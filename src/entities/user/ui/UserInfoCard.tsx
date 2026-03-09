@@ -20,7 +20,7 @@ export default function UserInfoCard({
         sx={{ width: 140, height: 140, m: "14px" }}
         src={
           user.avatarFilePath
-            ? process.env.NEXT_PUBLIC_API_URL + user.avatarFilePath
+            ? "http://217.26.31.189" + user.avatarFilePath
             : ""
         }
       />
