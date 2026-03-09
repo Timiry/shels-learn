@@ -3,6 +3,7 @@
 import { useLoginMutation } from "@/features/auth/model/authApi";
 import { LoginForm } from "@/features/auth/ui/LoginForm";
 import { routes } from "@/shared/config/routes";
+import { setAuthToken } from "@/shared/lib/auth/cookies";
 import { useRouter } from "next/navigation";
 
 export default function LoginPage() {
@@ -12,10 +13,15 @@ export default function LoginPage() {
   const handleSubmit = async (email: string, password: string) => {
     try {
       const result = await login({ email, password }).unwrap();
+
+      // Дублируем установку токена перед редиректом,
+      // чтобы исключить гонку между onQueryStarted и навигацией
+      setAuthToken(result.token);
+
       if (result.role === "ADMIN") {
-        router.push(routes.admin.courses.allCourses);
+        router.replace(routes.admin.courses.allCourses);
       } else {
-        router.push(routes.student.learning);
+        router.replace(routes.student.learning);
       }
     } catch (err: any) {
       console.error("Ошибка авторизации:", err);
