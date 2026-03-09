@@ -1,3 +1,4 @@
+import { setAuthToken } from "@/shared/lib/auth/cookies";
 import { baseApi as api } from "../../../shared/api/baseApi";
 import {
   ApiResponse,
@@ -36,11 +37,7 @@ const injectedRtkApi = api.injectEndpoints({
         try {
           const { data } = await queryFulfilled;
           // Сохраняем токен только на клиенте
-          if (typeof window !== "undefined") {
-            localStorage.setItem("token", data.token);
-            // Опционально: сохраняем роль для быстрого определения интерфейса
-            localStorage.setItem("userRole", data.role);
-          }
+          setAuthToken(data.token);
         } catch {
           // Ошибка обрабатывается в компоненте
         }

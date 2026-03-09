@@ -22,6 +22,7 @@ const theme = createTheme({
     },
     success: {
       main: "#EFF7DE",
+      dark: "#5ca448",
     },
     error: {
       main: mainRed,
