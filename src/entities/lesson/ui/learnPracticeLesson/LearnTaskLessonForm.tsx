@@ -110,7 +110,7 @@ export default function LearnTaskLessonForm({
               }}
             >
               <Typography variant="h6" gutterBottom sx={{ mb: 2 }}>
-                {`Вопрос № ${question.position + 1}`}
+                {`Вопрос № ${question.position}`}
               </Typography>
               <Typography
                 variant="body1"

@@ -24,7 +24,7 @@ import {
 import { CourseAdminDetailsDto } from "@/entities/course/model/types";
 import CourseContent from "@/features/coursesManagement/ui/CourseContent";
 import CourseStatsTable from "@/features/coursesManagement/ui/CourseStatsTable";
-import { useCourseStatsQuery } from "@/features/statisticsAndReports/api/statistiksAndReportsApi";
+import { useCourseStatsQuery } from "@/features/statisticsAndReports/api/statisticsAndReportsApi";
 
 export default function CourseInfoPage() {
   const router = useRouter();

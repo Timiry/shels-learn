@@ -1,13 +1,13 @@
 export const routes = {
   auth: {
     login: "/login",
-    activateAccount: "/activate",
     forgotPassword: "/forgot-password",
-    resetPassword: "/reset-password",
+    setPassword: "/set-password",
   },
   admin: {
     checking: {
       allTasks: "/admin/checking",
+      checkTaskById: (id: string | number) => `/admin/checking/${id}`,
     },
     courses: {
       allCourses: "/admin/courses",
