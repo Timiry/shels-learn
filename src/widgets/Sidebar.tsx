@@ -123,8 +123,7 @@ export default function Sidebar() {
           <Avatar
             src={
               myProfile?.user.avatarFilePath
-                ? process.env.NEXT_PUBLIC_API_URL +
-                  myProfile.user.avatarFilePath
+                ? "http://217.26.31.189" + myProfile.user.avatarFilePath
                 : ""
             }
             sx={{

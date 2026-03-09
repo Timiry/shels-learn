@@ -29,7 +29,7 @@ export default function CourseInfoCard({
           height="140"
           image={
             courseInfo.coverFilePath
-              ? process.env.NEXT_PUBLIC_API_URL + courseInfo.coverFilePath
+              ? "http://217.26.31.189" + courseInfo.coverFilePath
               : "/coverFiller.png"
           }
           alt={courseInfo.title}

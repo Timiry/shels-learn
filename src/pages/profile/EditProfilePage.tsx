@@ -49,8 +49,7 @@ export default function EditProfilePage() {
               value={
                 photo === null
                   ? profileInfo.user.avatarFilePath
-                    ? process.env.NEXT_PUBLIC_API_URL +
-                      profileInfo.user.avatarFilePath
+                    ? "http://217.26.31.189" + profileInfo.user.avatarFilePath
                     : profileInfo.user.avatarFilePath
                   : photo
               }

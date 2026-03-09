@@ -6,7 +6,7 @@ export default function PdfLessonContent({ lesson }: { lesson: LessonDto }) {
     <Box>
       {lesson.theoryContent && (
         <embed
-          src={process.env.NEXT_PUBLIC_API_URL + lesson.theoryContent}
+          src={"http://217.26.31.189" + lesson.theoryContent}
           type="application/pdf"
           width="100%"
           height="700px"
