@@ -14,9 +14,8 @@ import {
   Typography,
 } from "@mui/material";
 import EditOutlinedIcon from "@mui/icons-material/EditOutlined";
-import { useRouter, useParams } from "next/navigation";
+import { useRouter, useParams, useSearchParams } from "next/navigation";
 import TabNavigation from "@/shared/ui/TabNavigation";
-import { useState } from "react";
 import {
   useGetCourseQuery,
   useGetCourseReviewersQuery,
@@ -30,12 +29,14 @@ export default function CourseInfoPage() {
   const router = useRouter();
   const params = useParams();
   const courseId = params?.id as string;
+
+  const searchParams = useSearchParams();
+  const activeTab = searchParams?.get("tab") || "description";
+
   const { currentData: courseInfo } = useGetCourseQuery(+courseId);
   const { currentData: courseReviewers } =
     useGetCourseReviewersQuery(+courseId);
   const { currentData: courseStats } = useCourseStatsQuery(+courseId);
-
-  const [activeTab, setActiveTab] = useState("description");
 
   return (
     <Box width={"80%"} mx={"auto"}>
@@ -50,7 +51,9 @@ export default function CourseInfoPage() {
         <Tooltip arrow title={"Редактировать курс"}>
           <IconButton
             onClick={() => {
-              router.push(routes.admin.courses.editCourseById(courseId));
+              router.push(
+                routes.admin.courses.editCourseByIdAndTab(courseId, "info")
+              );
             }}
           >
             <EditOutlinedIcon fontSize="large" />
@@ -64,7 +67,11 @@ export default function CourseInfoPage() {
           { id: "students", label: "СТУДЕНТЫ" },
         ]}
         activeTab={activeTab}
-        onTabChange={setActiveTab}
+        onTabChange={(tabId: string) =>
+          router.push(
+            routes.admin.courses.courseInfoByIdAndTab(courseId, tabId)
+          )
+        }
       >
         {activeTab === "description" && courseInfo && (
           <CourseContent courseInfo={courseInfo} />

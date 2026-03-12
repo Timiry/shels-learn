@@ -45,9 +45,15 @@ export default function ManageCourseStudentsPage() {
               idsNotIn: lists.idsToUnenroll,
             },
           });
-          router.push(routes.admin.courses.courseById(courseId));
+          router.push(
+            routes.admin.courses.courseInfoByIdAndTab(courseId, "students")
+          );
         }}
-        onCancel={() => router.push(routes.admin.courses.courseById(courseId))}
+        onCancel={() =>
+          router.push(
+            routes.admin.courses.courseInfoByIdAndTab(courseId, "students")
+          )
+        }
       />
     </Box>
   );

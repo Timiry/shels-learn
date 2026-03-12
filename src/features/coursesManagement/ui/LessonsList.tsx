@@ -16,13 +16,15 @@ import lessonTypeToIcon from "@/entities/lesson/ui/lessonTypeToIcon";
 interface LessonsListProps {
   activeLessonId?: number;
   lessons: LessonDto[];
-  onLessonClik: (lesson: LessonDto | undefined) => void;
+  onLessonClik: (lessonId: number | undefined) => void;
+  onCreateLessonClik: () => void;
 }
 
 export default function LessonsList({
   activeLessonId,
   lessons,
   onLessonClik,
+  onCreateLessonClik,
 }: LessonsListProps) {
   return (
     <Box
@@ -49,7 +51,7 @@ export default function LessonsList({
             {lessons.map((lesson) => (
               <ListItem
                 key={lesson.id}
-                onClick={() => onLessonClik(lesson)}
+                onClick={() => onLessonClik(lesson.id)}
                 sx={{
                   "&:hover": {
                     cursor: "pointer",
@@ -73,11 +75,7 @@ export default function LessonsList({
             ))}
           </List>
           <Box textAlign={"center"} mx={2}>
-            <Button
-              variant="outlined"
-              fullWidth
-              onClick={() => onLessonClik(undefined)}
-            >
+            <Button variant="outlined" fullWidth onClick={onCreateLessonClik}>
               Добавить урок
             </Button>
           </Box>

@@ -8,18 +8,24 @@ import {
 import { CourseAdminDetailsDto } from "@/entities/course/model/types";
 import EditCourseInfo from "@/features/coursesManagement/ui/EditCourseInfo";
 import EditCourseLessons from "@/features/coursesManagement/ui/EditCourseLessons";
+import { routes } from "@/shared/config/routes";
 import HeaderBox from "@/shared/ui/HeaderBox";
 import TabNavigation from "@/shared/ui/TabNavigation";
 import { Box, Typography, Button, Stack } from "@mui/material";
-import { useParams } from "next/navigation";
-import { useState } from "react";
+import { useParams, useRouter, useSearchParams } from "next/navigation";
 
 export default function EditCoursePage() {
-  const [activeTab, setActiveTab] = useState("info");
+  const searchParams = useSearchParams();
+  const activeTab = searchParams?.get("tab") || "info";
+  const lessonId = searchParams?.get("lessonId");
+  const mode = searchParams?.get("mode");
+  const lessonType = searchParams?.get("type");
 
   const params = useParams();
   const courseId = params?.id as string;
   const { currentData: courseInfo } = useGetCourseQuery(+courseId);
+
+  const router = useRouter();
 
   const [updateCourse] = useUpdateCourseMutation();
   const [deleteCourse] = useDeleteCourseMutation();
@@ -41,7 +47,11 @@ export default function EditCoursePage() {
           { id: "lessons", label: "УРОКИ" },
         ]}
         activeTab={activeTab}
-        onTabChange={setActiveTab}
+        onTabChange={(tabId: string) => {
+          router.push(
+            routes.admin.courses.editCourseByIdAndTab(courseId, tabId)
+          );
+        }}
       >
         {activeTab === "info" && (
           <Box>
@@ -58,6 +68,9 @@ export default function EditCoursePage() {
           <EditCourseLessons
             courseId={+courseId}
             lessons={courseInfo?.lessons || []}
+            activeLessonId={lessonId}
+            mode={mode}
+            lessonType={lessonType}
           />
         )}
       </TabNavigation>
