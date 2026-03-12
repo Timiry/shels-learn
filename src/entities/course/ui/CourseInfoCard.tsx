@@ -21,7 +21,12 @@ export default function CourseInfoCard({
     <Card sx={{ maxWidth: 270 }}>
       <CardActionArea
         onClick={() =>
-          router.push(routes.admin.courses.courseById(courseInfo.id))
+          router.push(
+            routes.admin.courses.courseInfoByIdAndTab(
+              courseInfo.id,
+              "description"
+            )
+          )
         }
       >
         <CardMedia

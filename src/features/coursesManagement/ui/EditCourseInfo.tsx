@@ -75,7 +75,12 @@ export default function EditCourseInfo({
                 createCourseRequest: course,
               });
             }
-            router.push(routes.admin.courses.courseById(courseInfo.id));
+            router.push(
+              routes.admin.courses.courseInfoByIdAndTab(
+                courseInfo.id,
+                "description"
+              )
+            );
           }}
           formId={formId}
           isCreation={false}

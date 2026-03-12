@@ -1,3 +1,5 @@
+import { LessonType } from "@/entities/course/model/types";
+
 export const routes = {
   auth: {
     login: "/login",
@@ -12,8 +14,23 @@ export const routes = {
     courses: {
       allCourses: "/admin/courses",
       createCourse: "/admin/courses/create",
-      courseById: (id: string | number) => `/admin/courses/${id}`,
-      editCourseById: (id: string | number) => `/admin/courses/${id}/edit`,
+      courseInfoByIdAndTab: (id: string | number, tab: string) =>
+        `/admin/courses/${id}/?tab=${tab}`,
+      editCourseByIdAndTab: (id: string | number, tab: string) =>
+        `/admin/courses/${id}/edit?tab=${tab}`,
+      viewCourseLesson: (
+        courseId: string | number,
+        lessonId: string | number
+      ) =>
+        `/admin/courses/${courseId}/edit?tab=lessons&mode=view&lessonId=${lessonId}`,
+      editCourseLesson: (
+        courseId: string | number,
+        lessonId: string | number
+      ) =>
+        `/admin/courses/${courseId}/edit?tab=lessons&mode=edit&lessonId=${lessonId}`,
+      createCourseLesson: (courseId: string | number, lessonType: LessonType) =>
+        `/admin/courses/${courseId}/edit?tab=lessons&mode=create&type=${lessonType}`,
+
       manageStudents: (id: string | number) =>
         `/admin/courses/${id}/manage-students`,
       manageReviewers: (id: string | number) =>

@@ -119,11 +119,6 @@ export default function EditPdfLessonForm({
 
       let fileUrl = existingPdfUrl || "";
 
-      if (!fileUrl && isCreation) {
-        setSubmitError("Пожалуйста, загрузите PDF файл");
-        return;
-      }
-
       // Если выбран новый файл - загружаем его
       if (selectedFile) {
         const uploadResult = await uploadFile({ file: selectedFile }).unwrap();
@@ -133,6 +128,11 @@ export default function EditPdfLessonForm({
         }
 
         fileUrl = uploadResult.link;
+      }
+
+      if (!fileUrl) {
+        setSubmitError("Пожалуйста, загрузите PDF файл");
+        return;
       }
 
       // Отправляем данные формы с ссылкой на файл

@@ -20,17 +20,26 @@ import {
 import EditIcon from "@mui/icons-material/EditOutlined";
 import DeleteIcon from "@mui/icons-material/DeleteOutline";
 import ConfirmDeleteModal from "@/shared/ui/ConfirmDeleteModal";
+import { useRouter } from "next/navigation";
+import { routes } from "@/shared/config/routes";
 
+interface EditCourseLessonsProps {
+  lessons: LessonDto[];
+  courseId: number;
+  activeLessonId?: string | null;
+  mode?: string | null;
+  lessonType?: string | null;
+}
 export default function EditCourseLessons({
   lessons,
   courseId,
-}: {
-  lessons: LessonDto[];
-  courseId: number;
-}) {
-  const [activeLesson, setActiveLesson] = useState<LessonDto>();
-  const [isEdit, setIsEdit] = useState<boolean>(false);
-  const [lessonType, setLessonType] = useState<LessonType>();
+  activeLessonId,
+  mode,
+  lessonType,
+}: EditCourseLessonsProps) {
+  const activeLesson = activeLessonId
+    ? lessons.find((lesson) => lesson.id === +activeLessonId)
+    : undefined;
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
 
   const [createPracticeLesson] = useCreatePracticeLessonMutation();
@@ -38,6 +47,8 @@ export default function EditCourseLessons({
   const [updatePracticeLesson] = useUpdatePracticeLessonMutation();
   const [updateTheoryLesson] = useUpdateTheoryLessonMutation();
   const [deleteLesson] = useDeleteLessonMutation();
+
+  const router = useRouter();
 
   const lessonTypeToWord = {
     THEORY_TEXT: "ТЕКСТ",
@@ -50,13 +61,19 @@ export default function EditCourseLessons({
   return (
     <Box display={"flex"} flexDirection={"row"}>
       <LessonsList
-        activeLessonId={activeLesson?.id}
+        activeLessonId={activeLessonId ? +activeLessonId : undefined}
         lessons={lessons}
-        onLessonClik={(lesson: LessonDto | undefined) => {
-          setIsEdit(false);
-          setLessonType(undefined);
-          setActiveLesson(lesson);
+        onLessonClik={(lessonId: number | undefined) => {
+          if (lessonId)
+            router.push(
+              routes.admin.courses.viewCourseLesson(courseId, lessonId)
+            );
         }}
+        onCreateLessonClik={() =>
+          router.push(
+            routes.admin.courses.editCourseByIdAndTab(courseId, "lessons")
+          )
+        }
       />
       <Box
         flexGrow={1}
@@ -66,7 +83,7 @@ export default function EditCourseLessons({
         }}
       >
         {/* содержание выбранного урока */}
-        {activeLesson && !isEdit && (
+        {activeLesson && mode === "view" && (
           <Box maxWidth={"80%"} mx={"auto"}>
             <Stack justifyContent={"space-between"} direction={"row"} pb={3}>
               <Typography variant="caption">
@@ -82,7 +99,12 @@ export default function EditCourseLessons({
                     borderColor: "divider",
                   }}
                   onClick={() => {
-                    setIsEdit(true);
+                    router.push(
+                      routes.admin.courses.editCourseLesson(
+                        courseId,
+                        activeLesson.id
+                      )
+                    );
                   }}
                 >
                   <EditIcon fontSize="small" />
@@ -107,7 +129,7 @@ export default function EditCourseLessons({
         )}
 
         {/* редактирование выбранного урока */}
-        {activeLesson && isEdit && (
+        {activeLesson && mode === "edit" && (
           <Box maxWidth={"80%"} mx={"auto"}>
             <Box pb={3}>
               <Typography variant="caption">
@@ -130,11 +152,20 @@ export default function EditCourseLessons({
                       updatePracticeLessonRequest:
                         lessonInfo as CreatePracticeLessonRequest,
                     });
-                setIsEdit(false);
+                router.push(
+                  routes.admin.courses.viewCourseLesson(
+                    courseId,
+                    activeLesson.id
+                  )
+                );
               }}
               onCancel={() => {
-                setIsEdit(false);
-                setLessonType(undefined);
+                router.push(
+                  routes.admin.courses.viewCourseLesson(
+                    courseId,
+                    activeLesson.id
+                  )
+                );
               }}
               isCreation={false}
               lessonType={activeLesson.lessonType}
@@ -144,12 +175,12 @@ export default function EditCourseLessons({
         )}
 
         {/* создание нового урока */}
-        {!activeLesson && lessonType && (
+        {mode === "create" && lessonType && (
           <Box maxWidth={"80%"} mx={"auto"}>
             <Box pb={3}>
               <Typography variant="caption">
                 СОЗДАНИЕ УРОКА {" > "}
-                {lessonTypeToWord[lessonType]}
+                {lessonTypeToWord[lessonType as LessonType]}
               </Typography>
             </Box>
             <EditLesson
@@ -165,23 +196,30 @@ export default function EditCourseLessons({
                       createPracticeLessonRequest:
                         lessonInfo as CreatePracticeLessonRequest,
                     }).unwrap();
-                setIsEdit(false);
-                setLessonType(undefined);
-                setActiveLesson(newLesson);
+                router.push(
+                  routes.admin.courses.viewCourseLesson(courseId, newLesson.id)
+                );
               }}
               onCancel={() => {
-                setIsEdit(false);
-                setLessonType(undefined);
+                router.push(
+                  routes.admin.courses.editCourseByIdAndTab(courseId, "lessons")
+                );
               }}
               isCreation={true}
-              lessonType={lessonType}
+              lessonType={lessonType as LessonType}
             />
           </Box>
         )}
 
         {/* меню для выбора типа нового урока */}
         {!activeLesson && !lessonType && (
-          <CreateLessonMenu onIconClick={setLessonType} />
+          <CreateLessonMenu
+            onIconClick={(lessonType: LessonType) =>
+              router.push(
+                routes.admin.courses.createCourseLesson(courseId, lessonType)
+              )
+            }
+          />
         )}
       </Box>
       <ConfirmDeleteModal
@@ -190,10 +228,10 @@ export default function EditCourseLessons({
         onConfirm={() => {
           if (activeLesson) {
             deleteLesson({ courseId: courseId, lessonId: activeLesson?.id });
-            setActiveLesson(undefined);
-            setIsEdit(false);
-            setLessonType(undefined);
             setIsDeleteModalOpen(false);
+            router.push(
+              routes.admin.courses.editCourseByIdAndTab(courseId, "lessons")
+            );
           }
         }}
         objectname={activeLesson?.title || ""}

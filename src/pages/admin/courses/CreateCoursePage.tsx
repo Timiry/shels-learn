@@ -56,7 +56,12 @@ export default function CreateCoursePage() {
                   coverFilePath: cover.link,
                 }).unwrap();
               }
-              router.push(routes.admin.courses.courseById(course.id));
+              router.push(
+                routes.admin.courses.courseInfoByIdAndTab(
+                  course.id,
+                  "description"
+                )
+              );
             }}
             formId={formId}
             isCreation={true}
