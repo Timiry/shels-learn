@@ -5,6 +5,7 @@ import type { Metadata } from "next";
 import { Montserrat } from "next/font/google";
 import { ReduxProvider } from "./provider";
 import "./globals.css";
+import { AppRouterCacheProvider } from "@mui/material-nextjs/v16-appRouter";
 
 const montserrat = Montserrat({
   subsets: ["cyrillic", "latin"],
@@ -23,12 +24,14 @@ export default function RootLayout({
   return (
     <html lang="ru" style={{ fontSize: "14px" }}>
       <body className={`${montserrat.className}`}>
-        <ReduxProvider>
-          <ThemeProvider theme={theme}>
-            <CssBaseline />
-            {children}
-          </ThemeProvider>
-        </ReduxProvider>
+        <AppRouterCacheProvider>
+          <ReduxProvider>
+            <ThemeProvider theme={theme}>
+              <CssBaseline />
+              {children}
+            </ThemeProvider>
+          </ReduxProvider>
+        </AppRouterCacheProvider>
       </body>
     </html>
   );

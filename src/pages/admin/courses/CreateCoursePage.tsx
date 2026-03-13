@@ -2,19 +2,23 @@
 
 import { useCreateCourseMutation } from "@/entities/course/model/coursesApi";
 import { CreateCourseRequest, CourseDto } from "@/entities/course/model/types";
+import { useGetAllSectionsQuery } from "@/entities/section/model/sectionsApi";
 import EditCourseForm from "@/features/coursesManagement/ui/EditCourseForm";
 import { useUploadMutation } from "@/shared/api/filesApi";
 import { routes } from "@/shared/config/routes";
 import HeaderBox from "@/shared/ui/HeaderBox";
 import ImageUpload from "@/shared/ui/ImageUpload";
 import { Box, Typography, Button } from "@mui/material";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useState } from "react";
 
 export default function CreateCoursePage() {
+  const searchParams = useSearchParams();
+  const sectionIdForCreation = searchParams?.get("sectionId");
   const [photo, setPhoto] = useState<File | null>(null);
   const router = useRouter();
   const formId = "course-create-form";
+  const { currentData: sections } = useGetAllSectionsQuery();
   const [uploadImage] = useUploadMutation();
   const [createCourse] = useCreateCourseMutation();
 
@@ -63,6 +67,10 @@ export default function CreateCoursePage() {
                 )
               );
             }}
+            sections={sections}
+            sectionIdForCreation={
+              sectionIdForCreation ? +sectionIdForCreation : undefined
+            }
             formId={formId}
             isCreation={true}
           />

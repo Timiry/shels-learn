@@ -157,12 +157,12 @@ export type ProgramCourseSettingsRequest = {
   courseId: number;
 };
 
-export type CourseSummaryDto = {
+export type CourseSectionDto = {
   id: number;
   title: string;
   description: string;
   ptiority: number;
-  courses: CourseMiniInfo[];
+  courses?: CourseMiniInfo[];
 };
 
 export type CourseMiniInfo = {
@@ -212,7 +212,7 @@ export type CreatePracticeLessonRequest = {
     | "THEORY_PDF"
     | "PRACTICE_TEST"
     | "PRACTICE_OPEN_ANSWER";
-  partialPoints?: number;
+  fullPoints?: number;
   passingThresholdPercent?: number;
   evaluateByCorrectCount?: boolean;
   randomQuestionCount?: number;
