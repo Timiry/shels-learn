@@ -13,15 +13,19 @@ import EditCourseForm from "./EditCourseForm";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useUploadMutation } from "@/shared/api/filesApi";
+import { SectionDto } from "@/entities/section/model/sectionsApi";
 
 interface EditCourseInfoProps {
   courseInfo: CourseDto;
+  sections?: SectionDto[];
+
   onUpdate: (arg: UpdateCourseApiArg) => {};
   onDelete: (id: number) => void;
 }
 
 export default function EditCourseInfo({
   courseInfo,
+  sections,
   onUpdate,
   onDelete,
 }: EditCourseInfoProps) {
@@ -85,6 +89,7 @@ export default function EditCourseInfo({
           formId={formId}
           isCreation={false}
           currentValues={courseInfo}
+          sections={sections}
         />
         <Stack spacing={3} direction={"row"} justifyContent={"flex-end"} mt={3}>
           <Button

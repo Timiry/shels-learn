@@ -1,14 +1,17 @@
 "use client";
 
-import { useForm } from "react-hook-form";
+import { Controller, useForm } from "react-hook-form";
 import { Box, Typography, TextField, Stack, MenuItem } from "@mui/material";
 import { CourseDto, CreateCourseRequest } from "@/entities/course/model/types";
+import { SectionDto } from "@/entities/section/model/sectionsApi";
 
 interface EditCourseFormProps {
   onSubmit: (courseInfo: CreateCourseRequest) => void;
   formId: string;
   isCreation: boolean;
   currentValues?: CourseDto;
+  sections?: SectionDto[];
+  sectionIdForCreation?: number;
 }
 
 export default function EditCourseForm({
@@ -16,13 +19,14 @@ export default function EditCourseForm({
   formId,
   isCreation,
   currentValues,
+  sections,
+  sectionIdForCreation,
 }: EditCourseFormProps) {
   const {
     register,
     handleSubmit,
     setError,
-    watch,
-    setValue,
+    control,
     formState: { errors },
   } = useForm<CreateCourseRequest>({
     defaultValues: isCreation
@@ -30,13 +34,15 @@ export default function EditCourseForm({
           title: "",
           description: "",
           authorFullName: "",
-          passingThresholdPercent: 100,
+          passingThresholdPercent: 90,
+          sectionId: sectionIdForCreation || 1,
         }
       : {
           title: currentValues?.title,
           description: currentValues?.description,
           authorFullName: currentValues?.authorFullName,
           passingThresholdPercent: currentValues?.passingThresholdPercent,
+          sectionId: currentValues?.sectionId,
         },
   });
 
@@ -69,6 +75,33 @@ export default function EditCourseForm({
           rows={8}
         />
 
+        <Typography variant="body1">Раздел курса</Typography>
+        <Controller
+          name="sectionId"
+          control={control}
+          render={({ field }) => (
+            <TextField
+              {...field}
+              select
+              fullWidth
+              helperText={"Раздел, в котором будет находиться курс"}
+              onChange={(e) => field.onChange(Number(e.target.value))}
+            >
+              {!sections || sections.length === 0 ? (
+                <MenuItem value="" disabled>
+                  Нет доступных разделов
+                </MenuItem>
+              ) : (
+                sections.map((section) => (
+                  <MenuItem key={section.id} value={section.id}>
+                    {section.title}
+                  </MenuItem>
+                ))
+              )}
+            </TextField>
+          )}
+        />
+
         <Typography variant="body1">Автор курса</Typography>
         <TextField
           {...register("authorFullName")}
@@ -77,24 +110,28 @@ export default function EditCourseForm({
         />
 
         <Typography variant="body1">Порог прохождения</Typography>
-        <TextField
-          {...register("passingThresholdPercent", {
-            valueAsNumber: true,
-          })}
-          select
-          helperText={
-            "Выберите минимальный процент для успешного прохождения курса"
-          }
-          defaultValue={90}
-          sx={{ maxWidth: 400 }}
-        >
-          <MenuItem value={50}>50%</MenuItem>
-          <MenuItem value={60}>60%</MenuItem>
-          <MenuItem value={70}>70%</MenuItem>
-          <MenuItem value={80}>80%</MenuItem>
-          <MenuItem value={90}>90%</MenuItem>
-          <MenuItem value={100}>100%</MenuItem>
-        </TextField>
+        <Controller
+          name="passingThresholdPercent"
+          control={control}
+          render={({ field }) => (
+            <TextField
+              {...field}
+              select
+              sx={{ maxWidth: 400 }}
+              helperText={
+                "Выберите минимальный процент для успешного прохождения курса"
+              }
+              onChange={(e) => field.onChange(Number(e.target.value))}
+            >
+              <MenuItem value={50}>50%</MenuItem>
+              <MenuItem value={60}>60%</MenuItem>
+              <MenuItem value={70}>70%</MenuItem>
+              <MenuItem value={80}>80%</MenuItem>
+              <MenuItem value={90}>90%</MenuItem>
+              <MenuItem value={100}>100%</MenuItem>
+            </TextField>
+          )}
+        />
       </Stack>
     </Box>
   );

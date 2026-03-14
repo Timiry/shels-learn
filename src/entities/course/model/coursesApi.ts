@@ -7,7 +7,6 @@ import {
   LessonDto,
   UpdateTheoryLessonApiArg,
   UpdatePracticeLessonApiArg,
-  CourseSummaryDto,
   CreateCourseRequest,
   AssignReviewerApiArg,
   CreateTheoryLessonApiArg,
@@ -16,6 +15,7 @@ import {
   AssignStudentApiArg,
   GetLessonApiArg,
   DeleteLessonApiArg,
+  CourseSectionDto,
 } from "./types";
 
 const injectedRtkApi = api.injectEndpoints({
@@ -58,9 +58,9 @@ const injectedRtkApi = api.injectEndpoints({
       }
     ),
 
-    getAllCourses: build.query<CourseSummaryDto[], void>({
+    getAllCourses: build.query<CourseSectionDto[], void>({
       query: () => ({ url: `/api/v1/admin/courses` }),
-      providesTags: ["Course"],
+      providesTags: ["Course", "Sections"],
     }),
     createCourse: build.mutation<CourseDto, CreateCourseRequest>({
       query: (queryArg) => ({

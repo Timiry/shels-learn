@@ -14,6 +14,14 @@ export const baseApi = createApi({
     },
     credentials: "include", // Важно для отправки кук с запросами
   }),
-  tagTypes: ["User", "AllUsers", "Profile", "Course", "Learning", "Review"],
+  tagTypes: [
+    "User",
+    "AllUsers",
+    "Profile",
+    "Course",
+    "Learning",
+    "Review",
+    "Sections",
+  ],
   endpoints: () => ({}),
 });

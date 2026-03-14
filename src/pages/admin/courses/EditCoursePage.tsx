@@ -6,6 +6,7 @@ import {
   useUpdateCourseMutation,
 } from "@/entities/course/model/coursesApi";
 import { CourseAdminDetailsDto } from "@/entities/course/model/types";
+import { useGetAllSectionsQuery } from "@/entities/section/model/sectionsApi";
 import EditCourseInfo from "@/features/coursesManagement/ui/EditCourseInfo";
 import EditCourseLessons from "@/features/coursesManagement/ui/EditCourseLessons";
 import { routes } from "@/shared/config/routes";
@@ -24,6 +25,7 @@ export default function EditCoursePage() {
   const params = useParams();
   const courseId = params?.id as string;
   const { currentData: courseInfo } = useGetCourseQuery(+courseId);
+  const { currentData: sections } = useGetAllSectionsQuery();
 
   const router = useRouter();
 
@@ -58,6 +60,7 @@ export default function EditCoursePage() {
             {courseInfo !== undefined && (
               <EditCourseInfo
                 courseInfo={courseInfo.course}
+                sections={sections}
                 onUpdate={updateCourse}
                 onDelete={deleteCourse}
               />

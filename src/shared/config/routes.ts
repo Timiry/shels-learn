@@ -13,7 +13,11 @@ export const routes = {
     },
     courses: {
       allCourses: "/admin/courses",
+      coursesBySectionId: (sectionId: string | number) =>
+        `/admin/courses?sectionId=${sectionId}`,
       createCourse: "/admin/courses/create",
+      createCourseInSection: (sectionId: string | number) =>
+        `/admin/courses/create?sectionId=${sectionId}`,
       courseInfoByIdAndTab: (id: string | number, tab: string) =>
         `/admin/courses/${id}/?tab=${tab}`,
       editCourseByIdAndTab: (id: string | number, tab: string) =>
