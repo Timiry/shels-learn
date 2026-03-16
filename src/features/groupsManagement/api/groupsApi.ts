@@ -1,7 +1,7 @@
 export type GroupType = "GENERAL" | "COMPANY" | "DEPARTMENT" | "POSITION";
 
 export type GroupSummaryDto = {
-  id: number;
+  id: string;
   title: string;
   type: GroupType;
   studentsCount: number;
@@ -13,4 +13,15 @@ export type LearningProgramDto = {
   id: number;
   title: string;
   courses: number[];
+};
+
+export type CreateGroupRequest = {
+  title: string;
+  type: GroupType;
+};
+
+export type GroupDto = {
+  id: string;
+  title: string;
+  type: GroupType;
 };

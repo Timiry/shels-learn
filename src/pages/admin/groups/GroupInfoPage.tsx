@@ -7,6 +7,8 @@ import EditOutlinedIcon from "@mui/icons-material/EditOutlined";
 import { useRouter, useParams, useSearchParams } from "next/navigation";
 import TabNavigation from "@/shared/ui/TabNavigation";
 import {
+  CreateGroupRequest,
+  GroupDto,
   GroupType,
   LearningProgramDto,
 } from "@/features/groupsManagement/api/groupsApi";
@@ -16,6 +18,8 @@ import { UserDto } from "@/entities/user/model/usersApi";
 import GroupCoursesTable from "@/features/groupsManagement/ui/GroupCoursesTable";
 import { CourseMiniInfo } from "@/entities/course/model/types";
 import GroupProgramsTable from "@/features/groupsManagement/ui/GroupProgramsTable";
+import { useState } from "react";
+import GroupModalForm from "@/features/groupsManagement/ui/GroupModalForm";
 
 export default function GroupInfoPage() {
   const router = useRouter();
@@ -26,11 +30,17 @@ export default function GroupInfoPage() {
   const searchParams = useSearchParams();
   const activeTab = searchParams?.get("tab") || "students";
 
+  const [isGroupModalOpen, setIsGroupModalOpen] = useState(false);
+
   // const { currentData: groupInfo } = useGetGroupQuery(+groupId); // предполагаем получение группы
   // методы получения студентов, курсов, программ
 
   // моки:
-  const groupInfo = { id: groupId, title: "Тестовая группа", type: "GENERAL" };
+  const groupInfo: GroupDto = {
+    id: groupId,
+    title: "Тестовая группа",
+    type: "GENERAL",
+  };
   const students: UserDto[] = [
     {
       id: 1,
@@ -103,7 +113,9 @@ export default function GroupInfoPage() {
         </Box>
         <Tooltip arrow title={"Редактировать группу"}>
           <IconButton
-            onClick={() => {}} //TODO: открывать модалку для редактирования группы
+            onClick={() => {
+              setIsGroupModalOpen(true);
+            }}
           >
             <EditOutlinedIcon fontSize="large" />
           </IconButton>
@@ -174,6 +186,25 @@ export default function GroupInfoPage() {
           </Box>
         )}
       </TabNavigation>
+      <GroupModalForm
+        open={isGroupModalOpen}
+        onSubmit={(groupInfo: CreateGroupRequest) => {
+          console.log("Изменение группы", groupInfo);
+          //TODO: добавить метод редактирования группы
+          setIsGroupModalOpen(false);
+        }}
+        onDelete={(groupId: string) => {
+          console.log("Удаление группы", groupId);
+          //TODO: добавить метод удаления группы
+          setIsGroupModalOpen(false);
+          router.push(routes.admin.groups.allGroupsByType(groupType));
+        }}
+        onClose={() => {
+          setIsGroupModalOpen(false);
+        }}
+        isCreation={false}
+        currentValues={groupInfo}
+      />
     </Box>
   );
 }

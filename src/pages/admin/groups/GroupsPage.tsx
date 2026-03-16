@@ -1,6 +1,7 @@
 "use client";
 
 import {
+  CreateGroupRequest,
   GroupSummaryDto,
   GroupType,
 } from "@/features/groupsManagement/api/groupsApi";
@@ -15,16 +16,20 @@ import TabNavigation from "@/shared/ui/TabNavigation";
 import { routes } from "@/shared/config/routes";
 import groupTypeToWord from "@/features/groupsManagement/lib/groupTypeToWord";
 import GroupTable from "@/features/groupsManagement/ui/GroupTable";
+import GroupModalForm from "@/features/groupsManagement/ui/GroupModalForm";
+import { useState } from "react";
 
 export default function GroupsPage() {
   const router = useRouter();
   const params = useParams();
   const groupType = params?.type as GroupType;
 
+  const [isGroupModalOpen, setIsGroupModalOpen] = useState(false);
+
   // мок получения всех групп
   const allGroups: GroupSummaryDto[] = [
     {
-      id: 1,
+      id: "1",
       title: "Группа А-101",
       type: "GENERAL",
       studentsCount: 25,
@@ -32,7 +37,7 @@ export default function GroupsPage() {
       programsCount: 1,
     },
     {
-      id: 2,
+      id: "2",
       title: 'ООО "ТехноСофт"',
       type: "COMPANY",
       studentsCount: 150,
@@ -40,7 +45,7 @@ export default function GroupsPage() {
       programsCount: 2,
     },
     {
-      id: 3,
+      id: "3",
       title: "Отдел разработки",
       type: "DEPARTMENT",
       studentsCount: 45,
@@ -48,7 +53,7 @@ export default function GroupsPage() {
       programsCount: 1,
     },
     {
-      id: 4,
+      id: "4",
       title: "Менеджеры проектов",
       type: "POSITION",
       studentsCount: 18,
@@ -56,7 +61,7 @@ export default function GroupsPage() {
       programsCount: 1,
     },
     {
-      id: 5,
+      id: "5",
       title: "Группа Б-205",
       type: "GENERAL",
       studentsCount: 22,
@@ -64,7 +69,7 @@ export default function GroupsPage() {
       programsCount: 1,
     },
     {
-      id: 6,
+      id: "6",
       title: 'ЗАО "Диджитал Эдьюкейшн"',
       type: "COMPANY",
       studentsCount: 200,
@@ -72,7 +77,7 @@ export default function GroupsPage() {
       programsCount: 3,
     },
     {
-      id: 7,
+      id: "7",
       title: "Отдел маркетинга",
       type: "DEPARTMENT",
       studentsCount: 30,
@@ -80,7 +85,7 @@ export default function GroupsPage() {
       programsCount: 1,
     },
     {
-      id: 8,
+      id: "8",
       title: "Frontend разработчики",
       type: "POSITION",
       studentsCount: 28,
@@ -88,7 +93,7 @@ export default function GroupsPage() {
       programsCount: 2,
     },
     {
-      id: 9,
+      id: "9",
       title: "Группа В-303",
       type: "GENERAL",
       studentsCount: 20,
@@ -96,7 +101,7 @@ export default function GroupsPage() {
       programsCount: 1,
     },
     {
-      id: 10,
+      id: "10",
       title: 'ООО "Бизнес Тренинг"',
       type: "COMPANY",
       studentsCount: 120,
@@ -127,9 +132,7 @@ export default function GroupsPage() {
             <Typography variant="h1">{groupTypeToWord[groupType]}</Typography>
           </Box>
           <Tooltip arrow title={"Создать группу"}>
-            <IconButton
-              onClick={() => {}} //TODO: открытие модалки для создания группы текущего типа
-            >
+            <IconButton onClick={() => setIsGroupModalOpen(true)}>
               <AddOutlinedIcon fontSize="large" />
             </IconButton>
           </Tooltip>
@@ -139,6 +142,20 @@ export default function GroupsPage() {
           <GroupTable groups={groupsByType} />
         </Box>
       </TabNavigation>
+      <GroupModalForm
+        open={isGroupModalOpen}
+        onSubmit={(groupInfo: CreateGroupRequest) => {
+          console.log("Создание группы", groupInfo);
+          //TODO: добавить метод создания группы
+          setIsGroupModalOpen(false);
+        }}
+        onDelete={(groupId: string) => {}}
+        onClose={() => {
+          setIsGroupModalOpen(false);
+        }}
+        isCreation={true}
+        currentValues={{ id: "", title: "", type: groupType }}
+      />
     </Box>
   );
 }
