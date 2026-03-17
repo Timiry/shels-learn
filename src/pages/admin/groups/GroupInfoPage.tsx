@@ -144,7 +144,9 @@ export default function GroupInfoPage() {
               <Button
                 variant="outlined"
                 onClick={() => {
-                  //   router.push(routes.admin.groups.manageStudents(groupInfo.type, groupId)) //TODO: добавить страницу управления студентами
+                  router.push(
+                    routes.admin.groups.manageStudents(groupInfo.type, groupId)
+                  );
                 }}
               >
                 Управление студентами
@@ -160,7 +162,9 @@ export default function GroupInfoPage() {
               <Button
                 variant="outlined"
                 onClick={() => {
-                  //   router.push(routes.admin.groups.manageCourses(groupInfo.type, groupId)) //TODO: добавить страницу управления курсами
+                  router.push(
+                    routes.admin.groups.manageCourses(groupInfo.type, groupId)
+                  );
                 }}
               >
                 Управление курсами
@@ -176,7 +180,9 @@ export default function GroupInfoPage() {
               <Button
                 variant="outlined"
                 onClick={() => {
-                  //   router.push(routes.admin.groups.managePrograms(groupInfo.type, groupId)) //TODO: добавить страницу управления программами
+                  router.push(
+                    routes.admin.groups.managePrograms(groupInfo.type, groupId)
+                  );
                 }}
               >
                 Управление программами
