@@ -11,7 +11,6 @@ import {
 import { useState, useEffect } from "react";
 import {
   LearnerLessonDto,
-  PracticeSubmissionRequest,
   SubmitPracticeApiArg,
 } from "@/features/student/api/studentApi";
 

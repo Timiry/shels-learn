@@ -1,4 +1,4 @@
-import { LessonDto } from "@/entities/course/model/types";
+import { LessonDto } from "@/entities/course/model/coursesApi";
 import Alert from "@mui/material/Alert";
 import Box from "@mui/material/Box";
 import { extractYouTubeVideoId } from "../../lib/utils/validationYoutubeUrl";

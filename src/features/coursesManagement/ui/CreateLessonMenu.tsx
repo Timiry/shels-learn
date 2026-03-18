@@ -1,4 +1,4 @@
-import { LessonType } from "@/entities/course/model/types";
+import { LessonType } from "@/entities/course/model/coursesApi";
 import lessonTypeToIcon from "@/entities/lesson/ui/lessonTypeToIcon";
 import { Box, IconButton, Stack, Typography } from "@mui/material";
 

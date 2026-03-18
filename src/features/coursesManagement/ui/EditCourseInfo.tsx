@@ -4,7 +4,7 @@ import {
   CreateCourseRequest,
   UpdateCourseApiArg,
   CourseDto,
-} from "@/entities/course/model/types";
+} from "@/entities/course/model/coursesApi";
 import { routes } from "@/shared/config/routes";
 import ConfirmDeleteModal from "@/shared/ui/ConfirmDeleteModal";
 import ImageUpload from "@/shared/ui/ImageUpload";
@@ -118,7 +118,7 @@ export default function EditCourseInfo({
           onDelete(courseInfo?.id);
           router.push(routes.admin.courses.allCourses);
         }}
-        objectname={courseInfo.title}
+        objectname={courseInfo.title || ""}
         objectType="course"
       />
     </Box>

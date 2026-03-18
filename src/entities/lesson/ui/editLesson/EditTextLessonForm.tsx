@@ -4,7 +4,7 @@ import {
   CreatePracticeLessonRequest,
   CreateTheoryLessonRequest,
   LessonDto,
-} from "@/entities/course/model/types";
+} from "@/entities/course/model/coursesApi";
 
 import { useForm } from "react-hook-form";
 import { Box, Typography, TextField, Stack, Button } from "@mui/material";
@@ -47,13 +47,13 @@ export default function EditTextLessonForm({
           title: "",
           fullPoints: 1,
           content: "",
-          contentType: "HTML_TEXT",
+          lessonType: "THEORY_TEXT",
         }
       : {
           title: currentValues?.title || "",
           fullPoints: currentValues?.fullPoints || 1,
           content: currentValues?.theoryContent || "",
-          contentType: currentValues?.theoryContentType || "HTML_TEXT",
+          lessonType: currentValues?.lessonType || "THEORY_TEXT",
         },
   });
 

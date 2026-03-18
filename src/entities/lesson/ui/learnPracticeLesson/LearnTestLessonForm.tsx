@@ -7,18 +7,13 @@ import {
   RadioGroup,
   FormControlLabel,
   Checkbox,
-  FormControl,
-  FormLabel,
   Stack,
   Divider,
   Alert,
-  TextField,
 } from "@mui/material";
 import { useState, useEffect } from "react";
-import {} from "@/entities/course/model/types";
 import {
   LearnerLessonDto,
-  PracticeSubmissionRequest,
   SubmitPracticeApiArg,
 } from "@/features/student/api/studentApi";
 
