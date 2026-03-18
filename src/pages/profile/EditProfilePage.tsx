@@ -1,7 +1,7 @@
 "use client";
 
 import {
-  UpdateMyProfileRequest,
+  UpdateUserRequest,
   useMyProfileQuery,
   useUpdateMyProfileMutation,
 } from "@/features/student/api/studentApi";
@@ -48,9 +48,9 @@ export default function EditProfilePage() {
             <ImageUpload
               value={
                 photo === null
-                  ? profileInfo.user.avatarFilePath
+                  ? profileInfo.user?.avatarFilePath
                     ? "http://217.26.31.189" + profileInfo.user.avatarFilePath
-                    : profileInfo.user.avatarFilePath
+                    : profileInfo.user?.avatarFilePath
                   : photo
               }
               onChange={(file: File) => {
@@ -63,7 +63,7 @@ export default function EditProfilePage() {
           </Box>
           <Box pl={"50px"} flex={1}>
             <EditUserForm
-              onSubmit={async (userInfo: UpdateMyProfileRequest) => {
+              onSubmit={async (userInfo: UpdateUserRequest) => {
                 if (photoWasChange && photo) {
                   const avatar = await uploadImage({
                     file: photo,
@@ -82,7 +82,7 @@ export default function EditProfilePage() {
               }}
               formId={formId}
               isCreation={false}
-              isAdmin={profileInfo.user.role === "ADMIN"}
+              isAdmin={profileInfo.user?.role === "ADMIN"}
               currentValues={profileInfo.user}
             />
           </Box>

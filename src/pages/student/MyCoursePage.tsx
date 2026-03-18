@@ -66,7 +66,14 @@ export default function MyCoursePage() {
             <ListItem key={lesson.id}>
               <ListItemIcon
                 sx={{
-                  color: lesson.passed ? "success.dark" : "text.secondary",
+                  color:
+                    lesson.lessonProgress?.status === "COMPLETED"
+                      ? "success.dark"
+                      : lesson.lessonProgress?.status === "INCOMPLETED"
+                        ? "error.main"
+                        : lesson.lessonProgress?.status === "PENDING_REVIEW"
+                          ? "success.light"
+                          : "text.secondary",
                 }}
               >
                 {lessonTypeToIcon[lesson.lessonType]}

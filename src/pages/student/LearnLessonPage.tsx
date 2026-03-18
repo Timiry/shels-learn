@@ -59,9 +59,9 @@ export default function LearnLessonPage() {
   const [completeTheory] = useCompleteTheoryLessonMutation();
   const [completePractice] = useSubmitPracticeMutation();
 
-  const isLessonCompleted = course?.lessons?.find(
-    (item) => item.id === lesson?.id
-  )?.passed;
+  const isLessonCompleted =
+    course?.lessons?.find((item) => item.id === lesson?.id)?.lessonProgress
+      ?.status === "COMPLETED";
 
   const videoUrl = lesson?.theoryContent || "";
   const youtubeId = extractYouTubeVideoId(videoUrl);
@@ -72,7 +72,7 @@ export default function LearnLessonPage() {
   // Обработчик завершения урока
   const handleLessonCompletion = () => {
     try {
-      if (lesson?.lessonType.includes("THEORY")) {
+      if (lesson?.lessonType?.includes("THEORY")) {
         completeTheory(lesson.id);
       } else {
         // completePractice();
@@ -183,7 +183,7 @@ export default function LearnLessonPage() {
                           justifyContent: "center",
                           color: isCurrentLesson
                             ? "primary.main"
-                            : lessonItem.passed
+                            : lessonItem.lessonProgress?.status === "COMPLETED"
                               ? "success.dark"
                               : "text.secondary",
                         }}
@@ -221,7 +221,7 @@ export default function LearnLessonPage() {
                 Получено баллов:{" "}
                 {
                   course.lessons?.find((item) => item?.id === lesson?.id)
-                    ?.pointsAwarded
+                    ?.lessonProgress?.pointsAwarded
                 }
               </Typography>
             </Box>
@@ -318,7 +318,7 @@ export default function LearnLessonPage() {
               pb: 1,
             }}
           >
-            {lesson?.lessonType.includes("THEORY") ? (
+            {lesson?.lessonType?.includes("THEORY") ? (
               <Button
                 variant="contained"
                 color="primary"

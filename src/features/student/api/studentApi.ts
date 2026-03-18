@@ -1,3 +1,4 @@
+import { UserDto } from "@/entities/user/model/usersApi";
 import { baseApi as api } from "../../../shared/api/baseApi";
 const injectedRtkApi = api.injectEndpoints({
   endpoints: (build) => ({
@@ -6,15 +7,6 @@ const injectedRtkApi = api.injectEndpoints({
       UpdateMyLastVisitApiArg
     >({
       query: () => ({ url: `/api/v1/student/my/last-visit`, method: "POST" }),
-    }),
-    completeTheoryLesson: build.mutation<
-      CompleteTheoryLessonApiResponse,
-      CompleteTheoryLessonApiArg
-    >({
-      query: (queryArg) => ({
-        url: `/api/v1/student/lessons/${queryArg}/complete-theory`,
-        method: "POST",
-      }),
       invalidatesTags: ["Learning"],
     }),
     submitPractice: build.mutation<
@@ -25,6 +17,16 @@ const injectedRtkApi = api.injectEndpoints({
         url: `/api/v1/student/lessons/${queryArg.lessonId}/submit-practice`,
         method: "POST",
         body: queryArg.practiceSubmissionRequest,
+      }),
+      invalidatesTags: ["Learning"],
+    }),
+    completeTheoryLesson: build.mutation<
+      CompleteTheoryLessonApiResponse,
+      CompleteTheoryLessonApiArg
+    >({
+      query: (queryArg) => ({
+        url: `/api/v1/student/lessons/${queryArg}/complete-theory`,
+        method: "POST",
       }),
       invalidatesTags: ["Learning"],
     }),
@@ -52,7 +54,9 @@ const injectedRtkApi = api.injectEndpoints({
       providesTags: ["Learning"],
     }),
     myProgram: build.query<MyProgramApiResponse, MyProgramApiArg>({
-      query: (queryArg) => ({ url: `/api/v1/student/my/programs/${queryArg}` }),
+      query: (queryArg) => ({
+        url: `/api/v1/student/my/programs/${queryArg}`,
+      }),
       providesTags: ["Learning"],
     }),
     myCourses: build.query<MyCoursesApiResponse, MyCoursesApiArg>({
@@ -89,32 +93,32 @@ export { injectedRtkApi as studentApi };
 export type UpdateMyLastVisitApiResponse =
   /** status 200 Дата последнего визита обновлена */ UserDto;
 export type UpdateMyLastVisitApiArg = void;
-export type UploadMyAvatarApiResponse =
-  /** status 200 Аватар обновлен */ UserDto;
-export type UploadMyAvatarApiArg = {
-  file: File;
-};
 export type SubmitPracticeApiResponse =
   /** status 200 Ответы отправлены */ SubmissionResultDto;
 export type SubmitPracticeApiArg = {
   lessonId: number;
   practiceSubmissionRequest: PracticeSubmissionRequest;
 };
+export type CompleteTheoryLessonApiResponse =
+  /** status 200 Теоретический урок отмечен как пройденный */ SubmissionResultDto;
+export type CompleteTheoryLessonApiArg = number;
 export type MyProfileApiResponse =
   /** status 200 Профиль текущего пользователя */ StudentProfileDto;
 export type MyProfileApiArg = void;
 export type UpdateMyProfileApiResponse =
   /** status 200 Профиль обновлён */ StudentProfileDto;
-export type UpdateMyProfileApiArg = UpdateMyProfileRequest;
+export type UpdateMyProfileApiArg = UpdateUserRequest;
 export type MyStatsApiResponse =
   /** status 200 Личная статистика */ StudentCourseStatDto[];
 export type MyStatsApiArg = void;
-export type MyProgramsApiResponse = unknown;
+export type MyProgramsApiResponse =
+  /** status 200 Список программ пользователя */ ProgramDto[];
 export type MyProgramsApiArg = void;
-export type MyProgramApiResponse = unknown;
+export type MyProgramApiResponse =
+  /** status 200 Программа пользователя */ ProgramDto;
 export type MyProgramApiArg = number;
 export type MyCoursesApiResponse =
-  /** status 200 Список назначенных курсов */ CourseDto[];
+  /** status 200 Список назначенных курсов */ CourseLearnerDto[];
 export type MyCoursesApiArg = void;
 export type GetLessonForLearnerApiResponse =
   /** status 200 Урок для прохождения */ LearnerLessonDto;
@@ -122,53 +126,47 @@ export type GetLessonForLearnerApiArg = number;
 export type CourseForLearnerApiResponse =
   /** status 200 Детали курса */ CourseLearnerDto;
 export type CourseForLearnerApiArg = number;
-export type UserDto = {
-  id?: number;
-  fullName?: string;
-  email?: string;
-  role?: "ADMIN" | "STUDENT";
-  activation?: boolean;
-  enabled?: boolean;
-  phone?: string;
-  comment?: string;
-  avatarFilePath?: string;
-  createdAt?: string;
-  createdBy?: string;
-  lastVisit?: string;
-  deactivatedAt?: string;
-  deactivatedBy?: string;
-};
-export type ApiResponse = {
-  message?: string;
-};
-export type SubmissionResultDto = {
-  submissionId?: number;
-  status?: "COMPLETE" | "INCOMPLETE" | "PENDING_REVIEW" | "REWORK" | "ACCEPTED";
-  passed?: boolean;
-  message?: string;
-};
-export type PracticeSubmissionRequest = {
-  /** Ответы по индексам вопросов: questionIndex -> список ответов */
-  questionAnswers?: {
-    [key: string]: string[];
-  };
-};
+export type NextLessonForLearnerApiResponse =
+  /** status 200 Следующий доступный урок */ LearnerLessonDto;
+export type NextLessonForLearnerApiArg = number;
 export type GroupDto = {
   id?: string;
   title?: string;
   type?: "GENERAL" | "COMPANY" | "DEPARTMENT" | "POSITION";
 };
+
+export type ApiResponse = {
+  message?: string;
+};
+export type SubmissionResultDto = {
+  submissionId?: number;
+  status?:
+    | "COMPLETED"
+    | "INCOMPLETED"
+    | "PENDING_REVIEW"
+    | "REWORKING"
+    | "STARTED";
+};
+export type PracticeSubmissionRequest = {
+  /** Ответы по id вопросов: questionId -> answers[] */
+  questionAnswers?: {
+    [key: string]: string[];
+  };
+  /** Время отправки ответа на практику в UTC */
+  submittedAt?: number;
+};
 export type StudentProfileDto = {
   user: UserDto;
-  groups: GroupDto[];
+  groups?: GroupDto[];
 };
-export type UpdateMyProfileRequest = {
-  fullName: string;
-  phone?: string;
-  comment?: string;
-  email: string;
-  role: "ADMIN" | "STUDENT";
+export type UpdateUserRequest = {
+  fullName?: string;
+  email?: string;
+  role?: "ADMIN" | "STUDENT";
   avatarFilePath?: string;
+  phone?: string;
+  snils?: string;
+  comment?: string;
   password?: string;
 };
 export type StudentCourseStatDto = {
@@ -184,65 +182,69 @@ export type StudentCourseStatDto = {
   startedAt?: string;
   completedAt?: string;
 };
-export type CourseDto = {
-  id: number;
+export type ProgramCourseDto = {
+  courseId?: number;
+  orderIndex?: number;
+  available?: boolean;
+  viewed?: boolean;
+  completed?: boolean;
+};
+
+export type AccessCondition =
+  | "PREVIOUS_COURSES_COMPLETED"
+  | "PREVIOUS_COURSES_VIEWED_OR_PENDING"
+  | "ALL_OPEN";
+
+export type ProgramDto = {
+  id?: number;
   title?: string;
   description?: string;
-  authorFullName?: string;
-  coverFilePath?: string;
-  passingThresholdPercent?: number;
-  deadlineDays?: number;
-  lessonsFreeOrder?: boolean;
-  allowContinueAfterFail?: boolean;
+  accessCondition?: AccessCondition;
+  deadlineAt?: number;
   blockAfterDeadline?: boolean;
-  keepAccessAfterDeadline?: boolean;
-  includeInOverallStats?: boolean;
-  sectionId?: number;
-  sectionTitle?: string;
-  sectionPriority?: number;
+  completed?: boolean;
+  courses?: ProgramCourseDto[];
 };
-export type LearnerPracticeQuestionDto = {
-  position: number;
-  questionType?:
-    | "SINGLE_CHOICE"
-    | "MULTIPLE_CHOICE"
-    | "MATCHING"
-    | "ORDERING"
-    | "OPEN_ANSWER";
-  questionText?: string;
-  options?: string[];
-  fullPoints?: number;
-  partialPoints?: number;
+
+export type CourseProgressStatus =
+  | "NEW"
+  | "IN_PROGRESS"
+  | "COMPLETED"
+  | "INCOMPLETED";
+
+export type CourseProgressDto = {
+  deadlineAt?: number;
+  completionPercent?: number;
+  completedLessons?: number;
+  remainingLessons?: number;
+  completionStatus?: CourseProgressStatus;
 };
-export type LearnerLessonDto = {
-  id: number;
-  position: number;
-  title: string;
-  description?: string;
-  lessonType:
-    | "THEORY_TEXT"
-    | "THEORY_VIDEO"
-    | "THEORY_PDF"
-    | "PRACTICE_TEST"
-    | "PRACTICE_OPEN_ANSWER";
-  theoryContentType?: "HTML_TEXT" | "VIDEO_URL" | "PDF_FILE";
-  theoryContent?: string;
-  questions?: LearnerPracticeQuestionDto[];
+
+export type LessonProgressStatus =
+  | "COMPLETED"
+  | "INCOMPLETED"
+  | "PENDING_REVIEW"
+  | "REWORKING"
+  | "STARTED";
+
+export type LessonProgressDto = {
+  status?: LessonProgressStatus;
+  pointsAwarded?: number;
 };
 export type LearnerLessonSummaryDto = {
   id: number;
-  position?: number;
-  title?: string;
+  position: number;
+  title: string;
   lessonType:
     | "THEORY_TEXT"
     | "THEORY_VIDEO"
     | "THEORY_PDF"
     | "PRACTICE_TEST"
     | "PRACTICE_OPEN_ANSWER";
-  passed?: boolean;
-  pointsAwarded?: number;
   blocked?: boolean;
   blockReason?: string;
+  fullPoints?: number;
+  lessonProgress?: LessonProgressDto;
 };
 export type CourseLearnerDto = {
   id: number;
@@ -250,26 +252,54 @@ export type CourseLearnerDto = {
   description?: string;
   coverFilePath?: string;
   deadlineDays?: number;
-  completionPercent?: number;
-  completedLessons?: number;
-  remainingLessons?: number;
   totalLessons?: number;
-  courseCompleted?: boolean;
+  progress?: CourseProgressDto;
   lessons?: LearnerLessonSummaryDto[];
 };
 
-export type NextLessonForLearnerApiResponse =
-  /** status 200 Следующий доступный урок */ LearnerLessonDto;
-export type NextLessonForLearnerApiArg = number;
+export type QuestionProgressStatus =
+  | "PENDING_REVIEW"
+  | "ACCEPTED"
+  | "REWORK"
+  | "REJECTED";
 
-export type CompleteTheoryLessonApiResponse =
-  /** status 200 Теоретический урок отмечен как пройденный */ SubmissionResultDto;
-export type CompleteTheoryLessonApiArg = number;
-
+export type LearnerPracticeQuestionDto = {
+  id?: number;
+  position: number;
+  questionType?:
+    | "SINGLE_CHOICE"
+    | "MULTIPLE_CHOICE"
+    | "ORDERING"
+    | "OPEN_ANSWER";
+  questionText?: string;
+  options?: string[];
+  userAnswers?: string[];
+  correctAnswers?: string[];
+  status?: QuestionProgressStatus;
+  reviewComment?: string;
+  awardedPoints?: number;
+  fullPoints?: number;
+  partialPoints?: number;
+};
+export type LearnerLessonDto = {
+  id: number;
+  position?: number;
+  title?: string;
+  description?: string;
+  lessonType?:
+    | "THEORY_TEXT"
+    | "THEORY_VIDEO"
+    | "THEORY_PDF"
+    | "PRACTICE_TEST"
+    | "PRACTICE_OPEN_ANSWER";
+  theoryContent?: string;
+  deadlineAt?: number;
+  questions?: LearnerPracticeQuestionDto[];
+};
 export const {
   useUpdateMyLastVisitMutation,
-  useCompleteTheoryLessonMutation,
   useSubmitPracticeMutation,
+  useCompleteTheoryLessonMutation,
   useMyProfileQuery,
   useUpdateMyProfileMutation,
   useMyStatsQuery,
