@@ -57,6 +57,7 @@ export default function EditTaskLessonForm({
     defaultValues: isCreation
       ? {
           title: "",
+          passingThresholdPercent: 90,
           lessonType: "PRACTICE_OPEN_ANSWER",
           questions: [],
           stopLesson: false,
@@ -178,19 +179,6 @@ export default function EditTaskLessonForm({
 
   // Обработчик отправки формы
   const onSubmitForm = (lessonInfo: CreatePracticeLessonRequest) => {
-    if (!lessonInfo.title.trim()) {
-      setValue("title", lessonInfo.title.trim(), { shouldValidate: true });
-      return;
-    }
-
-    if (
-      !lessonInfo.passingThresholdPercent ||
-      lessonInfo.passingThresholdPercent <= 0 ||
-      lessonInfo.passingThresholdPercent > 100
-    ) {
-      return;
-    }
-
     // Форматируем данные для отправки
     const formattedQuestions: PracticeQuestionRequest[] = questions.map(
       (q, index) => ({
@@ -263,6 +251,7 @@ export default function EditTaskLessonForm({
               </Typography>
               <TextField
                 {...register("passingThresholdPercent", {
+                  required: "Порог прохождения обязателен",
                   valueAsNumber: true,
                   min: { value: 1, message: "Минимум 1%" },
                   max: { value: 100, message: "Максимум 100%" },

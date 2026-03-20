@@ -73,7 +73,7 @@ export default function TaskQuestionForm({
       {/* Поля для баллов */}
       <Box sx={{ display: "flex", alignItems: "center", gap: 2, mb: 2 }}>
         <Typography variant="body1">Баллы</Typography>
-        <Typography variant="body2">Правильный:</Typography>
+        <Typography variant="body2">Полный:</Typography>
         <TextField
           type="number"
           value={question.fullPoints}

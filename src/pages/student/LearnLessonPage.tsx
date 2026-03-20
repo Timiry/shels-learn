@@ -30,7 +30,6 @@ import NextLink from "next/link";
 
 import { useParams, useRouter } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
-import { ca } from "zod/locales";
 
 export default function LearnLessonPage() {
   const params = useParams();
@@ -66,7 +65,7 @@ export default function LearnLessonPage() {
   const [completePractice] = useSubmitPracticeMutation();
 
   useEffect(() => {
-    if (lesson && lesson.status === undefined) {
+    if (lesson && !lesson.status) {
       if (lesson?.timeLimitMinutes) setIsDialogOpen(true);
       else startLearningLesson(+lessonId);
     }

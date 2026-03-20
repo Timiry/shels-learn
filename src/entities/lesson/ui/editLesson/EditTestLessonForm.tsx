@@ -64,6 +64,7 @@ export default function EditTestLessonForm({
     defaultValues: isCreation
       ? {
           title: "",
+          passingThresholdPercent: 90,
           lessonType: "PRACTICE_TEST",
           questions: [],
           shuffleOptions: false,
@@ -73,7 +74,7 @@ export default function EditTestLessonForm({
         }
       : {
           title: currentValues?.title || "",
-          passingThresholdPercent: currentValues?.passingThresholdPercent,
+          passingThresholdPercent: currentValues?.passingThresholdPercent || 90,
           lessonType: "PRACTICE_TEST",
           questions: currentValues?.questions || [],
           stopLesson: currentValues?.stopLesson,
@@ -374,6 +375,7 @@ export default function EditTestLessonForm({
               </Typography>
               <TextField
                 {...register("passingThresholdPercent", {
+                  required: "Порог прохождения обязателен",
                   valueAsNumber: true,
                   min: { value: 1, message: "Минимум 1%" },
                   max: { value: 100, message: "Максимум 100%" },
