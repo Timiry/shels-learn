@@ -1,6 +1,5 @@
 "use client";
 
-import { useGetUserQuery } from "@/entities/user/model/usersApi";
 import UserInfoCard from "@/entities/user/ui/UserInfoCard";
 import {
   useMyProfileQuery,
@@ -25,7 +24,7 @@ export default function ProfilePage() {
     userInfo && (
       <Box display="flex">
         <UserInfoCard
-          user={userInfo.user}
+          user={userInfo}
           onEditClick={() =>
             router.push(
               activeRole === "ADMIN"

@@ -110,10 +110,10 @@ export type CompleteTheoryLessonApiResponse =
   /** status 200 Теоретический урок отмечен как пройденный */ SubmissionResultDto;
 export type CompleteTheoryLessonApiArg = number;
 export type MyProfileApiResponse =
-  /** status 200 Профиль текущего пользователя */ StudentProfileDto;
+  /** status 200 Профиль текущего пользователя */ UserDto;
 export type MyProfileApiArg = void;
 export type UpdateMyProfileApiResponse =
-  /** status 200 Профиль обновлён */ StudentProfileDto;
+  /** status 200 Профиль обновлён */ UserDto;
 export type UpdateMyProfileApiArg = UpdateUserRequest;
 export type MyStatsApiResponse =
   /** status 200 Личная статистика */ StudentCourseStatDto[];
@@ -162,10 +162,7 @@ export type PracticeSubmissionRequest = {
   /** Время отправки ответа на практику в UTC */
   submittedAt?: number;
 };
-export type StudentProfileDto = {
-  user: UserDto;
-  groups?: GroupDto[];
-};
+
 export type UpdateUserRequest = {
   fullName?: string;
   email?: string;
