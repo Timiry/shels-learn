@@ -22,6 +22,7 @@ export const baseApi = createApi({
     "Learning",
     "Review",
     "Sections",
+    "Programs",
   ],
   endpoints: () => ({}),
 });
