@@ -11,17 +11,21 @@ import {
 import { useState, useEffect } from "react";
 import {
   LearnerLessonDto,
+  LessonProgressStatus,
   SubmitPracticeApiArg,
 } from "@/features/student/api/studentApi";
+import LessonOption from "../lessonContent/lessonOption";
 
 interface LearnTaskLessonFormProps {
   lesson: LearnerLessonDto;
+  lessonStatus?: LessonProgressStatus;
   formId: string;
   onSubmit: (data: SubmitPracticeApiArg) => void;
 }
 
 export default function LearnTaskLessonForm({
   lesson,
+  lessonStatus,
   formId,
   onSubmit,
 }: LearnTaskLessonFormProps) {
@@ -33,7 +37,9 @@ export default function LearnTaskLessonForm({
     if (lesson.questions) {
       const initialAnswers: { [key: string]: string[] } = {};
       lesson.questions.forEach((question) => {
-        initialAnswers[question.position.toString()] = [""];
+        initialAnswers[question.position.toString()] = question.userAnswers || [
+          "",
+        ];
       });
       setAnswers(initialAnswers);
     }
@@ -51,10 +57,10 @@ export default function LearnTaskLessonForm({
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!areAllQuestionsAnswered()) {
-      alert("Вы ответили не на все вопросы");
-      return;
-    }
+    // if (!areAllQuestionsAnswered()) {
+    //   alert("Вы ответили не на все вопросы");
+    //   return;
+    // }
 
     // Форматируем данные для отправки
     const submissionData: SubmitPracticeApiArg = {
@@ -67,15 +73,15 @@ export default function LearnTaskLessonForm({
     onSubmit(submissionData);
   };
 
-  // Проверка, все ли вопросы имеют ответы (не пустые)
-  const areAllQuestionsAnswered = () => {
-    if (!lesson.questions) return false;
+  // // Проверка, все ли вопросы имеют ответы (не пустые)
+  // const areAllQuestionsAnswered = () => {
+  //   if (!lesson.questions) return false;
 
-    return lesson.questions.every((question, index) => {
-      const answer = answers[(index + 1).toString()]?.[0] || "";
-      return answer.trim().length > 0;
-    });
-  };
+  //   return lesson.questions.every((question, index) => {
+  //     const answer = answers[(index + 1).toString()]?.[0] || "";
+  //     return answer.trim().length > 0;
+  //   });
+  // };
 
   if (!lesson.questions || lesson.questions.length === 0) {
     return (
@@ -108,9 +114,22 @@ export default function LearnTaskLessonForm({
                 bgcolor: "background.paper",
               }}
             >
-              <Typography variant="h6" gutterBottom sx={{ mb: 2 }}>
-                {`Вопрос № ${question.position}`}
-              </Typography>
+              <Box
+                display={"flex"}
+                justifyContent={"space-between"}
+                alignItems={"center"}
+              >
+                <Typography variant="h6" gutterBottom sx={{ mb: 2 }}>
+                  {`Вопрос № ${question.position}`}
+                </Typography>
+                {lessonStatus !== "STARTED" &&
+                  question.status === "ACCEPTED" && (
+                    <LessonOption
+                      name="Получено баллов"
+                      value={`${question.awardedPoints} из ${question.fullPoints}`}
+                    />
+                  )}
+              </Box>
               <Typography
                 variant="body1"
                 sx={{ mb: 2, whiteSpace: "pre-wrap" }}
@@ -119,6 +138,46 @@ export default function LearnTaskLessonForm({
               </Typography>
 
               <Divider sx={{ mb: 2 }} />
+              {question?.status === "ACCEPTED" && (
+                <Typography
+                  variant="body1"
+                  p={1}
+                  my={2}
+                  sx={{ bgcolor: "#b4e1a9", borderRadius: "5px" }}
+                >
+                  Ответ принят
+                </Typography>
+              )}
+              {question?.status === "REJECTED" && (
+                <Typography
+                  variant="body1"
+                  p={1}
+                  my={2}
+                  sx={{ bgcolor: "#f4b2a3", borderRadius: "5px" }}
+                >
+                  Ответ не принят
+                </Typography>
+              )}
+              {question?.status === "PENDING_REVIEW" && (
+                <Typography
+                  variant="body1"
+                  p={1}
+                  my={2}
+                  sx={{ bgcolor: "#ece4a0", borderRadius: "5px" }}
+                >
+                  Ответ ожидает проверки
+                </Typography>
+              )}
+              {question?.status === "REWORK" && (
+                <Typography
+                  variant="body1"
+                  p={1}
+                  my={2}
+                  sx={{ bgcolor: "#f7d1b3", borderRadius: "5px" }}
+                >
+                  Ответ требует доработки
+                </Typography>
+              )}
 
               {/* Текстовое поле для ответа */}
               <TextField
@@ -128,11 +187,14 @@ export default function LearnTaskLessonForm({
                 maxRows={10}
                 placeholder="Введите ваш ответ здесь..."
                 value={answer}
+                disabled={
+                  lessonStatus !== "STARTED" ||
+                  (question.status && question.status !== "REWORK")
+                }
                 onChange={(e) =>
                   handleAnswerChange(question.position, e.target.value)
                 }
                 variant="outlined"
-                error={answer.trim().length === 0 && answer.length > 0}
                 sx={{
                   "& .MuiInputBase-root": {
                     fontSize: "1rem",
@@ -141,8 +203,17 @@ export default function LearnTaskLessonForm({
                 }}
               />
 
+              {question.reviewComment && (
+                <Box bgcolor={"#f0ecc6"} p={2} my={1} borderRadius={1}>
+                  <Typography>Комментарий тренера:</Typography>
+                  <Typography variant="body2">
+                    {question.reviewComment}
+                  </Typography>
+                </Box>
+              )}
+
               {/* Информация о баллах */}
-              {question.fullPoints && (
+              {(question.fullPoints || question.partialPoints) && (
                 <Box
                   sx={{
                     mt: 2,
@@ -152,7 +223,13 @@ export default function LearnTaskLessonForm({
                   }}
                 >
                   <Typography variant="caption" color="text.secondary">
-                    Баллы за верный ответ: {question.fullPoints}
+                    {question.fullPoints
+                      ? `Балл за полный ответ: ${question.fullPoints}`
+                      : ""}
+
+                    {question.partialPoints !== undefined
+                      ? ` | Балл за частичный ответ: ${question.partialPoints}`
+                      : ""}
                   </Typography>
                 </Box>
               )}

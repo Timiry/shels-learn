@@ -1,40 +1,36 @@
 "use client";
 
-import { extractYouTubeVideoId } from "@/entities/lesson/lib/utils/validationYoutubeUrl";
-import LearnTaskLessonForm from "@/entities/lesson/ui/learnPracticeLesson/LearnTaskLessonForm";
-import LearnTestLessonForm from "@/entities/lesson/ui/learnPracticeLesson/LearnTestLessonForm";
-import PdfLessonContent from "@/entities/lesson/ui/lessonContent/PdfLessonContent";
-import TextLessonContent from "@/entities/lesson/ui/lessonContent/TextLessonContent";
-import VideoLessonContent from "@/entities/lesson/ui/lessonContent/VideoLessonContent";
-import lessonTypeToIcon from "@/entities/lesson/ui/lessonTypeToIcon";
+import LearnLessonForm from "@/entities/lesson/ui/learnLesson";
 import {
+  CourseLearnerDto,
+  LearnerLessonDto,
   LearnerLessonSummaryDto,
-  SubmitPracticeApiArg,
   useCompleteTheoryLessonMutation,
   useCourseForLearnerQuery,
   useGetLessonForLearnerQuery,
+  useStartLearningLessonMutation,
   useSubmitPracticeMutation,
 } from "@/features/student/api/studentApi";
+import LessonsIconsList from "@/features/student/ui/LessonsIconsList";
+import { LessonTimer } from "@/features/student/ui/LessonTimer";
 import { routes } from "@/shared/config/routes";
+import FullscreenLoader from "@/shared/ui/FullScreenLoader";
 import {
   Box,
   Typography,
   Alert,
   Divider,
-  useTheme,
   Button,
-  CircularProgress,
-  List,
-  ListItem,
-  ListItemButton,
-  ListItemIcon,
   Stack,
   Link,
+  Snackbar,
+  DialogActions,
+  DialogContent,
 } from "@mui/material";
 import NextLink from "next/link";
 
 import { useParams, useRouter } from "next/navigation";
-import { useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 
 export default function LearnLessonPage() {
   const params = useParams();
@@ -42,6 +38,15 @@ export default function LearnLessonPage() {
 
   const courseId = params?.courseId as string;
   const lessonId = params?.lessonId as string;
+
+  // Состояние для уведомлений
+  const [snackbar, setSnackbar] = useState<{
+    open: boolean;
+    message: string;
+    severity: "success" | "error" | "warning";
+  }>({ open: false, message: "", severity: "warning" });
+
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
 
   const {
     data: course,
@@ -56,58 +61,87 @@ export default function LearnLessonPage() {
     refetch,
   } = useGetLessonForLearnerQuery(+lessonId);
 
+  const [startLearningLesson] = useStartLearningLessonMutation();
   const [completeTheory] = useCompleteTheoryLessonMutation();
   const [completePractice] = useSubmitPracticeMutation();
 
-  const isLessonCompleted =
-    course?.lessons?.find((item) => item.id === lesson?.id)?.lessonProgress
-      ?.status === "COMPLETED";
+  useEffect(() => {
+    if (lesson?.status === undefined && lesson?.timeLimitMinutes)
+      setIsDialogOpen(true);
+    else startLearningLesson(+lessonId);
+  }, []);
 
-  const videoUrl = lesson?.theoryContent || "";
-  const youtubeId = extractYouTubeVideoId(videoUrl);
+  const lessonProgress = course?.lessons?.find(
+    (item) => item.id === lesson?.id
+  )?.lessonProgress;
+
+  const fullPoints = course?.lessons?.find(
+    (item) => item.id === lesson?.id
+  )?.fullPoints;
+
+  const isLessonCompleted = lessonProgress?.status === "COMPLETED";
+
+  const isLessonLast = lesson?.position === course?.lessons?.length;
 
   const testFormId = "testForm";
   const taskFormId = "taskForm";
 
-  // Обработчик завершения урока
-  const handleLessonCompletion = () => {
-    try {
-      if (lesson?.lessonType?.includes("THEORY")) {
-        completeTheory(lesson.id);
-      } else {
-        // completePractice();
-      }
-    } catch (err) {
-      console.error("Ошибка завершения урока:", err);
-    }
-  };
-
   // Получаем следующий урок
-  const getNextLesson = (): LearnerLessonSummaryDto | null => {
-    if (!course?.lessons) return null;
-
-    const currentIndex = course.lessons.findIndex(
-      (l) => l.id === Number(lessonId)
-    );
-    if (currentIndex === -1 || currentIndex >= course.lessons.length - 1) {
-      return null;
+  const getNextLesson = (): LearnerLessonSummaryDto | undefined => {
+    if (!course?.lessons || isLessonLast) return undefined;
+    const position = lesson?.position;
+    if (position !== undefined) {
+      return course.lessons.find(
+        (lessonItem) => lessonItem.position === position + 1
+      );
+    } else {
+      const currentIndex = course.lessons.findIndex(
+        (l) => l.id === Number(lessonId)
+      );
+      return course.lessons[currentIndex + 1];
     }
-
-    return course.lessons[currentIndex + 1];
   };
 
   const nextLesson = getNextLesson();
 
-  // Проверка, является ли текущий урок последним //TODO: обработать завершение курса, выводить инфу о завершении
-  const isLastLesson = () => {
-    if (!course?.lessons) return false;
-    const currentIndex = course.lessons.findIndex(
-      (l) => l.id === Number(lessonId)
-    );
-    return currentIndex === course.lessons.length - 1;
-  };
+  // Автоматическая отправка при истечении времени
+  const handleTimeUp = useCallback(async () => {
+    if (!lesson || lesson.status !== "STARTED") return;
 
-  if (isCourseLoading || isLessonLoading) return <CircularProgress />;
+    try {
+      // Для практических уроков отправляем форму
+
+      const form = document.getElementById(
+        lesson.lessonType === "PRACTICE_TEST" ? testFormId : taskFormId
+      ) as HTMLFormElement;
+
+      if (form) {
+        form.requestSubmit();
+      } else {
+        // Если форма не найдена, показываем ошибку
+        setSnackbar({
+          open: true,
+          message: "Не удалось автоматически отправить ответы.",
+          severity: "error",
+        });
+      }
+
+      setSnackbar({
+        open: true,
+        message: "Ваши ответы отправлены автоматически",
+        severity: "success",
+      });
+    } catch (error) {
+      setSnackbar({
+        open: true,
+        message: "Ошибка при автоматической отправке ответов",
+        severity: "error",
+      });
+      console.error("Ошибка автоматической отправки:", error);
+    }
+  }, [lesson, completeTheory, testFormId, taskFormId]);
+
+  if (isCourseLoading || isLessonLoading) return <FullscreenLoader />;
 
   return (
     <>
@@ -119,84 +153,9 @@ export default function LearnLessonPage() {
       <Divider />
       <Box sx={{ display: "flex", minHeight: "calc(100vh - 41px)" }}>
         {/* Левая панель с уроками */}
-        <Box
-          sx={{
-            // width: 300,
-            borderRight: "1px solid",
-            borderColor: "divider",
-            flexShrink: 0,
-            display: "flex",
-            flexDirection: "column",
-            overflow: "hidden",
-          }}
-        >
-          {/* Список уроков */}
-          <Box
-            sx={{
-              flex: 1,
-              overflowY: "auto",
-              p: 1,
-              "&::-webkit-scrollbar": {
-                width: "6px",
-              },
-              "&::-webkit-scrollbar-track": {
-                backgroundColor: "background.default",
-              },
-              "&::-webkit-scrollbar-thumb": {
-                backgroundColor: "divider",
-                borderRadius: "3px",
-              },
-            }}
-          >
-            <List>
-              {course?.lessons?.map((lessonItem) => {
-                const isCurrentLesson = lessonItem.id === Number(lessonId);
-                return (
-                  <ListItem
-                    key={lessonItem.id}
-                    disablePadding
-                    sx={{
-                      mb: 0.5,
-                      borderRadius: 1,
-                    }}
-                  >
-                    <ListItemButton
-                      selected={isCurrentLesson}
-                      disabled={lessonItem.blocked}
-                      onClick={() =>
-                        router.push(
-                          `/student/learning/course/${courseId}/lesson/${lessonItem.id}`
-                        )
-                      }
-                      sx={{
-                        borderRadius: 1,
-                        "&.Mui-selected": {
-                          "& .MuiListItemIcon-root": {
-                            color: "primary.main",
-                          },
-                        },
-                      }}
-                    >
-                      <ListItemIcon
-                        sx={{
-                          minWidth: 40,
-                          justifyContent: "center",
-                          color: isCurrentLesson
-                            ? "primary.main"
-                            : lessonItem.lessonProgress?.status === "COMPLETED"
-                              ? "success.dark"
-                              : "text.secondary",
-                        }}
-                      >
-                        {lessonTypeToIcon[lessonItem.lessonType]}
-                      </ListItemIcon>
-                    </ListItemButton>
-                  </ListItem>
-                );
-              })}
-            </List>
-          </Box>
-        </Box>
+        {course && (
+          <LessonsIconsList course={course} activeLessonId={+lessonId} />
+        )}
 
         {/* Основной контент */}
         <Box
@@ -214,151 +173,252 @@ export default function LearnLessonPage() {
             {lesson?.title}
           </Typography>
 
-          {isLessonCompleted && (
-            <Box p={1} my={2} sx={{ bgcolor: "#EFF7DE", borderRadius: "5px" }}>
-              <Typography variant="body1">Урок пройден</Typography>
-              <Typography variant="body2">
-                Получено баллов:{" "}
-                {
-                  course.lessons?.find((item) => item?.id === lesson?.id)
-                    ?.lessonProgress?.pointsAwarded
-                }
-              </Typography>
-            </Box>
-          )}
+          {isDialogOpen ? (
+            <>
+              <Box mt={5}>
+                <DialogContent
+                  sx={{
+                    textAlign: "center",
+                    py: 4,
+                    px: 3,
+                    display: "flex",
+                    flexDirection: "column",
+                    alignItems: "center",
+                  }}
+                >
+                  <Typography variant="h5" component="h2" mb={1}>
+                    Тест
+                  </Typography>
 
-          {/* Контент урока */}
-          <Box
-            sx={{
-              flex: 1,
-              mb: 3,
-              borderRadius: 1,
-              bgcolor: "background.paper",
-            }}
-          >
-            {!lesson && (
-              <Alert severity="error">Не удалось получить урок</Alert>
-            )}
+                  <Typography variant="body2">
+                    На прохождение теста дается {lesson?.timeLimitMinutes}{" "}
+                    минут. Отсчет начнется сразу после начала теста.
+                  </Typography>
+                  {lesson?.maxAttempts ? (
+                    <Typography variant="body2">
+                      Осталось попыток ( {lesson?.attempts} /{" "}
+                      {lesson?.maxAttempts})
+                    </Typography>
+                  ) : (
+                    <></>
+                  )}
+                </DialogContent>
 
-            {lesson?.lessonType === "THEORY_PDF" && (
-              <Box>
-                {lesson?.theoryContent && (
-                  <embed
-                    src={"http://217.26.31.189" + lesson.theoryContent}
-                    type="application/pdf"
-                    width="100%"
-                    height="700px"
+                <DialogActions
+                  sx={{
+                    p: 2,
+                    justifyContent: "center",
+                  }}
+                >
+                  <Button
+                    variant="contained"
+                    onClick={() => {
+                      startLearningLesson(+lessonId);
+                      setIsDialogOpen(false);
+                    }}
+                  >
+                    Начать
+                  </Button>
+                </DialogActions>
+              </Box>
+            </>
+          ) : (
+            <>
+              {/* Таймер ограничения времени */}
+              {lesson && lesson.status === "STARTED" && (
+                <LessonTimer
+                  lessonId={lesson.id}
+                  timeLimitMinutes={lesson.timeLimitMinutes}
+                  onTimeUp={handleTimeUp}
+                />
+              )}
+
+              {/* Обработка статуса урока, инфа по статусу */}
+              {lesson?.status === "COMPLETED" && (
+                <Box
+                  p={1}
+                  my={2}
+                  sx={{ bgcolor: "#EFF7DE", borderRadius: "5px" }}
+                >
+                  <Typography variant="body1">Урок пройден</Typography>
+                  <Typography variant="body2">
+                    Получено баллов: {lessonProgress?.pointsAwarded} /{" "}
+                    {fullPoints}
+                  </Typography>
+                </Box>
+              )}
+              {lesson?.status === "INCOMPLETED" && (
+                <Box
+                  p={1}
+                  my={2}
+                  sx={{ bgcolor: "#f4b2a3", borderRadius: "5px" }}
+                >
+                  <Typography variant="body1">Урок не пройден</Typography>
+                </Box>
+              )}
+              {lesson?.status === "PENDING_REVIEW" && (
+                <Box
+                  p={1}
+                  my={2}
+                  sx={{ bgcolor: "#f0e8a7", borderRadius: "5px" }}
+                >
+                  <Typography variant="body1">
+                    Урок отправлен тренеру и ожидает его проверки
+                  </Typography>
+                </Box>
+              )}
+              {lesson?.status === "REWORKING" && (
+                <Box
+                  p={1}
+                  my={2}
+                  sx={{ bgcolor: "#f1caac", borderRadius: "5px" }}
+                  display={"flex"}
+                  justifyContent={"space-between"}
+                  alignItems={"center"}
+                >
+                  {lesson?.lessonType === "PRACTICE_OPEN_ANSWER" ? (
+                    <Typography variant="body1" display={"inline"}>
+                      Тренер проверил ваши ответы и отправил урок на доработку
+                    </Typography>
+                  ) : (
+                    <Typography variant="body1" display={"inline"}>
+                      Урок не пройден, но вы можете его пересдать.
+                      {lesson?.attempts && lesson?.maxAttempts
+                        ? ` Осталось попыток (
+                  ${lesson?.attempts} / ${lesson?.maxAttempts})`
+                        : ""}
+                    </Typography>
+                  )}
+                  <Button
+                    variant="contained"
+                    color="warning"
+                    onClick={() => {
+                      lesson?.timeLimitMinutes
+                        ? setIsDialogOpen(true)
+                        : startLearningLesson(+lessonId);
+                    }}
+                  >
+                    Пересдать урок
+                  </Button>
+                </Box>
+              )}
+
+              {/* Контент урока */}
+              <Box
+                sx={{
+                  flex: 1,
+                  mb: 3,
+                  borderRadius: 1,
+                  bgcolor: "background.paper",
+                }}
+              >
+                {lessonError && (
+                  <Alert severity="error">Не удалось получить урок</Alert>
+                )}
+
+                {lesson && (
+                  <LearnLessonForm
+                    lesson={lesson}
+                    lessonStatus={lesson?.status}
+                    formId={
+                      lesson?.lessonType === "PRACTICE_TEST"
+                        ? testFormId
+                        : taskFormId
+                    }
+                    onSubmit={completePractice}
                   />
                 )}
               </Box>
-            )}
-            {lesson?.lessonType === "THEORY_TEXT" && (
-              <Box
-                width={"80%"}
-                mx={"auto"}
-                dangerouslySetInnerHTML={{ __html: lesson.theoryContent || "" }}
-              ></Box>
-            )}
-            {lesson?.lessonType === "THEORY_VIDEO" && (
-              <Box display={"flex"} justifyContent={"center"}>
-                {youtubeId ? (
-                  <iframe
-                    width="800"
-                    height="500"
-                    src={`https://www.youtube.com/embed/${youtubeId}?rel=0&modestbranding=1`}
-                    title="YouTube video player"
-                    frameBorder="0"
-                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                    referrerPolicy="strict-origin-when-cross-origin"
-                    allowFullScreen
-                  ></iframe>
-                ) : (
-                  <Alert severity="error" sx={{ my: 2 }}>
-                    Невозможно проиграть видео: неверная YouTube ссылка.
-                  </Alert>
-                )}
-              </Box>
-            )}
-            {lesson?.lessonType === "PRACTICE_TEST" && (
-              <LearnTestLessonForm
-                lesson={lesson}
-                formId={testFormId}
-                onSubmit={completePractice}
-              />
-            )}
-            {lesson?.lessonType === "PRACTICE_OPEN_ANSWER" && (
-              <LearnTaskLessonForm
-                lesson={lesson}
-                formId={taskFormId}
-                onSubmit={(data: SubmitPracticeApiArg) => {
-                  try {
-                    completePractice(data);
-                    alert(
-                      "Ваши ответы на это задание отправлены тренеру и ожидают проверки"
-                    );
-                  } catch (err: any) {
-                    console.log("Ошибка отправки ответов на задания");
-                  }
+
+              {/* Нижняя панель с кнопками */}
+              <Stack
+                justifyContent="end"
+                direction="row"
+                spacing={2}
+                sx={{
+                  display: "flex",
+                  alignItems: "center",
+                  borderTop: "1px solid",
+                  borderColor: "divider",
+                  pt: 2,
+                  pb: 1,
                 }}
-              />
-            )}
-          </Box>
-
-          {/* Нижняя панель с кнопками */}
-          <Stack
-            justifyContent="end"
-            direction="row"
-            spacing={2}
-            sx={{
-              display: "flex",
-              alignItems: "center",
-              borderTop: "1px solid",
-              borderColor: "divider",
-              pt: 2,
-              pb: 1,
-            }}
-          >
-            {lesson?.lessonType?.includes("THEORY") ? (
-              <Button
-                variant="contained"
-                color="primary"
-                onClick={() => handleLessonCompletion()}
-                disabled={isLessonCompleted}
               >
-                {isLessonCompleted ? "Урок завершен" : "Завершить урок"}
-              </Button>
-            ) : (
-              <Button
-                variant="contained"
-                color="primary"
-                disabled={isLessonCompleted}
-                type="submit"
-                form={
-                  lesson?.lessonType === "PRACTICE_TEST"
-                    ? testFormId
-                    : taskFormId
-                }
-              >
-                {isLessonCompleted ? "Урок завершен" : "Завершить урок"}
-              </Button>
-            )}
+                {lesson?.lessonType?.includes("THEORY") ? (
+                  <Button
+                    variant="contained"
+                    color="primary"
+                    onClick={() => completeTheory(lesson.id)}
+                    disabled={isLessonCompleted}
+                  >
+                    {isLessonCompleted ? "Урок завершен" : "Завершить урок"}
+                  </Button>
+                ) : (
+                  lesson?.status === "STARTED" && (
+                    <Button
+                      variant="contained"
+                      color="primary"
+                      disabled={isLessonCompleted}
+                      type="submit"
+                      form={
+                        lesson?.lessonType === "PRACTICE_TEST"
+                          ? testFormId
+                          : taskFormId
+                      }
+                    >
+                      Завершить урок
+                    </Button>
+                  )
+                )}
 
-            <Button
-              variant="outlined"
-              disabled={nextLesson?.blocked}
-              onClick={() => {
-                router.push(
-                  nextLesson
-                    ? routes.student.lessonById(courseId, nextLesson.id)
-                    : routes.student.courseById(courseId)
-                );
-              }}
-            >
-              {nextLesson ? "Следующий урок" : "Завершить курс"}
-            </Button>
-          </Stack>
+                {nextLesson ? (
+                  <Button
+                    variant="outlined"
+                    disabled={nextLesson?.blocked}
+                    onClick={() => {
+                      router.push(
+                        nextLesson
+                          ? routes.student.lessonById(courseId, nextLesson.id)
+                          : routes.student.courseById(courseId)
+                      );
+                    }}
+                  >
+                    Следующий урок
+                  </Button>
+                ) : (
+                  isLessonLast &&
+                  course?.progress?.completionStatus !== "COMPLETED" && (
+                    <Button
+                      disabled={!isLessonCompleted}
+                      onClick={() =>
+                        router.push(routes.student.courseById(+courseId))
+                      }
+                    >
+                      Завершить курс
+                    </Button>
+                  )
+                )}
+              </Stack>
+            </>
+          )}
         </Box>
       </Box>
+
+      {/* Уведомления */}
+      <Snackbar
+        open={snackbar.open}
+        autoHideDuration={6000}
+        onClose={() => setSnackbar((prev) => ({ ...prev, open: false }))}
+        anchorOrigin={{ vertical: "top", horizontal: "center" }}
+      >
+        <Alert
+          onClose={() => setSnackbar((prev) => ({ ...prev, open: false }))}
+          severity={snackbar.severity}
+          sx={{ width: "100%" }}
+        >
+          {snackbar.message}
+        </Alert>
+      </Snackbar>
     </>
   );
 }

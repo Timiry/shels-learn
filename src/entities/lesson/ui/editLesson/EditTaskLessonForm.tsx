@@ -4,8 +4,6 @@ import {
   TextField,
   Button,
   Stack,
-  IconButton,
-  Alert,
   FormControlLabel,
   Switch,
 } from "@mui/material";
@@ -19,11 +17,8 @@ import {
   PracticeQuestionType,
 } from "@/entities/course/model/coursesApi";
 import { v4 as uuidv4 } from "uuid";
-import DeleteIcon from "@mui/icons-material/Delete";
 import AddIcon from "@mui/icons-material/Add";
 import Collapse from "@/shared/ui/Collapse";
-import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
-import MuiCollapse from "@mui/material/Collapse";
 import TaskQuestionForm from "./TaskQuestionForm";
 
 interface EditLessonFormProps {
@@ -73,8 +68,6 @@ export default function EditTaskLessonForm({
           lessonType: "PRACTICE_OPEN_ANSWER",
           questions: currentValues?.questions || [],
           stopLesson: currentValues?.stopLesson,
-          attemptLimit: currentValues?.attemptLimit,
-          timeLimitMinutes: currentValues?.timeLimitMinutes,
           showQuestionStatus: true,
         },
   });
@@ -282,40 +275,6 @@ export default function EditTaskLessonForm({
                   errors.passingThresholdPercent?.message ||
                   "Укажите процент, который должен набрать студент для успешного прохождения урока"
                 }
-              />
-            </Box>
-
-            <Box>
-              <Typography variant="body1" gutterBottom>
-                Ограничение попыток
-              </Typography>
-              <TextField
-                {...register("attemptLimit", {
-                  valueAsNumber: true,
-                  min: { value: 1, message: "Минимум 1 попытка" },
-                })}
-                type="number"
-                placeholder="Количество попыток (оставьте пустым для неограниченного количества)"
-                fullWidth
-                error={!!errors.attemptLimit}
-                helperText={errors.attemptLimit?.message}
-              />
-            </Box>
-
-            <Box>
-              <Typography variant="body1" gutterBottom>
-                Ограничение времени выполнения (в минутах)
-              </Typography>
-              <TextField
-                {...register("timeLimitMinutes", {
-                  valueAsNumber: true,
-                  min: { value: 1, message: "Минимум 1 минута" },
-                })}
-                type="number"
-                placeholder="Время на выполнение (оставьте пустым для неограниченного времени)"
-                fullWidth
-                error={!!errors.timeLimitMinutes}
-                helperText={errors.timeLimitMinutes?.message}
               />
             </Box>
 

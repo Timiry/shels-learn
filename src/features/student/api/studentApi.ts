@@ -9,6 +9,13 @@ const injectedRtkApi = api.injectEndpoints({
       query: () => ({ url: `/api/v1/student/my/last-visit`, method: "POST" }),
       invalidatesTags: ["Learning"],
     }),
+    startLearningLesson: build.mutation<SubmissionResultDto, number>({
+      query: (queryArg) => ({
+        url: `/api/v1/student/lessons/${queryArg}/start`,
+        method: "POST",
+      }),
+      invalidatesTags: ["Learning"],
+    }),
     submitPractice: build.mutation<
       SubmitPracticeApiResponse,
       SubmitPracticeApiArg
@@ -47,7 +54,7 @@ const injectedRtkApi = api.injectEndpoints({
     }),
     myStats: build.query<MyStatsApiResponse, MyStatsApiArg>({
       query: () => ({ url: `/api/v1/student/my/stats` }),
-      providesTags: ["Learning"],
+      providesTags: ["Learning", "Review"],
     }),
     myPrograms: build.query<MyProgramsApiResponse, MyProgramsApiArg>({
       query: () => ({ url: `/api/v1/student/my/programs` }),
@@ -61,21 +68,21 @@ const injectedRtkApi = api.injectEndpoints({
     }),
     myCourses: build.query<MyCoursesApiResponse, MyCoursesApiArg>({
       query: () => ({ url: `/api/v1/student/my/courses` }),
-      providesTags: ["Learning"],
+      providesTags: ["Learning", "Review", "Course"],
     }),
     getLessonForLearner: build.query<
       GetLessonForLearnerApiResponse,
       GetLessonForLearnerApiArg
     >({
       query: (queryArg) => ({ url: `/api/v1/student/lessons/${queryArg}` }),
-      providesTags: ["Learning"],
+      providesTags: ["Learning", "Review", "Course"],
     }),
     courseForLearner: build.query<
       CourseForLearnerApiResponse,
       CourseForLearnerApiArg
     >({
       query: (queryArg) => ({ url: `/api/v1/student/courses/${queryArg}` }),
-      providesTags: ["Learning"],
+      providesTags: ["Learning", "Review", "Course"],
     }),
     nextLessonForLearner: build.query<
       NextLessonForLearnerApiResponse,
@@ -294,10 +301,15 @@ export type LearnerLessonDto = {
     | "PRACTICE_OPEN_ANSWER";
   theoryContent?: string;
   deadlineAt?: number;
+  timeLimitMinutes?: number;
+  status?: LessonProgressStatus;
+  attempts?: number;
+  maxAttempts?: number;
   questions?: LearnerPracticeQuestionDto[];
 };
 export const {
   useUpdateMyLastVisitMutation,
+  useStartLearningLessonMutation,
   useSubmitPracticeMutation,
   useCompleteTheoryLessonMutation,
   useMyProfileQuery,

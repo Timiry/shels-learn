@@ -14,17 +14,21 @@ import {
 import { useState, useEffect } from "react";
 import {
   LearnerLessonDto,
+  LessonProgressStatus,
   SubmitPracticeApiArg,
 } from "@/features/student/api/studentApi";
+import LessonOption from "../lessonContent/lessonOption";
 
 interface LearnTestLessonFormProps {
   lesson: LearnerLessonDto;
+  lessonStatus?: LessonProgressStatus;
   formId: string;
   onSubmit: (data: SubmitPracticeApiArg) => void;
 }
 
 export default function LearnTestLessonForm({
   lesson,
+  lessonStatus,
   formId,
   onSubmit,
 }: LearnTestLessonFormProps) {
@@ -35,7 +39,8 @@ export default function LearnTestLessonForm({
     if (lesson.questions) {
       const initialAnswers: { [key: string]: string[] } = {};
       lesson.questions.forEach((question) => {
-        initialAnswers[question.position.toString()] = [];
+        initialAnswers[question.position.toString()] =
+          lessonStatus === "STARTED" ? [] : question.userAnswers || [];
       });
       setAnswers(initialAnswers);
     }
@@ -82,29 +87,32 @@ export default function LearnTestLessonForm({
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!areAllQuestionsAnswered()) {
-      alert("Вы ответили не на все вопросы");
-      return;
-    }
+    // if (!areAllQuestionsAnswered()) {
+    //   alert("Вы ответили не на все вопросы");
+    //   return;
+    // }
 
     // Форматируем данные для отправки
     const submissionData: SubmitPracticeApiArg = {
       lessonId: lesson.id,
-      practiceSubmissionRequest: { questionAnswers: answers },
+      practiceSubmissionRequest: {
+        questionAnswers: answers,
+        submittedAt: Date.now(),
+      },
     };
 
     onSubmit(submissionData);
   };
 
-  // Проверка, все ли вопросы имеют ответы
-  const areAllQuestionsAnswered = () => {
-    if (!lesson.questions) return false;
+  // // Проверка, все ли вопросы имеют ответы
+  // const areAllQuestionsAnswered = () => {
+  //   if (!lesson.questions) return false;
 
-    return lesson.questions.every((question, index) => {
-      const questionAnswers = answers[(index + 1).toString()] || [];
-      return questionAnswers.length > 0;
-    });
-  };
+  //   return lesson.questions.every((question, index) => {
+  //     const questionAnswers = answers[(index + 1).toString()] || [];
+  //     return questionAnswers.length > 0;
+  //   });
+  // };
 
   if (!lesson.questions || lesson.questions.length === 0) {
     return (
@@ -129,9 +137,21 @@ export default function LearnTestLessonForm({
               bgcolor: "background.paper",
             }}
           >
-            <Typography variant="h6" gutterBottom sx={{ mb: 2 }}>
-              {`Вопрос № ${question.position}`}
-            </Typography>
+            <Box
+              display={"flex"}
+              justifyContent={"space-between"}
+              alignItems={"center"}
+            >
+              <Typography variant="h6" gutterBottom sx={{ mb: 2 }}>
+                {`Вопрос № ${question.position}`}
+              </Typography>
+              {lessonStatus && lessonStatus !== "STARTED" && (
+                <LessonOption
+                  name="Получено баллов"
+                  value={`${question.awardedPoints} из ${question.fullPoints}`}
+                />
+              )}
+            </Box>
             <Typography variant="body2">{question.questionText}</Typography>
 
             <Divider sx={{ mb: 2 }} />
@@ -149,10 +169,17 @@ export default function LearnTestLessonForm({
                   <FormControlLabel
                     key={optionIndex}
                     value={option}
+                    disabled={lessonStatus !== "STARTED"}
                     control={<Radio />}
                     label={option}
                     sx={{
                       mb: 1,
+                      bgcolor:
+                        lessonStatus === "COMPLETED" &&
+                        question.correctAnswers?.includes(option)
+                          ? "success.light"
+                          : "inherit",
+                      borderRadius: 1,
                       "& .MuiFormControlLabel-label": {
                         fontSize: "0.95rem",
                       },
@@ -166,6 +193,7 @@ export default function LearnTestLessonForm({
                 {question.options?.map((option, optionIndex) => (
                   <FormControlLabel
                     key={optionIndex}
+                    disabled={lessonStatus !== "STARTED"}
                     control={
                       <Checkbox
                         checked={
@@ -186,6 +214,12 @@ export default function LearnTestLessonForm({
                     sx={{
                       mb: 1,
                       width: "100%",
+                      bgcolor:
+                        lessonStatus === "COMPLETED" &&
+                        question.correctAnswers?.includes(option)
+                          ? "success.light"
+                          : "inherit",
+                      borderRadius: 1,
                       "& .MuiFormControlLabel-label": {
                         fontSize: "0.95rem",
                       },
@@ -212,11 +246,11 @@ export default function LearnTestLessonForm({
               >
                 <Typography variant="caption" color="text.secondary">
                   {question.fullPoints
-                    ? `Полный балл: ${question.fullPoints}`
+                    ? `Балл за полный ответ: ${question.fullPoints}`
                     : ""}
 
-                  {question.partialPoints
-                    ? ` | Частичный балл: ${question.partialPoints}`
+                  {question.partialPoints !== undefined
+                    ? ` | Балл за частичный ответ: ${question.partialPoints}`
                     : ""}
                 </Typography>
               </Box>
