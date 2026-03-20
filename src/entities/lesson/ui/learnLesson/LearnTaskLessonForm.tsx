@@ -44,10 +44,10 @@ export default function LearnTaskLessonForm({
   }, [lesson.questions]);
 
   // Обработчик изменения текста ответа
-  const handleAnswerChange = (questionIndex: number, value: string) => {
+  const handleAnswerChange = (id: number, value: string) => {
     setAnswers((prev) => ({
       ...prev,
-      [questionIndex]: [value],
+      [id.toString()]: [value],
     }));
   };
 
@@ -99,11 +99,11 @@ export default function LearnTaskLessonForm({
       <Stack spacing={3}>
         {/* Вопросы */}
         {lesson.questions.map((question) => {
-          const answer = answers[question.position.toString()]?.[0] || "";
+          const answer = answers[question.id.toString()]?.[0] || "";
 
           return (
             <Box
-              key={question.position}
+              key={question.id}
               sx={{
                 p: 3,
                 border: "1px solid",
@@ -190,7 +190,7 @@ export default function LearnTaskLessonForm({
                   (question.status && question.status !== "REWORK")
                 }
                 onChange={(e) =>
-                  handleAnswerChange(question.position, e.target.value)
+                  handleAnswerChange(question.id, e.target.value)
                 }
                 variant="outlined"
                 sx={{

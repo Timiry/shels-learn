@@ -2,9 +2,8 @@
 
 import LearnLessonForm from "@/entities/lesson/ui/learnLesson";
 import {
-  CourseLearnerDto,
-  LearnerLessonDto,
   LearnerLessonSummaryDto,
+  SubmitPracticeApiArg,
   useCompleteTheoryLessonMutation,
   useCourseForLearnerQuery,
   useGetLessonForLearnerQuery,
@@ -31,6 +30,7 @@ import NextLink from "next/link";
 
 import { useParams, useRouter } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
+import { ca } from "zod/locales";
 
 export default function LearnLessonPage() {
   const params = useParams();
@@ -66,11 +66,11 @@ export default function LearnLessonPage() {
   const [completePractice] = useSubmitPracticeMutation();
 
   useEffect(() => {
-    if (lesson?.status === undefined) {
+    if (lesson && lesson.status === undefined) {
       if (lesson?.timeLimitMinutes) setIsDialogOpen(true);
       else startLearningLesson(+lessonId);
     }
-  }, []);
+  }, [lesson, lessonId, startLearningLesson]);
 
   const lessonProgress = course?.lessons?.find(
     (item) => item.id === lesson?.id
@@ -326,7 +326,18 @@ export default function LearnLessonPage() {
                         ? testFormId
                         : taskFormId
                     }
-                    onSubmit={completePractice}
+                    onSubmit={(data: SubmitPracticeApiArg) => {
+                      try {
+                        completePractice(data);
+                      } catch (err) {
+                        setSnackbar({
+                          open: true,
+                          message: "Ошибка при отправке ответов",
+                          severity: "error",
+                        });
+                        console.log(err);
+                      }
+                    }}
                   />
                 )}
               </Box>

@@ -47,35 +47,35 @@ export default function LearnTestLessonForm({
   }, [lesson.questions]);
 
   // Обработчик выбора ответа для одиночного выбора
-  const handleSingleChoiceChange = (questionIndex: number, answer: string) => {
+  const handleSingleChoiceChange = (id: number, answer: string) => {
     setAnswers((prev) => ({
       ...prev,
-      [questionIndex]: [answer],
+      [id.toString()]: [answer],
     }));
   };
 
   // Обработчик выбора ответа для множественного выбора
   const handleMultipleChoiceChange = (
-    questionIndex: number,
+    id: number,
     answer: string,
     checked: boolean
   ) => {
     setAnswers((prev) => {
-      const currentAnswers = prev[questionIndex.toString()] || [];
+      const currentAnswers = prev[id.toString()] || [];
 
       if (checked) {
         // Добавляем ответ, если его нет в массиве
         if (!currentAnswers.includes(answer)) {
           return {
             ...prev,
-            [questionIndex]: [...currentAnswers, answer],
+            [id.toString()]: [...currentAnswers, answer],
           };
         }
       } else {
         // Удаляем ответ из массива
         return {
           ...prev,
-          [questionIndex]: currentAnswers.filter((a) => a !== answer),
+          [id.toString()]: currentAnswers.filter((a) => a !== answer),
         };
       }
 
@@ -128,7 +128,7 @@ export default function LearnTestLessonForm({
         {/* Вопросы */}
         {lesson.questions.map((question) => (
           <Box
-            key={question.position}
+            key={question.id}
             sx={{
               p: 3,
               border: "1px solid",
@@ -160,9 +160,9 @@ export default function LearnTestLessonForm({
             {question.questionType === "SINGLE_CHOICE" ? (
               // Радиогруппа для одиночного выбора
               <RadioGroup
-                value={answers[question.position.toString()]?.[0] || ""}
+                value={answers[question.id.toString()]?.[0] || ""}
                 onChange={(e) =>
-                  handleSingleChoiceChange(question.position, e.target.value)
+                  handleSingleChoiceChange(question.id, e.target.value)
                 }
               >
                 {question.options?.map((option, optionIndex) => (
@@ -197,13 +197,12 @@ export default function LearnTestLessonForm({
                     control={
                       <Checkbox
                         checked={
-                          answers[question.position.toString()]?.includes(
-                            option
-                          ) || false
+                          answers[question.id.toString()]?.includes(option) ||
+                          false
                         }
                         onChange={(e) =>
                           handleMultipleChoiceChange(
-                            question.position,
+                            question.id,
                             option,
                             e.target.checked
                           )
