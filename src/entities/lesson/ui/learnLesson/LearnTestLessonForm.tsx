@@ -39,7 +39,7 @@ export default function LearnTestLessonForm({
     if (lesson.questions) {
       const initialAnswers: { [key: string]: string[] } = {};
       lesson.questions.forEach((question) => {
-        initialAnswers[question.position.toString()] =
+        initialAnswers[question.id.toString()] =
           lessonStatus === "STARTED" ? [] : question.userAnswers || [];
       });
       setAnswers(initialAnswers);

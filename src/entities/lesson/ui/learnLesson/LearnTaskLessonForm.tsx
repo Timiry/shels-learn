@@ -37,9 +37,7 @@ export default function LearnTaskLessonForm({
     if (lesson.questions) {
       const initialAnswers: { [key: string]: string[] } = {};
       lesson.questions.forEach((question) => {
-        initialAnswers[question.position.toString()] = question.userAnswers || [
-          "",
-        ];
+        initialAnswers[question.id.toString()] = question.userAnswers || [""];
       });
       setAnswers(initialAnswers);
     }

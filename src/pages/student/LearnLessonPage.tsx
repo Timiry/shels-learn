@@ -66,9 +66,10 @@ export default function LearnLessonPage() {
   const [completePractice] = useSubmitPracticeMutation();
 
   useEffect(() => {
-    if (lesson?.status === undefined && lesson?.timeLimitMinutes)
-      setIsDialogOpen(true);
-    else startLearningLesson(+lessonId);
+    if (lesson?.status === undefined) {
+      if (lesson?.timeLimitMinutes) setIsDialogOpen(true);
+      else startLearningLesson(+lessonId);
+    }
   }, []);
 
   const lessonProgress = course?.lessons?.find(

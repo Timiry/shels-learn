@@ -268,7 +268,7 @@ export type QuestionProgressStatus =
   | "REJECTED";
 
 export type LearnerPracticeQuestionDto = {
-  id?: number;
+  id: number;
   position: number;
   questionType?:
     | "SINGLE_CHOICE"
