@@ -66,8 +66,11 @@ export default function LearnLessonPage() {
 
   useEffect(() => {
     if (lesson && !lesson.status) {
-      if (lesson?.timeLimitMinutes) setIsDialogOpen(true);
-      else startLearningLesson(+lessonId);
+      if (lesson?.timeLimitMinutes) {
+        setIsDialogOpen(true);
+      } else {
+        startLearningLesson(+lessonId);
+      }
     }
   }, [lesson, lessonId, startLearningLesson]);
 
@@ -163,6 +166,7 @@ export default function LearnLessonPage() {
             flex: 1,
             p: 3,
             overflowY: "auto",
+            minHeight: 0,
             display: "flex",
             flexDirection: "column",
             bgcolor: "background.default",
@@ -355,7 +359,7 @@ export default function LearnLessonPage() {
                   pb: 1,
                 }}
               >
-                {lesson?.lessonType?.includes("THEORY") ? (
+                {lesson?.lessonType?.startsWith("THEORY_") ? (
                   <Button
                     variant="contained"
                     color="primary"
