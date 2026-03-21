@@ -1,6 +1,7 @@
 "use client";
 
 import BookOutlinedIcon from "@mui/icons-material/BookOutlined"; //курсы
+import FormatListNumberedOutlinedIcon from "@mui/icons-material/FormatListNumberedOutlined"; //программы
 import EditNoteOutlinedIcon from "@mui/icons-material/EditNoteOutlined"; //проверка
 import PeopleAltOutlinedIcon from "@mui/icons-material/PeopleAltOutlined"; //пользователи
 import AutoStoriesOutlinedIcon from "@mui/icons-material/AutoStoriesOutlined"; //обучение
@@ -58,6 +59,12 @@ export default function Sidebar() {
             label: "Курсы",
             icon: BookOutlinedIcon,
             path: routes.admin.courses.allCourses,
+          },
+          {
+            id: "programs",
+            label: "Программы",
+            icon: FormatListNumberedOutlinedIcon,
+            path: routes.admin.programs.allPrograms,
           },
           {
             id: "verification",

@@ -40,6 +40,16 @@ export const routes = {
       manageReviewers: (id: string | number) =>
         `/admin/courses/${id}/manage-reviewers`,
     },
+    programs: {
+      allPrograms: "/admin/programs",
+      createProgram: "/admin/programs/create",
+      programInfoByIdAndTab: (id: string | number, tab: string) =>
+        `/admin/programs/${id}/?tab=${tab}`,
+      editProgramByIdAndTab: (id: string | number, tab: string) =>
+        `/admin/programs/${id}/edit?tab=${tab}`,
+      manageStudents: (id: string | number) =>
+        `/admin/programs/${id}/manage-students`,
+    },
     groups: "/admin/groups",
     profile: "/admin/profile",
     editProfile: "/admin/profile/edit",
