@@ -4,7 +4,7 @@ import {
   CreatePracticeLessonRequest,
   CreateTheoryLessonRequest,
   LessonDto,
-} from "@/entities/course/model/types";
+} from "@/entities/course/model/coursesApi";
 
 import { useForm } from "react-hook-form";
 import { Box, Typography, TextField, Stack, Button } from "@mui/material";
@@ -36,13 +36,13 @@ export default function EditVideoLessonForm({
           title: "",
           fullPoints: 1,
           content: "",
-          contentType: "VIDEO_URL",
+          lessonType: "THEORY_VIDEO",
         }
       : {
           title: currentValues?.title || "",
           fullPoints: currentValues?.fullPoints || 1,
           content: currentValues?.theoryContent || "",
-          contentType: currentValues?.theoryContentType || "VIDEO_URL",
+          lessonType: currentValues?.lessonType || "THEORY_VIDEO",
         },
   });
 

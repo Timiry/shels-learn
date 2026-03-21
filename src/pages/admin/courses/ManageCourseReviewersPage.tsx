@@ -1,7 +1,7 @@
 "use client";
 
 import {
-  useAssignReviewersMutation,
+  useAssignReviewerMutation,
   useGetCourseQuery,
   useGetCourseReviewersQuery,
 } from "@/entities/course/model/coursesApi";
@@ -19,7 +19,7 @@ export default function ManageCourseReviewersPage() {
 
   const { currentData: courseInfo } = useGetCourseQuery(+courseId);
   const { currentData: reviewersLists } = useGetCourseReviewersQuery(+courseId);
-  const [asignReviewers] = useAssignReviewersMutation();
+  const [asignReviewers] = useAssignReviewerMutation();
 
   return (
     <Box>

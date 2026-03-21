@@ -28,6 +28,28 @@ const injectedRtkApi = api.injectEndpoints({
       }),
       providesTags: ["Review"],
     }),
+    resetStudentProgressByLesson: build.mutation<
+      ResetStudentProgressByLessonApiResponse,
+      ResetStudentProgressByLessonApiArg
+    >({
+      query: (queryArg) => ({
+        url: `/api/v1/admin/progress/lessons/user/reset`,
+        method: "POST",
+        body: queryArg,
+      }),
+      invalidatesTags: ["Course", "Learning"],
+    }),
+    resetStudentProgressByCourse: build.mutation<
+      ResetStudentProgressByCourseApiResponse,
+      ResetStudentProgressByCourseApiArg
+    >({
+      query: (queryArg) => ({
+        url: `/api/v1/admin/progress/courses/user/reset`,
+        method: "POST",
+        body: queryArg,
+      }),
+      invalidatesTags: ["Course", "Learning"],
+    }),
     reviewCourses: build.query<ReviewCoursesApiResponse, ReviewCoursesApiArg>({
       query: () => ({ url: `/api/v1/admin/progress/reviews/courses` }),
       providesTags: ["Review"],
@@ -59,6 +81,13 @@ export type ReviewOpenAnswerApiArg = {
   submissionId: number;
   reviewOpenSubmissionRequest: ReviewOpenSubmissionRequest;
 };
+export type ResetStudentProgressByLessonApiResponse =
+  /** status 200 Прогресс пользователя по уроку сброшен */ ApiResponse;
+export type ResetStudentProgressByLessonApiArg =
+  ResetStudentLessonProgressRequest;
+export type ResetStudentProgressByCourseApiResponse =
+  /** status 200 Прогресс пользователя по курсу сброшен */ ApiResponse;
+export type ResetStudentProgressByCourseApiArg = ResetStudentProgressRequest;
 export type PendingReviewsApiResponse =
   /** status 200 Список submissions для проверки по урокам */ PendingSubmissionDto[];
 export type PendingReviewsApiArg = void;
@@ -66,7 +95,7 @@ export type PendingReviewQuestionsApiResponse =
   /** status 200 Список вопросов submission для ревью */ PendingSubmissionQuestionDto[];
 export type PendingReviewQuestionsApiArg = number;
 export type ReviewCoursesApiResponse =
-  /** status 200 Список курсов reviewer */ CourseSummaryDto;
+  /** status 200 Список курсов reviewer */ CourseSummaryDto[];
 export type ReviewCoursesApiArg = void;
 export type SummaryCsvApiResponse = unknown;
 export type SummaryCsvApiArg = void;
@@ -77,15 +106,14 @@ export type CourseStatsApiResponse =
 export type CourseStatsApiArg = number;
 
 export type SubmissionLessonStatus =
-  | "COMPLETE"
-  | "INCOMPLETE"
+  | "COMPLETED"
+  | "INCOMPLETED"
   | "PENDING_REVIEW"
-  | "REWORK";
+  | "REWORKING"
+  | "STARTED";
 export type SubmissionResultDto = {
   submissionId?: number;
   status?: SubmissionLessonStatus;
-  passed?: boolean;
-  message?: string;
 };
 export type ApiResponse = {
   message?: string;
@@ -96,19 +124,31 @@ export type SubmissionQuestionStatus =
   | "ACCEPTED"
   | "REWORK"
   | "REJECTED";
+
+export type ReviewPointsType = "FULL" | "PARTIAL" | "ZERO" | null;
+
 export type ReviewQuestionDecisionDto = {
   /** Статус проверки вопроса */
-  submissionStatus?: SubmissionQuestionStatus;
-  /** Баллы за вопрос */
-  awardedPoints?: number;
+  submissionStatus: SubmissionQuestionStatus;
+  /** Тип баллов за вопрос. Должен быть null, если submissionStatus != ACCEPTED */
+  pointsType: ReviewPointsType;
   /** Комментарий ревьювера */
   reviewComment?: string;
 };
 export type ReviewOpenSubmissionRequest = {
-  /** Решения по индексам вопросов: questionIndex -> решение ревью */
+  /** Решения по id вопросов: questionId -> решение ревью */
   questionReviews?: {
     [key: string]: ReviewQuestionDecisionDto;
   };
+};
+export type ResetStudentLessonProgressRequest = {
+  userId: number;
+  courseId: number;
+  lessonId: number;
+};
+export type ResetStudentProgressRequest = {
+  userId: number;
+  courseId: number;
 };
 export type PendingSubmissionDto = {
   /** ID submission */
@@ -126,15 +166,17 @@ export type PendingSubmissionDto = {
   /** ФИО студента */
   studentFullname?: string;
   /** Дата отправки submission */
-  submittedAt?: string;
+  submittedAt?: number;
   /** Номер попытки */
   attempt?: number;
 };
 export type PendingSubmissionQuestionDto = {
+  /** Id вопроса */
+  questionId: number;
   /** Индекс вопроса */
   questionIndex?: number;
   /** Статус вопроса в review */
-  submissionStatus?: SubmissionQuestionStatus;
+  submissionStatus: SubmissionQuestionStatus;
   /** Текст вопроса */
   questionText?: string;
   /** Подсказка для тренера */
@@ -143,6 +185,8 @@ export type PendingSubmissionQuestionDto = {
   awardedPoints?: number;
   /** Максимальные баллы за вопрос */
   fullPoints?: number;
+  /** Частичные баллы за вопрос */
+  partialPoints?: number;
   /** Ответ студента */
   answer?: string;
   /** Комментарий ревьювера */
@@ -174,6 +218,7 @@ export type CourseStudentStatDto = {
   startedAt?: string;
   completedAt?: string;
 };
+
 export const {
   useReviewOpenAnswerMutation,
   usePendingReviewsQuery,

@@ -1,9 +1,10 @@
-import { LessonDto } from "@/entities/course/model/types";
 import Alert from "@mui/material/Alert";
 import Box from "@mui/material/Box";
 import { extractYouTubeVideoId } from "../../lib/utils/validationYoutubeUrl";
 
-export default function VideoLessonContent({ lesson }: { lesson: LessonDto }) {
+export default function VideoLessonContent<
+  T extends { theoryContent?: string },
+>({ lesson }: { lesson: T }) {
   const videoUrl = lesson.theoryContent || "";
   const youtubeId = extractYouTubeVideoId(videoUrl);
 
@@ -18,8 +19,8 @@ export default function VideoLessonContent({ lesson }: { lesson: LessonDto }) {
   return (
     <Box>
       <iframe
-        width="600"
-        height="400"
+        width="100%"
+        style={{ aspectRatio: "16 / 9" }}
         src={`https://www.youtube.com/embed/${youtubeId}?rel=0&modestbranding=1`}
         title="YouTube video player"
         frameBorder="0"

@@ -2,7 +2,7 @@ import {
   CreatePracticeLessonRequest,
   CreateTheoryLessonRequest,
   LessonDto,
-} from "@/entities/course/model/types";
+} from "@/entities/course/model/coursesApi";
 import { useUploadMutation } from "@/shared/api/filesApi";
 import {
   Stack,
@@ -57,13 +57,13 @@ export default function EditPdfLessonForm({
           title: "",
           fullPoints: 1,
           content: "",
-          contentType: "PDF_FILE",
+          lessonType: "THEORY_PDF",
         }
       : {
           title: currentValues?.title || "",
           fullPoints: currentValues?.fullPoints || 1,
           content: currentValues?.theoryContent || "",
-          contentType: currentValues?.theoryContentType || "PDF_FILE",
+          lessonType: currentValues?.lessonType || "THEORY_PDF",
         },
   });
 
@@ -139,7 +139,6 @@ export default function EditPdfLessonForm({
       onSubmit({
         ...lessonInfo,
         content: fileUrl,
-        contentType: "PDF_FILE",
       });
       setIsSubmitting(false);
     } catch (err) {

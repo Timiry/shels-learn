@@ -11,7 +11,7 @@ const theme = createTheme({
   palette: {
     primary: {
       main: mainBlue,
-      light: alpha(mainBlue, 0.7),
+      light: alpha(mainBlue, 0.1),
       dark: "#0e6eb7",
     },
     secondary: {
@@ -96,6 +96,14 @@ const theme = createTheme({
           }),
         },
       ],
+    },
+    MuiLink: {
+      styleOverrides: {
+        root: {
+          textDecoration: "none",
+          color: "#111",
+        },
+      },
     },
     MuiCard: {
       styleOverrides: {

@@ -3,7 +3,7 @@ import {
   CreateTheoryLessonRequest,
   LessonDto,
   LessonType,
-} from "@/entities/course/model/types";
+} from "@/entities/course/model/coursesApi";
 import { Box, IconButton, Stack, Typography } from "@mui/material";
 import LessonsList from "./LessonsList";
 import { useState } from "react";

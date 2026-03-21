@@ -5,7 +5,7 @@ import {
   useGetCourseQuery,
   useUpdateCourseMutation,
 } from "@/entities/course/model/coursesApi";
-import { CourseAdminDetailsDto } from "@/entities/course/model/types";
+import { CourseAdminDetailsDto } from "@/entities/course/model/coursesApi";
 import { useGetAllSectionsQuery } from "@/entities/section/model/sectionsApi";
 import EditCourseInfo from "@/features/coursesManagement/ui/EditCourseInfo";
 import EditCourseLessons from "@/features/coursesManagement/ui/EditCourseLessons";
@@ -57,7 +57,7 @@ export default function EditCoursePage() {
       >
         {activeTab === "info" && (
           <Box>
-            {courseInfo !== undefined && (
+            {courseInfo !== undefined && courseInfo.course !== undefined && (
               <EditCourseInfo
                 courseInfo={courseInfo.course}
                 sections={sections}
