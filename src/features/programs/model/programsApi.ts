@@ -1,3 +1,4 @@
+import { UserDto } from "@/entities/user/model/usersApi";
 import { baseApi as api } from "../../../shared/api/baseApi";
 const injectedRtkApi = api.injectEndpoints({
   endpoints: (build) => ({
@@ -141,15 +142,15 @@ export type AssignUsersToProgramApiArg = {
   programUserAssignRequest: ProgramUserAssignRequest;
 };
 export type ProgramCourseDto = {
-  courseId?: number;
-  orderIndex?: number;
+  courseId: number;
+  orderIndex: number;
   available?: boolean;
   viewed?: boolean;
   completed?: boolean;
 };
 export type ProgramDto = {
-  id?: number;
-  title?: string;
+  id: number;
+  title: string;
   description?: string;
   accessCondition?:
     | "PREVIOUS_COURSES_COMPLETED"
@@ -200,24 +201,6 @@ export type GroupDto = {
   id?: string;
   title?: string;
   type?: "GENERAL" | "COMPANY" | "DEPARTMENT" | "POSITION";
-};
-export type UserDto = {
-  id?: number;
-  fullName?: string;
-  email?: string;
-  role?: "ADMIN" | "STUDENT";
-  activation?: boolean;
-  enabled?: boolean;
-  phone?: string;
-  snils?: string;
-  comment?: string;
-  avatarFilePath?: string;
-  createdAt?: number;
-  createdBy?: string;
-  lastVisit?: number;
-  deactivatedAt?: number;
-  deactivatedBy?: string;
-  groups?: GroupDto[];
 };
 export type UserInNotInListsDto = {
   in?: UserDto[];
