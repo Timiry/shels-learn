@@ -6,7 +6,7 @@ export default function LessonOption({
   value,
 }: {
   name: string;
-  value: string;
+  value?: string;
 }) {
   return (
     <Box
@@ -17,11 +17,18 @@ export default function LessonOption({
       display={"inline"}
     >
       <Typography variant="body1" display={"inline"}>
-        {`${name}: `}
+        {name}
       </Typography>
-      <Typography variant="body1" color="secondary" display={"inline"}>
-        {value}
-      </Typography>
+      {value ? (
+        <>
+          <Typography display={"inline"}>{": "}</Typography>
+          <Typography variant="body1" color="secondary" display={"inline"}>
+            {value}
+          </Typography>
+        </>
+      ) : (
+        <></>
+      )}
     </Box>
   );
 }

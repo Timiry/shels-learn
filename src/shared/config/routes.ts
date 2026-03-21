@@ -1,4 +1,4 @@
-import { LessonType } from "@/entities/course/model/types";
+import { LessonType } from "@/entities/course/model/coursesApi";
 
 export const routes = {
   auth: {

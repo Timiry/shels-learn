@@ -5,13 +5,13 @@ import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
 
 import { useRouter } from "next/navigation";
-import CourseInfoCard from "@/entities/course/ui/CourseInfoCard";
 import { useMyCoursesQuery } from "@/features/student/api/studentApi";
 import Card from "@mui/material/Card";
 import CardActionArea from "@mui/material/CardActionArea";
 import { routes } from "@/shared/config/routes";
 import CardMedia from "@mui/material/CardMedia";
 import CardContent from "@mui/material/CardContent";
+import { formatDateFromTimestamp } from "@/shared/lib/utils/dateTimeFormatting";
 
 export default function LearningPage() {
   const router = useRouter();
@@ -79,6 +79,21 @@ export default function LearningPage() {
                   >
                     {course.description}
                   </Typography>
+                  <Box
+                    display={"flex"}
+                    justifyContent={"space-between"}
+                    alignItems={"center"}
+                  >
+                    {course?.progress?.deadlineAt && (
+                      <Typography color="error">
+                        {formatDateFromTimestamp(course?.progress?.deadlineAt)}
+                      </Typography>
+                    )}
+
+                    <Typography variant="h6" color="primary.main">
+                      {course.progress?.completionPercent || 0} %
+                    </Typography>
+                  </Box>
                 </CardContent>
               </CardActionArea>
             </Card>

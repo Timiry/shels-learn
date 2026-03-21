@@ -1,7 +1,7 @@
 "use client";
 
 import {
-  useAssignStudentsMutation,
+  useAssignStudentMutation,
   useGetCourseQuery,
   useGetEnrollmentListsQuery,
 } from "@/entities/course/model/coursesApi";
@@ -19,7 +19,7 @@ export default function ManageCourseStudentsPage() {
 
   const { currentData: courseInfo } = useGetCourseQuery(+courseId);
   const { currentData: studentsLists } = useGetEnrollmentListsQuery(+courseId);
-  const [asignStudents] = useAssignStudentsMutation();
+  const [asignStudents] = useAssignStudentMutation();
 
   return (
     <Box>

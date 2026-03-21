@@ -1,4 +1,4 @@
-import { LessonDto } from "@/entities/course/model/types";
+import { LessonDto } from "@/entities/course/model/coursesApi";
 import {
   Box,
   Button,
