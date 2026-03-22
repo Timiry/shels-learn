@@ -26,7 +26,7 @@ import {
   Typography,
 } from "@mui/material";
 
-import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { useState } from "react";
 import { routes } from "@/shared/config/routes";
 import { useMyProfileQuery } from "@/features/student/api/studentApi";
