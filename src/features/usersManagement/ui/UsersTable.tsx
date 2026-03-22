@@ -14,6 +14,7 @@ import { useRouter } from "next/navigation";
 import { routes } from "@/shared/config/routes";
 import usersTableColumns from "../model/usersTableColumns";
 import { UserDto } from "@/entities/user/model/usersApi";
+import { formatDateTime } from "@/shared/lib/utils/dateTimeFormatting";
 
 const makeUsersRows = (users: UserDto[]) =>
   users.map((user) => {
@@ -31,8 +32,8 @@ const makeUsersRows = (users: UserDto[]) =>
       department: department?.title || "-",
       position: position?.title || "-",
       enabled: user.enabled,
-      createdAt: user.createdAt,
-      lastVisit: user.lastVisit,
+      createdAt: formatDateTime(user.createdAt || ""),
+      lastVisit: formatDateTime(user.lastVisit || ""),
     };
   });
 

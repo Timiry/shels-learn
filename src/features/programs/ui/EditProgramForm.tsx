@@ -40,7 +40,7 @@ export default function EditProgramForm({
           accessCondition:
             currentValues?.accessCondition ||
             "PREVIOUS_COURSES_VIEWED_OR_PENDING",
-          deadlineDays: currentValues?.deadlineAt,
+          deadlineDays: currentValues?.deadlineDays,
         },
   });
 

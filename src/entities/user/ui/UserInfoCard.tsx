@@ -1,5 +1,6 @@
 import { Avatar, Button, Stack, Typography } from "@mui/material";
 import { UserDto } from "../model/usersApi";
+import { formatDateTime } from "@/shared/lib/utils/dateTimeFormatting";
 
 export default function UserInfoCard({
   user,
@@ -56,7 +57,7 @@ export default function UserInfoCard({
           {user.createdBy}
         </Typography>
         <Typography variant="caption" color="text.secondary">
-          {user.createdAt}
+          {formatDateTime(user.createdAt || "")}
         </Typography>
       </Stack>
       <Stack alignItems={"center"}>
