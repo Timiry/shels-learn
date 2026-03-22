@@ -8,6 +8,7 @@ import { useRouter, useParams, useSearchParams } from "next/navigation";
 import TabNavigation from "@/shared/ui/TabNavigation";
 import {
   useGetProgramCourseListsQuery,
+  useGetProgramEnrollmentListsQuery,
   useGetProgramQuery,
 } from "@/features/programs/model/programsApi";
 import ProgramContent from "@/features/programs/ui/ProgramContent";
@@ -25,6 +26,8 @@ export default function ProgramInfoPage() {
   // const { currentData: programStats } = useProgramStatsQuery(+programId);
   const { currentData: courseLists } =
     useGetProgramCourseListsQuery(+programId);
+  const { currentData: studentsLists } =
+    useGetProgramEnrollmentListsQuery(+programId);
 
   return (
     <Box width={"80%"} mx={"auto"}>
@@ -78,7 +81,7 @@ export default function ProgramInfoPage() {
                 Управление студентами
               </Button>
             </Box>
-            <ProgramStatsTable students={courseLists?.in || []} />
+            <ProgramStatsTable students={studentsLists?.in || []} />
           </Box>
         )}
       </TabNavigation>

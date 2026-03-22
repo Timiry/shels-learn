@@ -76,6 +76,12 @@ export default function EditProgramPage() {
                   orderedCourseIds: orderCourseIds,
                 },
               });
+              router.push(
+                routes.admin.programs.programInfoByIdAndTab(
+                  programId,
+                  "description"
+                )
+              );
             }}
             onCancel={() =>
               router.push(
