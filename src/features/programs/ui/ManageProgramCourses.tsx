@@ -14,7 +14,6 @@ import {
   Stack,
 } from "@mui/material";
 import { useState, useEffect, useCallback } from "react";
-import { CourseDto } from "../model/programsApi";
 import { useGetAllSectionsQuery } from "@/entities/section/model/sectionsApi";
 import AddOutlinedIcon from "@mui/icons-material/AddOutlined";
 import RemoveOutlinedIcon from "@mui/icons-material/RemoveOutlined";
@@ -36,6 +35,7 @@ import {
   useSortable,
 } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
+import { CourseDto } from "@/entities/course/model/coursesApi";
 
 interface ManageProgramCoursesProps {
   in: CourseDto[];

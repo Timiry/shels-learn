@@ -1,17 +1,7 @@
-// features/program-management/ui/EditProgramForm.tsx
 "use client";
 
 import { Controller, useForm } from "react-hook-form";
-import {
-  Box,
-  Typography,
-  TextField,
-  Stack,
-  MenuItem,
-  FormControlLabel,
-  Checkbox,
-  FormHelperText,
-} from "@mui/material";
+import { Box, Typography, TextField, Stack, MenuItem } from "@mui/material";
 import {
   ProgramDto,
   CreateLearningProgramRequest,
@@ -42,8 +32,7 @@ export default function EditProgramForm({
           title: "",
           description: "",
           accessCondition: "PREVIOUS_COURSES_VIEWED_OR_PENDING",
-          deadlineAt: undefined,
-          blockAfterDeadline: false,
+          deadlineDays: undefined,
         }
       : {
           title: currentValues?.title || "",
@@ -51,8 +40,7 @@ export default function EditProgramForm({
           accessCondition:
             currentValues?.accessCondition ||
             "PREVIOUS_COURSES_VIEWED_OR_PENDING",
-          deadlineAt: currentValues?.deadlineAt,
-          blockAfterDeadline: currentValues?.blockAfterDeadline || false,
+          deadlineDays: currentValues?.deadlineAt,
         },
   });
 
@@ -60,16 +48,6 @@ export default function EditProgramForm({
     if (!programInfo.title?.trim()) {
       return;
     }
-    // if (
-    //   programInfo.deadlineAt !== undefined &&
-    //   programInfo.deadlineAt !== null &&
-    //   programInfo.deadlineAt < 1
-    // ) {
-    //   setError("deadlineAt", {
-    //     message: "Срок прохождения должен быть не менее 1 дня",
-    //   });
-    //   return;
-    // }
     onSubmit(programInfo);
   };
 
@@ -135,44 +113,18 @@ export default function EditProgramForm({
             Дедлайн завершения программы
           </Typography>
           <TextField
-            {...register("deadlineAt", {
+            {...register("deadlineDays", {
               valueAsNumber: true,
               min: { value: 1, message: "Минимум 1 день" },
             })}
             placeholder="?"
             helperText={
-              errors.deadlineAt?.message ||
+              errors.deadlineDays?.message ||
               "Количество дней, за которые студент должен пройти программу"
             }
-            error={!!errors.deadlineAt}
+            error={!!errors.deadlineDays}
             type="number"
             sx={{ width: "250px" }}
-          />
-        </Box>
-
-        <Box>
-          <Controller
-            name="blockAfterDeadline"
-            control={control}
-            render={({ field }) => (
-              <FormControlLabel
-                control={
-                  <Checkbox
-                    checked={field.value || false}
-                    onChange={(e) => field.onChange(e.target.checked)}
-                  />
-                }
-                label={
-                  <Box>
-                    <Typography>Блокировать доступ после дедлайна</Typography>
-                    <Typography variant="body2">
-                      Если включено, студенты не смогут продолжать прохождение
-                      программы после установленного дедлайна
-                    </Typography>
-                  </Box>
-                }
-              />
-            )}
           />
         </Box>
       </Stack>

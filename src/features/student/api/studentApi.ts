@@ -1,5 +1,6 @@
 import { UserDto } from "@/entities/user/model/usersApi";
 import { baseApi as api } from "../../../shared/api/baseApi";
+import { ProgramDto } from "@/features/programs/model/programsApi";
 const injectedRtkApi = api.injectEndpoints({
   endpoints: (build) => ({
     updateMyLastVisit: build.mutation<
@@ -186,29 +187,11 @@ export type StudentCourseStatDto = {
   startedAt?: string;
   completedAt?: string;
 };
-export type ProgramCourseDto = {
-  courseId: number;
-  orderIndex?: number;
-  available?: boolean;
-  viewed?: boolean;
-  completed?: boolean;
-};
 
 export type AccessCondition =
   | "PREVIOUS_COURSES_COMPLETED"
   | "PREVIOUS_COURSES_VIEWED_OR_PENDING"
   | "ALL_OPEN";
-
-export type ProgramDto = {
-  id: number;
-  title?: string;
-  description?: string;
-  accessCondition?: AccessCondition;
-  deadlineAt?: number;
-  blockAfterDeadline?: boolean;
-  completed?: boolean;
-  courses?: ProgramCourseDto[];
-};
 
 export type CourseProgressStatus =
   | "NEW"

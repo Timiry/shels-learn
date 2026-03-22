@@ -12,11 +12,7 @@ import {
   Typography,
 } from "@mui/material";
 import { useRouter, useParams } from "next/navigation";
-import {
-  useCourseForLearnerQuery,
-  useMyProgramQuery,
-  useNextLessonForLearnerQuery,
-} from "@/features/student/api/studentApi";
+import { useMyProgramQuery } from "@/features/student/api/studentApi";
 import DoneOutlinedIcon from "@mui/icons-material/DoneOutlined";
 import { formatDateFromTimestamp } from "@/shared/lib/utils/dateTimeFormatting";
 
@@ -84,7 +80,7 @@ export default function MyProgramPage() {
                   }
                   disabled={!course.available}
                 >
-                  {/* <CardMedia
+                  <CardMedia
                     component="img"
                     height="140"
                     image={
@@ -93,9 +89,9 @@ export default function MyProgramPage() {
                         : "/coverFiller.png"
                     }
                     alt={course?.title}
-                  /> */}
+                  />
                   <CardContent>
-                    {/* <Typography
+                    <Typography
                       gutterBottom
                       variant="h6"
                       component="div"
@@ -107,14 +103,16 @@ export default function MyProgramPage() {
                       }}
                     >
                       {course?.title}
-                    </Typography> */}
+                    </Typography>
 
                     <Divider sx={{ my: "16px" }} />
                     <Box display={"flex"} justifyContent={"space-between"}>
                       <Typography variant="h5" color="secondary">
                         {index + 1}
                       </Typography>
-                      <DoneOutlinedIcon color="success" />
+                      {program.completed && (
+                        <DoneOutlinedIcon color="success" />
+                      )}
                     </Box>
                   </CardContent>
                 </CardActionArea>

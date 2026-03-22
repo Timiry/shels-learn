@@ -1,5 +1,7 @@
 import { UserDto } from "@/entities/user/model/usersApi";
 import { baseApi as api } from "../../../shared/api/baseApi";
+import { CourseDto } from "@/entities/course/model/coursesApi";
+
 const injectedRtkApi = api.injectEndpoints({
   endpoints: (build) => ({
     getProgram: build.query<GetProgramApiResponse, GetProgramApiArg>({
@@ -143,6 +145,11 @@ export type AssignUsersToProgramApiArg = {
 };
 export type ProgramCourseDto = {
   courseId: number;
+  title: string;
+  description?: string;
+  coverFilePath?: string;
+  deadlineAt?: number;
+  deadlineDays?: number;
   orderIndex: number;
   available?: boolean;
   viewed?: boolean;
@@ -156,8 +163,8 @@ export type ProgramDto = {
     | "PREVIOUS_COURSES_COMPLETED"
     | "PREVIOUS_COURSES_VIEWED_OR_PENDING"
     | "ALL_OPEN";
+  deadlineDays?: number;
   deadlineAt?: number;
-  blockAfterDeadline?: boolean;
   completed?: boolean;
   courses?: ProgramCourseDto[];
 };
@@ -171,24 +178,11 @@ export type CreateLearningProgramRequest = {
     | "PREVIOUS_COURSES_COMPLETED"
     | "PREVIOUS_COURSES_VIEWED_OR_PENDING"
     | "ALL_OPEN";
-  deadlineAt?: number;
-  blockAfterDeadline?: boolean;
+  deadlineDays?: number;
 };
 export type ProgramGroupAssignRequest = {
   idsIn?: string[];
   idsNotIn?: string[];
-};
-export type CourseDto = {
-  id: number;
-  title: string;
-  description?: string;
-  authorFullName?: string;
-  coverFilePath?: string;
-  deadlineDays?: number;
-  lessonsFreeOrder?: boolean;
-  sectionId?: number;
-  sectionTitle?: string;
-  sectionPriority?: number;
 };
 export type CourseInNotInListsDto = {
   in?: CourseDto[];

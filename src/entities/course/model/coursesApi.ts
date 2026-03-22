@@ -254,7 +254,7 @@ export type DeleteLessonApiArg = {
 };
 export type CourseDto = {
   id: number;
-  title?: string;
+  title: string;
   description?: string;
   authorFullName?: string;
   coverFilePath?: string;
