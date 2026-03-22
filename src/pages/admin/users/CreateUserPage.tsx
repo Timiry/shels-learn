@@ -30,7 +30,10 @@ export default function CreateUserPage() {
           <EditUserForm
             onSubmit={async (userInfo: UpdateUserRequest) => {
               const user = await createUser(userInfo).unwrap();
-              if (user.id) router.push(routes.admin.users.userById(user.id));
+              if (user.id)
+                router.push(
+                  routes.admin.users.userByIdAndTag(user.id, "courses")
+                );
             }}
             formId={formId}
             isCreation={true}

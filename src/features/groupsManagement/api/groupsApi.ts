@@ -77,7 +77,7 @@ const injectedRtkApi = api.injectEndpoints({
         method: "POST",
         body: queryArg.idsRequest,
       }),
-      invalidatesTags: ["Groups"],
+      invalidatesTags: ["Groups", "Learning", "User", "AllUsers"],
     }),
     removeUsersFromGroup: build.mutation<
       RemoveUsersFromGroupApiResponse,
@@ -88,7 +88,7 @@ const injectedRtkApi = api.injectEndpoints({
         method: "DELETE",
         body: queryArg.idsRequest,
       }),
-      invalidatesTags: ["Groups"],
+      invalidatesTags: ["Groups", "Learning", "User", "AllUsers"],
     }),
     getAvailableToAssignCourses: build.query<
       GetAvailableToAssignCoursesApiResponse,

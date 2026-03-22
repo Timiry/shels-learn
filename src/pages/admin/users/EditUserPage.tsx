@@ -46,7 +46,9 @@ export default function EditUserPage() {
                   userId: +userId,
                   updateUserRequest: userInfo,
                 });
-                router.push(routes.admin.users.userById(userId));
+                router.push(
+                  routes.admin.users.userByIdAndTag(userId, "courses")
+                );
               }}
               formId={formId}
               isCreation={false}

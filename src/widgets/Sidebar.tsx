@@ -96,11 +96,7 @@ export default function Sidebar() {
         ];
 
   const handleAvatarClick = (event: React.MouseEvent<HTMLButtonElement>) => {
-    if (globalRole === "STUDENT") {
-      router.push(routes.student.profile);
-    } else {
-      setAvatarAnchorEl(event.currentTarget);
-    }
+    setAvatarAnchorEl(event.currentTarget);
   };
 
   const handleMenuClose = () => {
@@ -173,20 +169,32 @@ export default function Sidebar() {
         <MenuItem>
           <Typography variant="subtitle2">{myProfile?.fullName}</Typography>
         </MenuItem>
-        <MenuItem onClick={() => handleMenuClick(routes.admin.profile)}>
+        <MenuItem
+          onClick={() =>
+            handleMenuClick(
+              activeRole === "ADMIN"
+                ? routes.admin.profile
+                : routes.student.profile
+            )
+          }
+        >
           <AccountCircleOutlinedIcon sx={{ mr: 1.5 }} />
           <Typography variant="body2">Перейти в профиль</Typography>
         </MenuItem>
-        <MenuItem
-          onClick={() => handleMenuClick(routes.admin.courses.allCourses)}
-        >
-          <SettingsOutlinedIcon sx={{ mr: 1.5 }} />
-          <Typography variant="body2">Войти как администратор</Typography>
-        </MenuItem>
-        <MenuItem onClick={() => handleMenuClick(routes.student.learning)}>
-          <SchoolOutlinedIcon sx={{ mr: 1.5 }} />
-          <Typography variant="body2">Войти как студент</Typography>
-        </MenuItem>
+        {globalRole === "ADMIN" && (
+          <>
+            <MenuItem
+              onClick={() => handleMenuClick(routes.admin.courses.allCourses)}
+            >
+              <SettingsOutlinedIcon sx={{ mr: 1.5 }} />
+              <Typography variant="body2">Войти как администратор</Typography>
+            </MenuItem>
+            <MenuItem onClick={() => handleMenuClick(routes.student.learning)}>
+              <SchoolOutlinedIcon sx={{ mr: 1.5 }} />
+              <Typography variant="body2">Войти как студент</Typography>
+            </MenuItem>
+          </>
+        )}
         <MenuItem
           onClick={() => {
             removeAuthToken();

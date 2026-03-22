@@ -1,3 +1,4 @@
+import { GroupDto } from "@/features/groupsManagement/api/groupsApi";
 import { baseApi as api } from "../../../shared/api/baseApi";
 const injectedRtkApi = api.injectEndpoints({
   endpoints: (build) => ({
@@ -110,11 +111,7 @@ export type GetUserStatsApiResponse =
 export type GetUserStatsApiArg = number;
 export type ExportUsersCsvApiResponse = unknown;
 export type ExportUsersCsvApiArg = void;
-export type GroupDto = {
-  id?: string;
-  title?: string;
-  type?: "GENERAL" | "COMPANY" | "DEPARTMENT" | "POSITION";
-};
+
 export type UserDto = {
   id: number;
   fullName: string;
@@ -137,12 +134,12 @@ export type ApiResponse = {
   message?: string;
 };
 export type UpdateUserRequest = {
-  fullName?: string;
-  email?: string;
-  role?: "ADMIN" | "STUDENT";
+  fullName: string;
+  email: string;
+  role: "ADMIN" | "STUDENT";
   avatarFilePath?: string;
   phone?: string;
-  snils?: string;
+  snils: string;
   comment?: string;
   password?: string;
 };
@@ -152,7 +149,7 @@ export type CreateUserRequest = {
   role: "ADMIN" | "STUDENT";
   avatarFilePath?: string;
   phone?: string;
-  snils?: string;
+  snils: string;
   comment?: string;
   createdAt?: number;
   createdBy?: string;

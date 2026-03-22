@@ -28,6 +28,21 @@ const usersTableColumns: GridColDef[] = [
       value === "ADMIN" ? "Администратор" : "Студент",
   },
   {
+    field: "company",
+    headerName: "Компания",
+    width: 240,
+  },
+  {
+    field: "department",
+    headerName: "Подразделение",
+    width: 240,
+  },
+  {
+    field: "position",
+    headerName: "Должность",
+    width: 240,
+  },
+  {
     field: "createdAt",
     headerName: "Зарегистрирован",
     width: 240,

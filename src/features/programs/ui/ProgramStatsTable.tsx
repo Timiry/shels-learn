@@ -75,7 +75,7 @@ export default function ProgramStatsTable({
         disableRowSelectionOnClick
         disableColumnMenu={true}
         onRowClick={(params, event, details) => {
-          router.push(routes.admin.users.userById(params.id));
+          router.push(routes.admin.users.userByIdAndTag(params.id, "courses"));
         }}
         sx={{
           border: 0,

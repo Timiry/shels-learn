@@ -16,15 +16,25 @@ import usersTableColumns from "../model/usersTableColumns";
 import { UserDto } from "@/entities/user/model/usersApi";
 
 const makeUsersRows = (users: UserDto[]) =>
-  users.map((user) => ({
-    id: user.id,
-    fullName: user.fullName,
-    email: user.email,
-    role: user.role,
-    enabled: user.enabled,
-    createdAt: user.createdAt,
-    lastVisit: user.lastVisit,
-  }));
+  users.map((user) => {
+    const company = user?.groups?.find((group) => group.type === "COMPANY");
+    const department = user?.groups?.find(
+      (group) => group.type === "DEPARTMENT"
+    );
+    const position = user?.groups?.find((group) => group.type === "POSITION");
+    return {
+      id: user.id,
+      fullName: user.fullName,
+      email: user.email,
+      role: user.role,
+      company: company?.title || "-",
+      department: department?.title || "-",
+      position: position?.title || "-",
+      enabled: user.enabled,
+      createdAt: user.createdAt,
+      lastVisit: user.lastVisit,
+    };
+  });
 
 const paginationModel = { page: 0, pageSize: 5 };
 
@@ -174,7 +184,7 @@ export default function UserTable({
         // checkboxSelection
         onRowSelectionModelChange={onRowSelectionModeChange}
         onRowClick={(params, event, details) => {
-          router.push(routes.admin.users.userById(params.id));
+          router.push(routes.admin.users.userByIdAndTag(params.id, "courses"));
         }}
         columnVisibilityModel={{ id: false, enabled: false }}
         disableColumnMenu={true}

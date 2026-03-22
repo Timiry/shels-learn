@@ -164,12 +164,12 @@ export type PracticeSubmissionRequest = {
 };
 
 export type UpdateUserRequest = {
-  fullName?: string;
-  email?: string;
-  role?: "ADMIN" | "STUDENT";
+  fullName: string;
+  email: string;
+  role: "ADMIN" | "STUDENT";
   avatarFilePath?: string;
   phone?: string;
-  snils?: string;
+  snils: string;
   comment?: string;
   password?: string;
 };
