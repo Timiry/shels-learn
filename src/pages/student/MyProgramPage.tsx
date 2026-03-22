@@ -44,7 +44,7 @@ export default function MyProgramPage() {
                 : program.courses?.reduce(
                     (completed, c) => (c.completed ? completed + 1 : completed),
                     0
-                  )}
+                  )}{" "}
               из {program.courses.length}
             </Typography>
           )}
