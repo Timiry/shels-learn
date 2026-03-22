@@ -1,4 +1,4 @@
-import { LessonType } from "@/entities/course/model/types";
+import { LessonType } from "@/entities/course/model/coursesApi";
 
 export const routes = {
   auth: {
@@ -51,6 +51,16 @@ export const routes = {
       managePrograms: (type: string, id: string | number) =>
         `/admin/groups/${type}/${id}/manage-programs`,
     },
+    programs: {
+      allPrograms: "/admin/programs",
+      createProgram: "/admin/programs/create",
+      programInfoByIdAndTab: (id: string | number, tab: string) =>
+        `/admin/programs/${id}/?tab=${tab}`,
+      editProgramByIdAndTab: (id: string | number, tab: string) =>
+        `/admin/programs/${id}/edit?tab=${tab}`,
+      manageStudents: (id: string | number) =>
+        `/admin/programs/${id}/manage-students`,
+    },
     profile: "/admin/profile",
     editProfile: "/admin/profile/edit",
     users: {
@@ -67,6 +77,6 @@ export const routes = {
     learning: "/student/learning",
     profile: "/student/profile",
     editProfile: "/student/profile/edit",
-    programs: "/student/programs",
+    programById: (id: string | number) => `/student/learning/program/${id}`,
   },
 };

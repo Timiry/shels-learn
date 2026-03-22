@@ -1,6 +1,7 @@
 "use client";
 
 import BookOutlinedIcon from "@mui/icons-material/BookOutlined"; //курсы
+import FormatListNumberedOutlinedIcon from "@mui/icons-material/FormatListNumberedOutlined"; //программы
 import EditNoteOutlinedIcon from "@mui/icons-material/EditNoteOutlined"; //проверка
 import Diversity3OutlinedIcon from "@mui/icons-material/Diversity3Outlined"; // группы
 import PeopleAltOutlinedIcon from "@mui/icons-material/PeopleAltOutlined"; //пользователи
@@ -47,7 +48,7 @@ export default function Sidebar() {
 
   const { currentData: myProfile } = useMyProfileQuery();
 
-  const globalRole = myProfile?.user.role;
+  const globalRole = myProfile?.role;
   const activeRole = pathname?.includes("admin") ? "ADMIN" : "STUDENT";
 
   // Определяем, какие разделы показывать
@@ -59,6 +60,12 @@ export default function Sidebar() {
             label: "Курсы",
             icon: BookOutlinedIcon,
             path: routes.admin.courses.allCourses,
+          },
+          {
+            id: "programs",
+            label: "Программы",
+            icon: FormatListNumberedOutlinedIcon,
+            path: routes.admin.programs.allPrograms,
           },
           {
             id: "verification",
@@ -129,8 +136,8 @@ export default function Sidebar() {
         <IconButton onClick={handleAvatarClick} sx={{ p: 0 }}>
           <Avatar
             src={
-              myProfile?.user.avatarFilePath
-                ? "http://217.26.31.189" + myProfile.user.avatarFilePath
+              myProfile?.avatarFilePath
+                ? "http://217.26.31.189" + myProfile.avatarFilePath
                 : ""
             }
             sx={{
@@ -164,9 +171,7 @@ export default function Sidebar() {
         sx={{ minWidth: 250 }}
       >
         <MenuItem>
-          <Typography variant="subtitle2">
-            {myProfile?.user.fullName}
-          </Typography>
+          <Typography variant="subtitle2">{myProfile?.fullName}</Typography>
         </MenuItem>
         <MenuItem onClick={() => handleMenuClick(routes.admin.profile)}>
           <AccountCircleOutlinedIcon sx={{ mr: 1.5 }} />

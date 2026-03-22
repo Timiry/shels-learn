@@ -4,15 +4,12 @@ import {
   TextField,
   Button,
   Stack,
-  Checkbox,
-  Radio,
-  RadioGroup,
-  IconButton,
   Menu,
   MenuItem,
-  Alert,
+  FormControlLabel,
+  Switch,
 } from "@mui/material";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useForm } from "react-hook-form";
 import {
   CreatePracticeLessonRequest,
@@ -20,11 +17,11 @@ import {
   LessonDto,
   PracticeQuestionRequest,
   PracticeQuestionType,
-} from "@/entities/course/model/types";
+} from "@/entities/course/model/coursesApi";
 import { v4 as uuidv4 } from "uuid";
-import DeleteIcon from "@mui/icons-material/Delete";
 import AddIcon from "@mui/icons-material/Add";
 import Collapse from "@/shared/ui/Collapse";
+import TestQuestionForm from "./TestQuestionForm";
 
 interface EditLessonFormProps {
   onSubmit: (
@@ -35,8 +32,9 @@ interface EditLessonFormProps {
   isCreation: boolean;
 }
 
-interface Question {
+export interface TestQuestion {
   id: string;
+  idForServer?: number;
   questionType: PracticeQuestionType;
   questionText: string;
   options: Option[];
@@ -69,20 +67,34 @@ export default function EditTestLessonForm({
           passingThresholdPercent: 90,
           lessonType: "PRACTICE_TEST",
           questions: [],
+          shuffleOptions: false,
+          stopLesson: false,
+          showQuestionStatus: true,
+          showCorrectAnswersAfterCompletion: false,
         }
       : {
           title: currentValues?.title || "",
           passingThresholdPercent: currentValues?.passingThresholdPercent || 90,
           lessonType: "PRACTICE_TEST",
           questions: currentValues?.questions || [],
+          stopLesson: currentValues?.stopLesson,
+          attemptLimit: currentValues?.attemptLimit,
+          timeLimitMinutes: currentValues?.timeLimitMinutes,
+          shuffleOptions: currentValues?.shuffleOnEveryAttempt,
+          showQuestionStatus: true,
+          showCorrectAnswersAfterCompletion:
+            currentValues?.showCorrectAnswersAfterCompletion,
         },
   });
 
-  const title = watch("title");
-  const passingThresholdPercent = watch("passingThresholdPercent");
+  const stopLesson = watch("stopLesson");
+  const shuffleOptions = watch("shuffleOptions");
+  const showCorrectAnswersAfterCompletion = watch(
+    "showCorrectAnswersAfterCompletion"
+  );
 
   // Состояние для вопросов
-  const [questions, setQuestions] = useState<Question[]>([]);
+  const [questions, setQuestions] = useState<TestQuestion[]>([]);
   const [addQuestionMenuAnchor, setAddQuestionMenuAnchor] =
     useState<null | HTMLElement>(null);
 
@@ -91,13 +103,16 @@ export default function EditTestLessonForm({
     if (currentValues?.questions) {
       const formattedQuestions = currentValues.questions.map((q) => ({
         id: uuidv4(),
+        idForServer: q.id || undefined,
         questionType: q.questionType,
         questionText: q.questionText,
-        options: q.options.map((option, index) => ({
-          id: uuidv4(),
-          text: option,
-          isCorrect: (q.correctAnswers || []).includes(option),
-        })),
+        options: q.options
+          ? q.options.map((option, index) => ({
+              id: uuidv4(),
+              text: option,
+              isCorrect: (q.correctAnswers || []).includes(option),
+            }))
+          : [],
         fullPoints: q.fullPoints || 1,
         partialPoints: q.partialPoints,
       }));
@@ -107,184 +122,183 @@ export default function EditTestLessonForm({
   }, [currentValues?.questions]);
 
   // Обработчик добавления вопроса
-  const handleAddQuestion = (questionType: PracticeQuestionType) => {
-    setQuestions([
-      ...questions,
-      {
-        id: uuidv4(),
-        questionType,
-        questionText: "",
-        options: [
-          { id: uuidv4(), text: "", isCorrect: true },
-          { id: uuidv4(), text: "", isCorrect: false },
-        ],
-        fullPoints: 1,
-        partialPoints: questionType === "MULTIPLE_CHOICE" ? 0 : undefined,
-      },
-    ]);
+  const handleAddQuestion = useCallback(
+    (questionType: PracticeQuestionType) => {
+      setQuestions((prev) => [
+        ...prev,
+        {
+          id: uuidv4(),
+          questionType,
+          questionText: "",
+          options: [
+            { id: uuidv4(), text: "", isCorrect: true },
+            { id: uuidv4(), text: "", isCorrect: false },
+          ],
+          fullPoints: 1,
+          partialPoints: questionType === "MULTIPLE_CHOICE" ? 0 : undefined,
+        },
+      ]);
 
-    setAddQuestionMenuAnchor(null);
-  };
+      setAddQuestionMenuAnchor(null);
+    },
+    []
+  );
 
   // Обработчик удаления вопроса
-  const handleDeleteQuestion = (questionId: string) => {
-    setQuestions(questions.filter((q) => q.id !== questionId));
-  };
+  const handleDeleteQuestion = useCallback((questionId: string) => {
+    setQuestions((prev) => prev.filter((q) => q.id !== questionId));
+  }, []);
 
   // Обработчик изменения текста вопроса
-  const handleQuestionTextChange = (questionId: string, text: string) => {
-    setQuestions(
-      questions.map((q) =>
-        q.id === questionId ? { ...q, questionText: text } : q
-      )
-    );
-  };
+  const handleQuestionTextChange = useCallback(
+    (questionId: string, text: string) => {
+      setQuestions((prev) =>
+        prev.map((q) =>
+          q.id === questionId ? { ...q, questionText: text } : q
+        )
+      );
+    },
+    []
+  );
 
   // Обработчик добавления варианта ответа
-  const handleAddOption = (questionId: string) => {
-    setQuestions(
-      questions.map((q) => {
+  const handleAddOption = useCallback((questionId: string) => {
+    setQuestions((prev) =>
+      prev.map((q) => {
         if (q.id !== questionId) return q;
-
         return {
           ...q,
           options: [...q.options, { id: uuidv4(), text: "", isCorrect: false }],
         };
       })
     );
-  };
+  }, []);
 
   // Обработчик удаления варианта ответа
-  const handleDeleteOption = (questionId: string, optionId: string) => {
-    setQuestions(
-      questions.map((q) => {
-        if (q.id !== questionId) return q;
-
-        // Не удаляем последний вариант ответа
-        if (q.options.length <= 2) return q;
-
-        return {
-          ...q,
-          options: q.options.filter((o) => o.id !== optionId),
-        };
-      })
-    );
-  };
+  const handleDeleteOption = useCallback(
+    (questionId: string, optionId: string) => {
+      setQuestions((prev) =>
+        prev.map((q) => {
+          if (q.id !== questionId) return q;
+          // Не удаляем последний вариант ответа
+          if (q.options.length <= 2) return q;
+          return {
+            ...q,
+            options: q.options.filter((o) => o.id !== optionId),
+          };
+        })
+      );
+    },
+    []
+  );
 
   // Обработчик изменения текста варианта ответа
-  const handleOptionTextChange = (
-    questionId: string,
-    optionId: string,
-    text: string
-  ) => {
-    setQuestions(
-      questions.map((q) => {
-        if (q.id !== questionId) return q;
-
-        return {
-          ...q,
-          options: q.options.map((o) =>
-            o.id === optionId ? { ...o, text } : o
-          ),
-        };
-      })
-    );
-  };
+  const handleOptionTextChange = useCallback(
+    (questionId: string, optionId: string, text: string) => {
+      setQuestions((prev) =>
+        prev.map((q) => {
+          if (q.id !== questionId) return q;
+          return {
+            ...q,
+            options: q.options.map((o) =>
+              o.id === optionId ? { ...o, text } : o
+            ),
+          };
+        })
+      );
+    },
+    []
+  );
 
   // Обработчик изменения состояния правильного ответа для одиночного выбора
-  const handleSingleChoiceChange = (
-    questionId: string,
-    selectedOptionId: string
-  ) => {
-    setQuestions(
-      questions.map((q) => {
-        if (q.id !== questionId || q.questionType !== "SINGLE_CHOICE") return q;
-
-        return {
-          ...q,
-          options: q.options.map((o) => ({
-            ...o,
-            isCorrect: o.id === selectedOptionId,
-          })),
-        };
-      })
-    );
-  };
+  const handleSingleChoiceChange = useCallback(
+    (questionId: string, selectedOptionId: string) => {
+      setQuestions((prev) =>
+        prev.map((q) => {
+          if (q.id !== questionId || q.questionType !== "SINGLE_CHOICE")
+            return q;
+          return {
+            ...q,
+            options: q.options.map((o) => ({
+              ...o,
+              isCorrect: o.id === selectedOptionId,
+            })),
+          };
+        })
+      );
+    },
+    []
+  );
 
   // Обработчик изменения состояния правильного ответа для множественного выбора
-  const handleMultipleChoiceChange = (
-    questionId: string,
-    optionId: string,
-    isCorrect: boolean
-  ) => {
-    setQuestions(
-      questions.map((q) => {
-        if (q.id !== questionId || q.questionType !== "MULTIPLE_CHOICE")
-          return q;
-
-        return {
-          ...q,
-          options: q.options.map((o) =>
-            o.id === optionId ? { ...o, isCorrect } : o
-          ),
-        };
-      })
-    );
-  };
+  const handleMultipleChoiceChange = useCallback(
+    (questionId: string, optionId: string, isCorrect: boolean) => {
+      setQuestions((prev) =>
+        prev.map((q) => {
+          if (q.id !== questionId || q.questionType !== "MULTIPLE_CHOICE")
+            return q;
+          return {
+            ...q,
+            options: q.options.map((o) =>
+              o.id === optionId ? { ...o, isCorrect } : o
+            ),
+          };
+        })
+      );
+    },
+    []
+  );
 
   // Обработчик изменения баллов за правильный ответ
-  const handleFullPointsChange = (questionId: string, value: number) => {
-    setQuestions(
-      questions.map((q) =>
-        q.id === questionId ? { ...q, fullPoints: value } : q
-      )
-    );
-  };
+  const handleFullPointsChange = useCallback(
+    (questionId: string, value: number) => {
+      setQuestions((prev) =>
+        prev.map((q) => (q.id === questionId ? { ...q, fullPoints: value } : q))
+      );
+    },
+    []
+  );
 
   // Обработчик изменения баллов за частичный ответ
-  const handlePartialPointsChange = (questionId: string, value: number) => {
-    setQuestions(
-      questions.map((q) =>
-        q.id === questionId ? { ...q, partialPoints: value } : q
-      )
-    );
-  };
+  const handlePartialPointsChange = useCallback(
+    (questionId: string, value: number) => {
+      setQuestions((prev) =>
+        prev.map((q) =>
+          q.id === questionId ? { ...q, partialPoints: value } : q
+        )
+      );
+    },
+    []
+  );
 
   // Обработчик отправки формы
   const onSubmitForm = (lessonInfo: CreatePracticeLessonRequest) => {
-    if (!lessonInfo.title.trim()) {
-      setValue("title", lessonInfo.title.trim(), { shouldValidate: true });
-      return;
-    }
-
-    if (
-      !lessonInfo.passingThresholdPercent ||
-      lessonInfo.passingThresholdPercent <= 0 ||
-      lessonInfo.passingThresholdPercent > 100
-    ) {
-      return;
-    }
-
     // Форматируем данные для отправки
-    const formattedQuestions: PracticeQuestionRequest[] = questions.map((q) => {
-      const baseQuestion = {
-        questionType: q.questionType,
-        questionText: q.questionText,
-        options: q.options.map((o) => o.text),
-        correctAnswers: q.options.filter((o) => o.isCorrect).map((o) => o.text),
-        fullPoints: q.fullPoints,
-      };
+    const formattedQuestions: PracticeQuestionRequest[] = questions.map(
+      (q, index) => {
+        const baseQuestion = {
+          id: q.idForServer,
+          position: index + 1,
+          questionType: q.questionType,
+          questionText: q.questionText,
+          options: q.options.map((o) => o.text),
+          correctAnswers: q.options
+            .filter((o) => o.isCorrect)
+            .map((o) => o.text),
+          fullPoints: q.fullPoints,
+        };
 
-      // Для одиночного выбора не отправляем partialPoints
-      if (q.questionType === "SINGLE_CHOICE") {
-        return baseQuestion;
+        // Для одиночного выбора не отправляем partialPoints
+        if (q.questionType === "SINGLE_CHOICE") {
+          return baseQuestion;
+        }
+
+        // Для множественного выбора отправляем partialPoints, если есть
+        return q.partialPoints
+          ? { ...baseQuestion, partialPoints: q.partialPoints }
+          : baseQuestion;
       }
-
-      // Для множественного выбора отправляем partialPoints, если есть
-      return q.partialPoints
-        ? { ...baseQuestion, partialPoints: q.partialPoints }
-        : baseQuestion;
-    });
+    );
 
     onSubmit({
       ...lessonInfo,
@@ -293,26 +307,49 @@ export default function EditTestLessonForm({
   };
 
   // Проверка валидности вопросов
-  const areQuestionsValid = questions.every((question) => {
+  const questionError = (question: TestQuestion) => {
+    if (question.questionText == "")
+      return "Текст вопроса должен быть заполнен";
+    if (question.options.find((o) => o.text === ""))
+      return "Текст варианта ответа должен быть заполнен";
+
     const correctAnswersCount = question.options.filter(
       (o) => o.isCorrect
     ).length;
-
-    // Для SINGLE_CHOICE должно быть ровно 1 правильный ответ
-    if (question.questionType === "SINGLE_CHOICE") {
-      return correctAnswersCount === 1;
+    if (
+      question.questionType === "SINGLE_CHOICE" &&
+      correctAnswersCount !== 1
+    ) {
+      return "Должен быть ровно 1 правильный ответ";
+    }
+    if (
+      question.questionType === "MULTIPLE_CHOICE" &&
+      correctAnswersCount < 1
+    ) {
+      return "Должен быть как минимум 1 правильный ответ";
     }
 
-    // Для MULTIPLE_CHOICE должно быть как минимум 1 правильный ответ
-    return correctAnswersCount >= 1;
-  });
+    if (
+      question.fullPoints <= 0 ||
+      (question.partialPoints && question.partialPoints < 0)
+    )
+      return "Баллы должны быть положитеьными и полный балл больше нуля";
+    if (
+      question.fullPoints &&
+      question.partialPoints &&
+      question.fullPoints <= question.partialPoints
+    )
+      return "Баллы за частичный ответ должны быть меньше чем баллы за полный";
+
+    return null;
+  };
+
+  const areAllQuestionsValid =
+    questions.length > 0 &&
+    questions.every((question) => questionError(question) === null);
 
   return (
-    <Box
-      component="form"
-      onSubmit={handleSubmit(onSubmitForm)}
-      id="edit-practice-lesson-form"
-    >
+    <Box component="form" onSubmit={handleSubmit(onSubmitForm)}>
       <Stack spacing={3}>
         {/* Настройки */}
         <Collapse title="Настройки" defaultExpanded={true}>
@@ -324,7 +361,6 @@ export default function EditTestLessonForm({
               <TextField
                 {...register("title", {
                   required: "Название обязательно",
-                  minLength: { value: 2, message: "Минимум 2 символа" },
                 })}
                 placeholder="Название урока"
                 fullWidth
@@ -339,8 +375,8 @@ export default function EditTestLessonForm({
               </Typography>
               <TextField
                 {...register("passingThresholdPercent", {
-                  valueAsNumber: true,
                   required: "Порог прохождения обязателен",
+                  valueAsNumber: true,
                   min: { value: 1, message: "Минимум 1%" },
                   max: { value: 100, message: "Максимум 100%" },
                 })}
@@ -350,9 +386,112 @@ export default function EditTestLessonForm({
                 error={!!errors.passingThresholdPercent}
                 helperText={
                   errors.passingThresholdPercent?.message ||
-                  "Укажите процент, который должен набрать студент для успешного прохождения урока"
+                  "Укажите процент от максимальных баллов, который должен набрать студент для успешного прохождения урока"
                 }
-                inputProps={{ min: 1, max: 100 }}
+              />
+            </Box>
+
+            <Box>
+              <Typography variant="body1" gutterBottom>
+                Ограничение попыток
+              </Typography>
+              <TextField
+                {...register("attemptLimit", {
+                  valueAsNumber: true,
+                  min: { value: 1, message: "Минимум 1 попытка" },
+                })}
+                type="number"
+                placeholder="Количество попыток (оставьте пустым для неограниченного количества)"
+                fullWidth
+                error={!!errors.attemptLimit}
+                helperText={errors.attemptLimit?.message}
+              />
+            </Box>
+
+            <Box>
+              <Typography variant="body1" gutterBottom>
+                Ограничение времени выполнения (в минутах)
+              </Typography>
+              <TextField
+                {...register("timeLimitMinutes", {
+                  valueAsNumber: true,
+                  min: { value: 1, message: "Минимум 1 минута" },
+                })}
+                type="number"
+                placeholder="Время на выполнение (оставьте пустым для неограниченного времени)"
+                fullWidth
+                error={!!errors.timeLimitMinutes}
+                helperText={errors.timeLimitMinutes?.message}
+              />
+            </Box>
+
+            <Box>
+              <FormControlLabel
+                control={
+                  <Switch
+                    checked={stopLesson}
+                    onChange={(e) => setValue("stopLesson", e.target.checked)}
+                    color="primary"
+                  />
+                }
+                label={
+                  <Box>
+                    <Typography>Стоп-урок</Typography>
+                    <Typography variant="body2">
+                      Студент сможет перейти к следующему уроку только после
+                      того как успешно пройдет этот
+                    </Typography>
+                  </Box>
+                }
+              />
+            </Box>
+
+            <Box>
+              <FormControlLabel
+                control={
+                  <Switch
+                    checked={shuffleOptions}
+                    onChange={(e) =>
+                      setValue("shuffleOptions", e.target.checked)
+                    }
+                    color="primary"
+                  />
+                }
+                label={
+                  <Box>
+                    <Typography>Перемешивание вариантов ответа</Typography>
+                    <Typography variant="body2">
+                      Варианты ответов теста у студента будут отображаться в
+                      случайном порядке
+                    </Typography>
+                  </Box>
+                }
+              />
+            </Box>
+
+            <Box>
+              <FormControlLabel
+                control={
+                  <Switch
+                    checked={showCorrectAnswersAfterCompletion}
+                    onChange={(e) =>
+                      setValue(
+                        "showCorrectAnswersAfterCompletion",
+                        e.target.checked
+                      )
+                    }
+                    color="primary"
+                  />
+                }
+                label={
+                  <Box>
+                    <Typography>Показывать правильные ответы</Typography>
+                    <Typography variant="body2">
+                      После завершения тестов студент будет видеть, какие
+                      варианты ответов были правильными
+                    </Typography>
+                  </Box>
+                }
               />
             </Box>
           </Stack>
@@ -362,199 +501,21 @@ export default function EditTestLessonForm({
         <Collapse title="Вопросы" defaultExpanded={true}>
           <Stack spacing={2}>
             {questions.map((question, index) => (
-              <Box
+              <TestQuestionForm
                 key={question.id}
-                sx={{
-                  border: "1px solid",
-                  borderColor: "divider",
-                  borderRadius: 1,
-                  p: 2,
-                  position: "relative",
-                }}
-              >
-                <Box
-                  sx={{
-                    display: "flex",
-                    justifyContent: "space-between",
-                    alignItems: "center",
-                    mb: 2,
-                  }}
-                >
-                  <Typography variant="h6">Вопрос №{index + 1}</Typography>
-                  <IconButton
-                    onClick={() => handleDeleteQuestion(question.id)}
-                    sx={{ color: "error.main" }}
-                  >
-                    <DeleteIcon />
-                  </IconButton>
-                </Box>
-
-                <TextField
-                  fullWidth
-                  placeholder="Введите текст вопроса"
-                  value={question.questionText}
-                  onChange={(e) =>
-                    handleQuestionTextChange(question.id, e.target.value)
-                  }
-                  multiline
-                  rows={3}
-                  sx={{ mb: 2 }}
-                />
-
-                {/* Поля для баллов */}
-                <Box
-                  sx={{ display: "flex", alignItems: "center", gap: 2, mb: 2 }}
-                >
-                  <Typography variant="body1">Баллы</Typography>
-                  <Typography variant="body2">Правильный:</Typography>
-                  <TextField
-                    type="number"
-                    value={question.fullPoints}
-                    onChange={(e) =>
-                      handleFullPointsChange(
-                        question.id,
-                        Number(e.target.value)
-                      )
-                    }
-                    sx={{ flex: 1 }}
-                  />
-                  {question.questionType === "MULTIPLE_CHOICE" && (
-                    <>
-                      <Typography variant="body2">Частичный:</Typography>
-
-                      <TextField
-                        type="number"
-                        value={question.partialPoints || 0}
-                        onChange={(e) =>
-                          handlePartialPointsChange(
-                            question.id,
-                            Number(e.target.value)
-                          )
-                        }
-                        inputProps={{ max: question.fullPoints }}
-                        sx={{ flex: 1 }}
-                      />
-                    </>
-                  )}
-                </Box>
-
-                <Box sx={{ mb: 2 }}>
-                  {question.questionType === "SINGLE_CHOICE" ? (
-                    // Радиогруппа для одиночного выбора
-                    <RadioGroup
-                      value={
-                        question.options.find((o) => o.isCorrect)?.id || ""
-                      }
-                      onChange={(e) =>
-                        handleSingleChoiceChange(question.id, e.target.value)
-                      }
-                    >
-                      {question.options.map((option) => (
-                        <Box
-                          key={option.id}
-                          sx={{
-                            display: "flex",
-                            alignItems: "center",
-                            mb: 1,
-                            p: 1,
-                            backgroundColor: "background.default",
-                            borderRadius: 1,
-                          }}
-                        >
-                          <Radio value={option.id} />
-                          <TextField
-                            fullWidth
-                            placeholder={`Вариант ответа`}
-                            value={option.text}
-                            onChange={(e) =>
-                              handleOptionTextChange(
-                                question.id,
-                                option.id,
-                                e.target.value
-                              )
-                            }
-                            sx={{ ml: 1 }}
-                          />
-                          <IconButton
-                            onClick={() =>
-                              handleDeleteOption(question.id, option.id)
-                            }
-                            sx={{ ml: 1 }}
-                          >
-                            <DeleteIcon />
-                          </IconButton>
-                        </Box>
-                      ))}
-                    </RadioGroup>
-                  ) : (
-                    // Чекбоксы для множественного выбора
-                    <Box>
-                      {question.options.map((option) => (
-                        <Box
-                          key={option.id}
-                          sx={{
-                            display: "flex",
-                            alignItems: "center",
-                            mb: 1,
-                            p: 1,
-                            backgroundColor: "background.default",
-                            borderRadius: 1,
-                          }}
-                        >
-                          <Checkbox
-                            checked={option.isCorrect}
-                            onChange={(e) =>
-                              handleMultipleChoiceChange(
-                                question.id,
-                                option.id,
-                                e.target.checked
-                              )
-                            }
-                          />
-                          <TextField
-                            fullWidth
-                            placeholder={`Вариант ответа`}
-                            value={option.text}
-                            onChange={(e) =>
-                              handleOptionTextChange(
-                                question.id,
-                                option.id,
-                                e.target.value
-                              )
-                            }
-                            sx={{ ml: 1 }}
-                          />
-                          <IconButton
-                            onClick={() =>
-                              handleDeleteOption(question.id, option.id)
-                            }
-                            sx={{ ml: 1 }}
-                          >
-                            <DeleteIcon />
-                          </IconButton>
-                        </Box>
-                      ))}
-                    </Box>
-                  )}
-                </Box>
-
-                <Button
-                  variant="outlined"
-                  onClick={() => handleAddOption(question.id)}
-                  sx={{ mb: 2 }}
-                  startIcon={<AddIcon />}
-                >
-                  Добавить вариант ответа
-                </Button>
-
-                {!areQuestionsValid && (
-                  <Alert severity="error" sx={{ mt: 1 }}>
-                    {question.questionType === "SINGLE_CHOICE"
-                      ? "Должен быть ровно 1 правильный ответ"
-                      : "Должен быть как минимум 1 правильный ответ"}
-                  </Alert>
-                )}
-              </Box>
+                question={question}
+                index={index}
+                handleDeleteQuestion={handleDeleteQuestion}
+                handleQuestionTextChange={handleQuestionTextChange}
+                handleAddOption={handleAddOption}
+                handleDeleteOption={handleDeleteOption}
+                handleOptionTextChange={handleOptionTextChange}
+                handleSingleChoiceChange={handleSingleChoiceChange}
+                handleMultipleChoiceChange={handleMultipleChoiceChange}
+                handleFullPointsChange={handleFullPointsChange}
+                handlePartialPointsChange={handlePartialPointsChange}
+                questionError={questionError}
+              />
             ))}
 
             {/* Кнопка добавления вопроса */}
@@ -599,7 +560,7 @@ export default function EditTestLessonForm({
           <Button
             type="submit"
             variant="contained"
-            disabled={!areQuestionsValid}
+            disabled={!areAllQuestionsValid}
           >
             {isCreation ? "Создать урок" : "Сохранить изменения"}
           </Button>

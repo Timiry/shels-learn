@@ -3,7 +3,7 @@ import {
   CreateTheoryLessonRequest,
   LessonDto,
   LessonType,
-} from "@/entities/course/model/types";
+} from "@/entities/course/model/coursesApi";
 import Box from "@mui/material/Box";
 import EditPdfLesson from "./EditPdfLessonForm";
 import EditTextLesson from "./EditTextLessonForm";

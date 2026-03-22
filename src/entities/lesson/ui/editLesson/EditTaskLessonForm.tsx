@@ -4,10 +4,10 @@ import {
   TextField,
   Button,
   Stack,
-  IconButton,
-  Alert,
+  FormControlLabel,
+  Switch,
 } from "@mui/material";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useForm } from "react-hook-form";
 import {
   CreatePracticeLessonRequest,
@@ -15,13 +15,11 @@ import {
   LessonDto,
   PracticeQuestionRequest,
   PracticeQuestionType,
-} from "@/entities/course/model/types";
+} from "@/entities/course/model/coursesApi";
 import { v4 as uuidv4 } from "uuid";
-import DeleteIcon from "@mui/icons-material/Delete";
 import AddIcon from "@mui/icons-material/Add";
 import Collapse from "@/shared/ui/Collapse";
-import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
-import MuiCollapse from "@mui/material/Collapse";
+import TaskQuestionForm from "./TaskQuestionForm";
 
 interface EditLessonFormProps {
   onSubmit: (
@@ -32,12 +30,14 @@ interface EditLessonFormProps {
   isCreation: boolean;
 }
 
-interface Question {
+export interface TaskQuestion {
   id: string;
+  idForServer?: number;
   questionType: PracticeQuestionType;
   questionText: string;
   trainerHint?: string;
   fullPoints: number;
+  partialPoints: number;
   isHintVisible: boolean;
 }
 
@@ -60,30 +60,35 @@ export default function EditTaskLessonForm({
           passingThresholdPercent: 90,
           lessonType: "PRACTICE_OPEN_ANSWER",
           questions: [],
+          stopLesson: false,
+          showQuestionStatus: true,
         }
       : {
           title: currentValues?.title || "",
           passingThresholdPercent: currentValues?.passingThresholdPercent || 90,
           lessonType: "PRACTICE_OPEN_ANSWER",
           questions: currentValues?.questions || [],
+          stopLesson: currentValues?.stopLesson,
+          showQuestionStatus: true,
         },
   });
 
-  const title = watch("title");
-  const passingThresholdPercent = watch("passingThresholdPercent");
+  const stopLesson = watch("stopLesson");
 
   // Состояние для вопросов
-  const [questions, setQuestions] = useState<Question[]>([]);
+  const [questions, setQuestions] = useState<TaskQuestion[]>([]);
 
   // Инициализация вопросов из текущих значений
   useEffect(() => {
     if (currentValues?.questions) {
       const formattedQuestions = currentValues.questions.map((q) => ({
         id: uuidv4(),
+        idForServer: q.id,
         questionType: q.questionType,
         questionText: q.questionText,
         trainerHint: q.trainerHint,
         fullPoints: q.fullPoints || 1,
+        partialPoints: q.partialPoints || 0,
         isHintVisible: !!q.trainerHint, // Показываем поле, если есть подсказка
       }));
 
@@ -92,47 +97,53 @@ export default function EditTaskLessonForm({
   }, [currentValues?.questions]);
 
   // Обработчик добавления вопроса
-  const handleAddQuestion = () => {
-    setQuestions([
-      ...questions,
+  const handleAddQuestion = useCallback(() => {
+    setQuestions((prev) => [
+      ...prev,
       {
         id: uuidv4(),
+        idForServer: undefined,
         questionType: "OPEN_ANSWER",
         questionText: "",
         trainerHint: "",
         fullPoints: 1,
+        partialPoints: 0,
         isHintVisible: false,
       },
     ]);
-  };
+  }, []);
 
   // Обработчик удаления вопроса
-  const handleDeleteQuestion = (questionId: string) => {
-    setQuestions(questions.filter((q) => q.id !== questionId));
-  };
+  const handleDeleteQuestion = useCallback((questionId: string) => {
+    setQuestions((prev) => prev.filter((q) => q.id !== questionId));
+  }, []);
 
   // Обработчик изменения текста вопроса
-  const handleQuestionTextChange = (questionId: string, text: string) => {
-    setQuestions(
-      questions.map((q) =>
-        q.id === questionId ? { ...q, questionText: text } : q
-      )
-    );
-  };
+  const handleQuestionTextChange = useCallback(
+    (questionId: string, text: string) => {
+      setQuestions((prev) =>
+        prev.map((q) =>
+          q.id === questionId ? { ...q, questionText: text } : q
+        )
+      );
+    },
+    []
+  );
 
   // Обработчик изменения подсказки тренера
-  const handleTrainerHintChange = (questionId: string, text: string) => {
-    setQuestions(
-      questions.map((q) =>
-        q.id === questionId ? { ...q, trainerHint: text } : q
-      )
-    );
-  };
+  const handleTrainerHintChange = useCallback(
+    (questionId: string, text: string) => {
+      setQuestions((prev) =>
+        prev.map((q) => (q.id === questionId ? { ...q, trainerHint: text } : q))
+      );
+    },
+    []
+  );
 
   // Обработчик переключения видимости подсказки
-  const handleToggleHint = (questionId: string) => {
-    setQuestions(
-      questions.map((q) =>
+  const handleToggleHint = useCallback((questionId: string) => {
+    setQuestions((prev) =>
+      prev.map((q) =>
         q.id === questionId
           ? {
               ...q,
@@ -142,35 +153,37 @@ export default function EditTaskLessonForm({
           : q
       )
     );
-  };
+  }, []);
 
   // Обработчик изменения баллов за правильный ответ
-  const handleFullPointsChange = (questionId: string, value: number) => {
-    setQuestions(
-      questions.map((q) =>
-        q.id === questionId ? { ...q, fullPoints: value } : q
-      )
-    );
-  };
+  const handleFullPointsChange = useCallback(
+    (questionId: string, value: number) => {
+      setQuestions((prev) =>
+        prev.map((q) => (q.id === questionId ? { ...q, fullPoints: value } : q))
+      );
+    },
+    []
+  );
+
+  // Обработчик изменения баллов за частичный ответ
+  const handlePartialPointsChange = useCallback(
+    (questionId: string, value: number) => {
+      setQuestions((prev) =>
+        prev.map((q) =>
+          q.id === questionId ? { ...q, partialPoints: value } : q
+        )
+      );
+    },
+    []
+  );
 
   // Обработчик отправки формы
   const onSubmitForm = (lessonInfo: CreatePracticeLessonRequest) => {
-    if (!lessonInfo.title.trim()) {
-      setValue("title", lessonInfo.title.trim(), { shouldValidate: true });
-      return;
-    }
-
-    if (
-      !lessonInfo.passingThresholdPercent ||
-      lessonInfo.passingThresholdPercent <= 0 ||
-      lessonInfo.passingThresholdPercent > 100
-    ) {
-      return;
-    }
-
     // Форматируем данные для отправки
     const formattedQuestions: PracticeQuestionRequest[] = questions.map(
-      (q) => ({
+      (q, index) => ({
+        id: q.idForServer,
+        position: index + 1,
         questionType: "OPEN_ANSWER",
         questionText: q.questionText,
         trainerHint: q.trainerHint?.trim() || undefined, // Отправляем только если есть значение
@@ -184,10 +197,28 @@ export default function EditTaskLessonForm({
     });
   };
 
-  // Проверка валидности вопросов (требуется хотя бы один вопрос с текстом)
-  const areQuestionsValid =
+  // Проверка валидности вопросов
+  const questionError = (question: TaskQuestion) => {
+    if (question.questionText == "")
+      return "Текст вопроса должен быть заполнен";
+    if (
+      question.fullPoints <= 0 ||
+      (question.partialPoints && question.partialPoints < 0)
+    )
+      return "Баллы должны быть положитеьными и полный балл больше нуля";
+    if (
+      question.fullPoints &&
+      question.partialPoints &&
+      question.fullPoints <= question.partialPoints
+    )
+      return "Баллы за частичный ответ должны быть меньше чем баллы за полный";
+
+    return null;
+  };
+
+  const areAllQuestionsValid =
     questions.length > 0 &&
-    questions.every((question) => question.questionText.trim().length > 0);
+    questions.every((question) => questionError(question) === null);
 
   return (
     <Box
@@ -206,7 +237,6 @@ export default function EditTaskLessonForm({
               <TextField
                 {...register("title", {
                   required: "Название обязательно",
-                  minLength: { value: 2, message: "Минимум 2 символа" },
                 })}
                 placeholder="Название урока"
                 fullWidth
@@ -221,8 +251,8 @@ export default function EditTaskLessonForm({
               </Typography>
               <TextField
                 {...register("passingThresholdPercent", {
-                  valueAsNumber: true,
                   required: "Порог прохождения обязателен",
+                  valueAsNumber: true,
                   min: { value: 1, message: "Минимум 1%" },
                   max: { value: 100, message: "Максимум 100%" },
                 })}
@@ -236,6 +266,27 @@ export default function EditTaskLessonForm({
                 }
               />
             </Box>
+
+            <Box>
+              <FormControlLabel
+                control={
+                  <Switch
+                    checked={stopLesson}
+                    onChange={(e) => setValue("stopLesson", e.target.checked)}
+                    color="primary"
+                  />
+                }
+                label={
+                  <Box>
+                    <Typography>Стоп-урок</Typography>
+                    <Typography variant="body2">
+                      Студент сможет перейти к следующему уроку только после
+                      того как успешно пройдет этот
+                    </Typography>
+                  </Box>
+                }
+              />
+            </Box>
           </Stack>
         </Collapse>
 
@@ -243,106 +294,18 @@ export default function EditTaskLessonForm({
         <Collapse title="Вопросы" defaultExpanded={true}>
           <Stack spacing={2}>
             {questions.map((question, index) => (
-              <Box
+              <TaskQuestionForm
                 key={question.id}
-                sx={{
-                  border: "1px solid",
-                  borderColor: "divider",
-                  borderRadius: 1,
-                  p: 2,
-                  position: "relative",
-                }}
-              >
-                <Box
-                  sx={{
-                    display: "flex",
-                    justifyContent: "space-between",
-                    alignItems: "center",
-                    mb: 2,
-                  }}
-                >
-                  <Typography variant="h6">Вопрос №{index + 1}</Typography>
-                  <IconButton
-                    onClick={() => handleDeleteQuestion(question.id)}
-                    sx={{ color: "error.main" }}
-                  >
-                    <DeleteIcon />
-                  </IconButton>
-                </Box>
-
-                <TextField
-                  fullWidth
-                  placeholder="Введите текст вопроса"
-                  value={question.questionText}
-                  onChange={(e) =>
-                    handleQuestionTextChange(question.id, e.target.value)
-                  }
-                  multiline
-                  rows={3}
-                  sx={{ mb: 2 }}
-                />
-
-                {/* Поля для баллов */}
-                <Box
-                  sx={{ display: "flex", alignItems: "center", gap: 2, mb: 2 }}
-                >
-                  <Typography variant="body1">Баллы</Typography>
-                  <Typography variant="body2">Правильный ответ:</Typography>
-                  <TextField
-                    type="number"
-                    value={question.fullPoints}
-                    onChange={(e) =>
-                      handleFullPointsChange(
-                        question.id,
-                        Number(e.target.value)
-                      )
-                    }
-                    sx={{ flex: 1 }}
-                  />
-                </Box>
-
-                {/* Кнопка для управления подсказкой */}
-                <Button
-                  variant="text"
-                  onClick={() => handleToggleHint(question.id)}
-                  sx={{ mb: 1, textTransform: "none", color: "primary.main" }}
-                  startIcon={
-                    <ExpandMoreIcon
-                      sx={{
-                        transform: question.isHintVisible
-                          ? "rotate(180deg)"
-                          : "rotate(0deg)",
-                        // transition: "transform 0.2s",
-                      }}
-                    />
-                  }
-                >
-                  {question.isHintVisible
-                    ? "Скрыть подсказку для тренера"
-                    : "Добавить подсказку для тренера"}
-                </Button>
-
-                {/* Поле для подсказки (показывается по клику) */}
-                <MuiCollapse in={question.isHintVisible}>
-                  <TextField
-                    fullWidth
-                    placeholder="Введите подсказку для тренера"
-                    value={question.trainerHint || ""}
-                    onChange={(e) =>
-                      handleTrainerHintChange(question.id, e.target.value)
-                    }
-                    multiline
-                    rows={2}
-                    sx={{ mb: 2 }}
-                  />
-                </MuiCollapse>
-
-                {!question.questionText.trim() && (
-                  <Alert severity="error" sx={{ mt: 1 }}>
-                    Текст вопроса обязателен
-                  </Alert>
-                )}
-              </Box>
+                question={question}
+                index={index}
+                handleDeleteQuestion={handleDeleteQuestion}
+                handleQuestionTextChange={handleQuestionTextChange}
+                handleTrainerHintChange={handleTrainerHintChange}
+                handleToggleHint={handleToggleHint}
+                handleFullPointsChange={handleFullPointsChange}
+                handlePartialPointsChange={handlePartialPointsChange}
+                questionError={questionError}
+              />
             ))}
 
             {/* Кнопка добавления вопроса */}
@@ -354,12 +317,6 @@ export default function EditTaskLessonForm({
             >
               Добавить вопрос
             </Button>
-
-            {questions.length === 0 && (
-              <Alert severity="info" sx={{ mt: 2 }}>
-                Добавьте хотя бы один вопрос для создания урока
-              </Alert>
-            )}
           </Stack>
         </Collapse>
 
@@ -380,7 +337,7 @@ export default function EditTaskLessonForm({
           <Button
             type="submit"
             variant="contained"
-            disabled={!areQuestionsValid}
+            disabled={!areAllQuestionsValid}
           >
             {isCreation ? "Создать урок" : "Сохранить изменения"}
           </Button>

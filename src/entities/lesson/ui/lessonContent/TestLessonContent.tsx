@@ -1,4 +1,4 @@
-import { LessonDto } from "@/entities/course/model/types";
+import { LessonDto } from "@/entities/course/model/coursesApi";
 import Box from "@mui/material/Box";
 import Stack from "@mui/material/Stack";
 import Typography from "@mui/material/Typography";
@@ -31,7 +31,7 @@ export default function TestLessonContent({ lesson }: { lesson: LessonDto }) {
                 </Box>
                 <LessonOption
                   name="Баллы"
-                  value={`${question.fullPoints} / ${question.partialPoints}`}
+                  value={`${question.fullPoints} / ${question.partialPoints} / 0`}
                 />
               </Box>
               <Divider />

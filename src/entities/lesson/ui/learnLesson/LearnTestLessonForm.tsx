@@ -7,29 +7,28 @@ import {
   RadioGroup,
   FormControlLabel,
   Checkbox,
-  FormControl,
-  FormLabel,
   Stack,
   Divider,
   Alert,
-  TextField,
 } from "@mui/material";
 import { useState, useEffect } from "react";
-import {} from "@/entities/course/model/types";
 import {
   LearnerLessonDto,
-  PracticeSubmissionRequest,
+  LessonProgressStatus,
   SubmitPracticeApiArg,
 } from "@/features/student/api/studentApi";
+import LessonOption from "../lessonContent/lessonOption";
 
 interface LearnTestLessonFormProps {
   lesson: LearnerLessonDto;
+  lessonStatus?: LessonProgressStatus;
   formId: string;
   onSubmit: (data: SubmitPracticeApiArg) => void;
 }
 
 export default function LearnTestLessonForm({
   lesson,
+  lessonStatus,
   formId,
   onSubmit,
 }: LearnTestLessonFormProps) {
@@ -40,42 +39,43 @@ export default function LearnTestLessonForm({
     if (lesson.questions) {
       const initialAnswers: { [key: string]: string[] } = {};
       lesson.questions.forEach((question) => {
-        initialAnswers[question.position.toString()] = [];
+        initialAnswers[question.id.toString()] =
+          lessonStatus === "STARTED" ? [] : question.userAnswers || [];
       });
       setAnswers(initialAnswers);
     }
   }, [lesson.questions]);
 
   // Обработчик выбора ответа для одиночного выбора
-  const handleSingleChoiceChange = (questionIndex: number, answer: string) => {
+  const handleSingleChoiceChange = (id: number, answer: string) => {
     setAnswers((prev) => ({
       ...prev,
-      [questionIndex]: [answer],
+      [id.toString()]: [answer],
     }));
   };
 
   // Обработчик выбора ответа для множественного выбора
   const handleMultipleChoiceChange = (
-    questionIndex: number,
+    id: number,
     answer: string,
     checked: boolean
   ) => {
     setAnswers((prev) => {
-      const currentAnswers = prev[questionIndex.toString()] || [];
+      const currentAnswers = prev[id.toString()] || [];
 
       if (checked) {
         // Добавляем ответ, если его нет в массиве
         if (!currentAnswers.includes(answer)) {
           return {
             ...prev,
-            [questionIndex]: [...currentAnswers, answer],
+            [id.toString()]: [...currentAnswers, answer],
           };
         }
       } else {
         // Удаляем ответ из массива
         return {
           ...prev,
-          [questionIndex]: currentAnswers.filter((a) => a !== answer),
+          [id.toString()]: currentAnswers.filter((a) => a !== answer),
         };
       }
 
@@ -87,29 +87,32 @@ export default function LearnTestLessonForm({
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!areAllQuestionsAnswered()) {
-      alert("Вы ответили не на все вопросы");
-      return;
-    }
+    // if (!areAllQuestionsAnswered()) {
+    //   alert("Вы ответили не на все вопросы");
+    //   return;
+    // }
 
     // Форматируем данные для отправки
     const submissionData: SubmitPracticeApiArg = {
       lessonId: lesson.id,
-      practiceSubmissionRequest: { questionAnswers: answers },
+      practiceSubmissionRequest: {
+        questionAnswers: answers,
+        submittedAt: Date.now(),
+      },
     };
 
     onSubmit(submissionData);
   };
 
-  // Проверка, все ли вопросы имеют ответы
-  const areAllQuestionsAnswered = () => {
-    if (!lesson.questions) return false;
+  // // Проверка, все ли вопросы имеют ответы
+  // const areAllQuestionsAnswered = () => {
+  //   if (!lesson.questions) return false;
 
-    return lesson.questions.every((question, index) => {
-      const questionAnswers = answers[(index + 1).toString()] || [];
-      return questionAnswers.length > 0;
-    });
-  };
+  //   return lesson.questions.every((question, index) => {
+  //     const questionAnswers = answers[(index + 1).toString()] || [];
+  //     return questionAnswers.length > 0;
+  //   });
+  // };
 
   if (!lesson.questions || lesson.questions.length === 0) {
     return (
@@ -125,7 +128,7 @@ export default function LearnTestLessonForm({
         {/* Вопросы */}
         {lesson.questions.map((question) => (
           <Box
-            key={question.position}
+            key={question.id}
             sx={{
               p: 3,
               border: "1px solid",
@@ -134,9 +137,21 @@ export default function LearnTestLessonForm({
               bgcolor: "background.paper",
             }}
           >
-            <Typography variant="h6" gutterBottom sx={{ mb: 2 }}>
-              {`Вопрос № ${question.position}`}
-            </Typography>
+            <Box
+              display={"flex"}
+              justifyContent={"space-between"}
+              alignItems={"center"}
+            >
+              <Typography variant="h6" gutterBottom sx={{ mb: 2 }}>
+                {`Вопрос № ${question.position}`}
+              </Typography>
+              {lessonStatus && lessonStatus !== "STARTED" && (
+                <LessonOption
+                  name="Получено баллов"
+                  value={`${question.awardedPoints} из ${question.fullPoints}`}
+                />
+              )}
+            </Box>
             <Typography variant="body2">{question.questionText}</Typography>
 
             <Divider sx={{ mb: 2 }} />
@@ -145,19 +160,26 @@ export default function LearnTestLessonForm({
             {question.questionType === "SINGLE_CHOICE" ? (
               // Радиогруппа для одиночного выбора
               <RadioGroup
-                value={answers[question.position.toString()]?.[0] || ""}
+                value={answers[question.id.toString()]?.[0] || ""}
                 onChange={(e) =>
-                  handleSingleChoiceChange(question.position, e.target.value)
+                  handleSingleChoiceChange(question.id, e.target.value)
                 }
               >
                 {question.options?.map((option, optionIndex) => (
                   <FormControlLabel
                     key={optionIndex}
                     value={option}
+                    disabled={lessonStatus !== "STARTED"}
                     control={<Radio />}
                     label={option}
                     sx={{
                       mb: 1,
+                      bgcolor:
+                        lessonStatus === "COMPLETED" &&
+                        question.correctAnswers?.includes(option)
+                          ? "success.light"
+                          : "inherit",
+                      borderRadius: 1,
                       "& .MuiFormControlLabel-label": {
                         fontSize: "0.95rem",
                       },
@@ -171,16 +193,16 @@ export default function LearnTestLessonForm({
                 {question.options?.map((option, optionIndex) => (
                   <FormControlLabel
                     key={optionIndex}
+                    disabled={lessonStatus !== "STARTED"}
                     control={
                       <Checkbox
                         checked={
-                          answers[question.position.toString()]?.includes(
-                            option
-                          ) || false
+                          answers[question.id.toString()]?.includes(option) ||
+                          false
                         }
                         onChange={(e) =>
                           handleMultipleChoiceChange(
-                            question.position,
+                            question.id,
                             option,
                             e.target.checked
                           )
@@ -191,6 +213,12 @@ export default function LearnTestLessonForm({
                     sx={{
                       mb: 1,
                       width: "100%",
+                      bgcolor:
+                        lessonStatus === "COMPLETED" &&
+                        question.correctAnswers?.includes(option)
+                          ? "success.light"
+                          : "inherit",
+                      borderRadius: 1,
                       "& .MuiFormControlLabel-label": {
                         fontSize: "0.95rem",
                       },
@@ -217,11 +245,11 @@ export default function LearnTestLessonForm({
               >
                 <Typography variant="caption" color="text.secondary">
                   {question.fullPoints
-                    ? `Полный балл: ${question.fullPoints}`
+                    ? `Балл за полный ответ: ${question.fullPoints}`
                     : ""}
 
-                  {question.partialPoints
-                    ? ` | Частичный балл: ${question.partialPoints}`
+                  {question.partialPoints !== undefined
+                    ? ` | Балл за частичный ответ: ${question.partialPoints}`
                     : ""}
                 </Typography>
               </Box>

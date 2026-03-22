@@ -1,8 +1,19 @@
 "use client";
 
 import { Controller, useForm } from "react-hook-form";
-import { Box, Typography, TextField, Stack, MenuItem } from "@mui/material";
-import { CourseDto, CreateCourseRequest } from "@/entities/course/model/types";
+import {
+  Box,
+  Typography,
+  TextField,
+  Stack,
+  MenuItem,
+  FormControlLabel,
+  Switch,
+} from "@mui/material";
+import {
+  CourseDto,
+  CreateCourseRequest,
+} from "@/entities/course/model/coursesApi";
 import { SectionDto } from "@/entities/section/model/sectionsApi";
 
 interface EditCourseFormProps {
@@ -27,6 +38,8 @@ export default function EditCourseForm({
     handleSubmit,
     setError,
     control,
+    watch,
+    setValue,
     formState: { errors },
   } = useForm<CreateCourseRequest>({
     defaultValues: isCreation
@@ -34,21 +47,31 @@ export default function EditCourseForm({
           title: "",
           description: "",
           authorFullName: "",
-          passingThresholdPercent: 90,
           sectionId: sectionIdForCreation || 1,
+          deadlineDays: undefined,
+          lessonsFreeOrder: false,
         }
       : {
           title: currentValues?.title,
           description: currentValues?.description,
           authorFullName: currentValues?.authorFullName,
-          passingThresholdPercent: currentValues?.passingThresholdPercent,
           sectionId: currentValues?.sectionId,
+          deadlineDays: currentValues?.deadlineDays,
+          lessonsFreeOrder: currentValues?.lessonsFreeOrder,
         },
   });
+
+  const lessonsFreeOrder = watch("lessonsFreeOrder");
 
   const onSubmitForm = (courseInfo: CreateCourseRequest) => {
     if (courseInfo.title === "") {
       setError("title", { message: "Название должно быть заполнено" });
+      return;
+    }
+    if (courseInfo.deadlineDays !== undefined && courseInfo.deadlineDays < 1) {
+      setError("deadlineDays", {
+        message: "Срок прохождения должен быть не менее 1 дня",
+      });
       return;
     }
     onSubmit(courseInfo);
@@ -109,28 +132,42 @@ export default function EditCourseForm({
           fullWidth
         />
 
-        <Typography variant="body1">Порог прохождения</Typography>
-        <Controller
-          name="passingThresholdPercent"
-          control={control}
-          render={({ field }) => (
-            <TextField
-              {...field}
-              select
-              sx={{ maxWidth: 400 }}
-              helperText={
-                "Выберите минимальный процент для успешного прохождения курса"
-              }
-              onChange={(e) => field.onChange(Number(e.target.value))}
-            >
-              <MenuItem value={50}>50%</MenuItem>
-              <MenuItem value={60}>60%</MenuItem>
-              <MenuItem value={70}>70%</MenuItem>
-              <MenuItem value={80}>80%</MenuItem>
-              <MenuItem value={90}>90%</MenuItem>
-              <MenuItem value={100}>100%</MenuItem>
-            </TextField>
-          )}
+        <Typography variant="body1">Дедлайн</Typography>
+        <TextField
+          {...register("deadlineDays")}
+          placeholder="?"
+          helperText={
+            errors.deadlineDays?.message ||
+            "Количество дней, за которые студент должен пройти курс"
+          }
+          error={!!errors.deadlineDays}
+          type="number"
+          sx={{ width: "250px" }}
+        />
+
+        <FormControlLabel
+          control={
+            <Switch
+              checked={lessonsFreeOrder}
+              onChange={(e) => setValue("lessonsFreeOrder", e.target.checked)}
+              color="primary"
+            />
+          }
+          label={
+            <Box>
+              <Typography variant="body1">
+                Свободный режим выполнения
+              </Typography>
+              <Typography variant="body2">
+                Студенты могут проходить уроки курса в любом порядке
+              </Typography>
+            </Box>
+          }
+          sx={{
+            alignItems: "flex-start",
+            ml: 0,
+            mt: 1,
+          }}
         />
       </Stack>
     </Box>

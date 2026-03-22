@@ -12,6 +12,7 @@ import {
   PendingSubmissionQuestionDto,
   ReviewQuestionDecisionDto,
   SubmissionQuestionStatus,
+  ReviewOpenSubmissionRequest,
 } from "@/features/statisticsAndReports/api/statisticsAndReportsApi";
 
 export default function CheckingStudentSubmitPage() {
@@ -34,31 +35,14 @@ export default function CheckingStudentSubmitPage() {
   const formattedQuestions: PendingSubmissionQuestionDto[] = questions || [];
 
   // Обработчик отправки результатов проверки
-  const handleReviewSubmit = async (
-    reviewedQuestions: PendingSubmissionQuestionDto[]
+  const handleReviewSubmit = (
+    reviewedQuestions: ReviewOpenSubmissionRequest
   ) => {
     try {
-      // Форматируем данные для отправки в соответствии с типом апи
-      const questionReviews: { [key: string]: ReviewQuestionDecisionDto } = {};
-
-      reviewedQuestions.forEach((question) => {
-        if (question.questionIndex !== undefined && question.submissionStatus) {
-          questionReviews[question.questionIndex.toString()] = {
-            submissionStatus:
-              question.submissionStatus as SubmissionQuestionStatus,
-            awardedPoints: question.awardedPoints,
-            reviewComment: question.reviewComment || undefined,
-          };
-        }
-      });
-
-      // Отправляем данные в формате, ожидаемом апи
-      await reviewSubmission({
+      reviewSubmission({
         submissionId: Number(submissionId),
-        reviewOpenSubmissionRequest: {
-          questionReviews,
-        },
-      }).unwrap();
+        reviewOpenSubmissionRequest: reviewedQuestions,
+      });
 
       // Перенаправление после успешной проверки
       router.push(routes.admin.checking.allTasks);
@@ -66,7 +50,7 @@ export default function CheckingStudentSubmitPage() {
       setFormError(
         (err as any)?.data?.message ||
           (err as any)?.message ||
-          "Ошибка при сохранении результатов проверки"
+          "Ошибка при отправке результатов проверки"
       );
     }
   };
