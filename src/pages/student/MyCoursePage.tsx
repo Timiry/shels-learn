@@ -8,6 +8,7 @@ import {
   Divider,
   List,
   ListItem,
+  ListItemButton,
   ListItemIcon,
   ListItemText,
   Typography,
@@ -17,8 +18,8 @@ import {
   useCourseForLearnerQuery,
   useNextLessonForLearnerQuery,
 } from "@/features/student/api/studentApi";
-import IconBorderWrapper from "@/shared/ui/IconBorderWrapper";
 import lessonTypeToIcon from "@/entities/lesson/ui/lessonTypeToIcon";
+import { formatDateFromTimestamp } from "@/shared/lib/utils/dateTimeFormatting";
 
 export default function MyCoursePage() {
   const router = useRouter();
@@ -57,6 +58,22 @@ export default function MyCoursePage() {
       </HeaderBox>
 
       <Box mx={"28px"}>
+        <Box display={"flex"} flexDirection={"row"} my={2}>
+          <Typography variant="h4" color="primary.main">
+            {course?.progress?.completionPercent || 0} %
+          </Typography>
+          <Box ml={2}>
+            <Typography variant="subtitle2">
+              Пройдено уроков: {course?.progress?.completedLessons} из{" "}
+              {course?.totalLessons}
+            </Typography>
+            {course?.progress?.deadlineAt && (
+              <Typography variant="subtitle2">
+                Дедлайн: {formatDateFromTimestamp(course?.progress?.deadlineAt)}
+              </Typography>
+            )}
+          </Box>
+        </Box>
         <Typography display={"block"} variant="body2" pb={2}>
           {course?.description}
         </Typography>
@@ -64,16 +81,34 @@ export default function MyCoursePage() {
         <List sx={{ mt: "28px" }}>
           {course?.lessons?.map((lesson) => (
             <ListItem key={lesson.id}>
-              <ListItemIcon
-                sx={{
-                  color: lesson.passed ? "success.dark" : "text.secondary",
-                }}
+              <ListItemButton
+                disabled={lesson.blocked}
+                onClick={() =>
+                  router.push(
+                    `/student/learning/course/${course?.id}/lesson/${lesson.id}`
+                  )
+                }
               >
-                {lessonTypeToIcon[lesson.lessonType]}
-              </ListItemIcon>
-              <ListItemText>
-                <Typography variant="body2">{lesson.title}</Typography>
-              </ListItemText>
+                <ListItemIcon
+                  sx={{
+                    color:
+                      lesson.lessonProgress?.status === "COMPLETED"
+                        ? "success.dark"
+                        : lesson.lessonProgress?.status === "INCOMPLETED"
+                          ? "error.main"
+                          : lesson.lessonProgress?.status === "PENDING_REVIEW"
+                            ? "warning.light"
+                            : lesson.lessonProgress?.status === "REWORKING"
+                              ? "warning.dark"
+                              : "text.secondary",
+                  }}
+                >
+                  {lessonTypeToIcon[lesson.lessonType]}
+                </ListItemIcon>
+                <ListItemText>
+                  <Typography variant="body2">{lesson.title}</Typography>
+                </ListItemText>
+              </ListItemButton>
             </ListItem>
           ))}
         </List>

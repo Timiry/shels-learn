@@ -1,7 +1,10 @@
 "use client";
 
 import { useCreateCourseMutation } from "@/entities/course/model/coursesApi";
-import { CreateCourseRequest, CourseDto } from "@/entities/course/model/types";
+import {
+  CreateCourseRequest,
+  CourseDto,
+} from "@/entities/course/model/coursesApi";
 import { useGetAllSectionsQuery } from "@/entities/section/model/sectionsApi";
 import EditCourseForm from "@/features/coursesManagement/ui/EditCourseForm";
 import { useUploadMutation } from "@/shared/api/filesApi";

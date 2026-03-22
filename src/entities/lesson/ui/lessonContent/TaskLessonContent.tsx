@@ -1,9 +1,7 @@
-import { LessonDto } from "@/entities/course/model/types";
+import { LessonDto } from "@/entities/course/model/coursesApi";
 import Box from "@mui/material/Box";
 import Stack from "@mui/material/Stack";
 import Typography from "@mui/material/Typography";
-import SingleIcon from "@mui/icons-material/CheckCircleOutlineOutlined";
-import MultipleIcon from "@mui/icons-material/LibraryAddCheckOutlined";
 import LessonOption from "./lessonOption";
 import Divider from "@mui/material/Divider";
 import TaskIcon from "@mui/icons-material/LiveHelpOutlined";
@@ -26,7 +24,10 @@ export default function TaskLessonContent({ lesson }: { lesson: LessonDto }) {
                     Вопрос № {index + 1}
                   </Typography>
                 </Box>
-                <LessonOption name="Баллы" value={`${question.fullPoints}`} />
+                <LessonOption
+                  name="Баллы"
+                  value={`${question.fullPoints} / ${question.partialPoints} / 0`}
+                />
               </Box>
               <Divider />
               <Typography variant="body2">{question.questionText}</Typography>

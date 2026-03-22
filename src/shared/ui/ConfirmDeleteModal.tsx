@@ -10,7 +10,7 @@ import {
 } from "@mui/material";
 import DeleteOutline from "@mui/icons-material/DeleteOutline";
 
-type ObjectType = "user" | "course" | "lesson" | "section"; //TODO: дополнить всеми типами сущностей
+type ObjectType = "user" | "course" | "lesson" | "section" | "group" | "program"; //TODO: дополнить всеми типами сущностей
 
 interface ConfirmDeleteModalProps {
   open: boolean;
@@ -32,6 +32,8 @@ export default function ConfirmDeleteModal({
     course: ["курса", "Курс"],
     lesson: ["урока", "Урок"],
     section: ["раздела", "Раздел"],
+    group: ["группы", "Группа"],
+    program: ["программы", "Пограмма"],
     //TODO: дополнить всеми типами сущностей
   };
 

@@ -1,3 +1,4 @@
+import { GroupDto } from "@/features/groupsManagement/api/groupsApi";
 import { baseApi as api } from "../../../shared/api/baseApi";
 const injectedRtkApi = api.injectEndpoints({
   endpoints: (build) => ({
@@ -18,24 +19,11 @@ const injectedRtkApi = api.injectEndpoints({
         url: `/api/v1/admin/users/${queryArg}`,
         method: "DELETE",
       }),
-      invalidatesTags: ["AllUsers"],
-    }),
-    updateGroup: build.mutation<UpdateGroupApiResponse, UpdateGroupApiArg>({
-      query: (queryArg) => ({
-        url: `/api/v1/admin/groups/${queryArg.groupId}`,
-        method: "PUT",
-        body: queryArg.updateGroupRequest,
-      }),
-    }),
-    deleteGroup: build.mutation<DeleteGroupApiResponse, DeleteGroupApiArg>({
-      query: (queryArg) => ({
-        url: `/api/v1/admin/groups/${queryArg}`,
-        method: "DELETE",
-      }),
+      invalidatesTags: ["User"],
     }),
     getUsers: build.query<GetUsersApiResponse, GetUsersApiArg>({
       query: () => ({ url: `/api/v1/admin/users` }),
-      providesTags: ["AllUsers"],
+      providesTags: ["User"],
     }),
     createUser: build.mutation<CreateUserApiResponse, CreateUserApiArg>({
       query: (queryArg) => ({
@@ -43,7 +31,7 @@ const injectedRtkApi = api.injectEndpoints({
         method: "POST",
         body: queryArg,
       }),
-      invalidatesTags: ["User", "AllUsers"],
+      invalidatesTags: ["User"],
     }),
     deleteUsers: build.mutation<DeleteUsersApiResponse, DeleteUsersApiArg>({
       query: (queryArg) => ({
@@ -51,7 +39,7 @@ const injectedRtkApi = api.injectEndpoints({
         method: "DELETE",
         body: queryArg,
       }),
-      invalidatesTags: ["AllUsers"],
+      invalidatesTags: ["User"],
     }),
     importUsersCsv: build.mutation<
       ImportUsersCsvApiResponse,
@@ -62,6 +50,7 @@ const injectedRtkApi = api.injectEndpoints({
         method: "POST",
         body: queryArg,
       }),
+      invalidatesTags: ["User"],
     }),
     setUsersActivation: build.mutation<
       SetUsersActivationApiResponse,
@@ -72,64 +61,18 @@ const injectedRtkApi = api.injectEndpoints({
         method: "POST",
         body: queryArg,
       }),
-      invalidatesTags: ["AllUsers"],
-    }),
-    groups: build.query<GroupsApiResponse, GroupsApiArg>({
-      query: () => ({ url: `/api/v1/admin/groups` }),
-    }),
-    createGroup: build.mutation<CreateGroupApiResponse, CreateGroupApiArg>({
-      query: (queryArg) => ({
-        url: `/api/v1/admin/groups`,
-        method: "POST",
-        body: queryArg,
-      }),
-    }),
-    addUserToGroup: build.mutation<
-      AddUserToGroupApiResponse,
-      AddUserToGroupApiArg
-    >({
-      query: (queryArg) => ({
-        url: `/api/v1/admin/groups/${queryArg.groupId}/members`,
-        method: "POST",
-        body: queryArg.groupUsersRequest,
-      }),
-    }),
-    removeUsersFromGroup: build.mutation<
-      RemoveUsersFromGroupApiResponse,
-      RemoveUsersFromGroupApiArg
-    >({
-      query: (queryArg) => ({
-        url: `/api/v1/admin/groups/${queryArg.groupId}/members`,
-        method: "DELETE",
-        body: queryArg.groupUsersRequest,
-      }),
+      invalidatesTags: ["User"],
     }),
     getUserStats: build.query<GetUserStatsApiResponse, GetUserStatsApiArg>({
       query: (queryArg) => ({ url: `/api/v1/admin/users/${queryArg}/stats` }),
+      providesTags: ["User"],
     }),
-
     exportUsersCsv: build.query<
       ExportUsersCsvApiResponse,
       ExportUsersCsvApiArg
     >({
       query: () => ({ url: `/api/v1/admin/users/export` }),
-    }),
-    groupUsersById: build.query<
-      GroupUsersByIdApiResponse,
-      GroupUsersByIdApiArg
-    >({
-      query: (queryArg) => ({ url: `/api/v1/admin/groups/${queryArg}/users` }),
-    }),
-    groupUsersByTitle: build.query<
-      GroupUsersByTitleApiResponse,
-      GroupUsersByTitleApiArg
-    >({
-      query: (queryArg) => ({
-        url: `/api/v1/admin/groups/users`,
-        params: {
-          title: queryArg,
-        },
-      }),
+      providesTags: ["User"],
     }),
   }),
   overrideExisting: false,
@@ -146,15 +89,6 @@ export type UpdateUserApiArg = {
 export type DeleteUserApiResponse =
   /** status 200 Пользователь удален */ ApiResponse;
 export type DeleteUserApiArg = number;
-export type UpdateGroupApiResponse =
-  /** status 200 Группа обновлена */ GroupDto;
-export type UpdateGroupApiArg = {
-  groupId: string;
-  updateGroupRequest: UpdateGroupRequest;
-};
-export type DeleteGroupApiResponse =
-  /** status 200 Группа удалена */ ApiResponse;
-export type DeleteGroupApiArg = string;
 export type GetUsersApiResponse =
   /** status 200 Список пользователей */ UserDto[];
 export type GetUsersApiArg = void;
@@ -172,48 +106,29 @@ export type ImportUsersCsvApiArg = {
 export type SetUsersActivationApiResponse =
   /** status 200 Статусы активации обновлены */ ApiResponse;
 export type SetUsersActivationApiArg = ActivationRequest;
-export type GroupsApiResponse = /** status 200 Список групп */ GroupDto;
-export type GroupsApiArg = void;
-export type CreateGroupApiResponse = /** status 201 Группа создана */ GroupDto;
-export type CreateGroupApiArg = CreateGroupRequest;
-export type AddUserToGroupApiResponse =
-  /** status 200 Пользователи добавлены */ ApiResponse;
-export type AddUserToGroupApiArg = {
-  groupId: string;
-  groupUsersRequest: GroupUsersRequest;
-};
-export type RemoveUsersFromGroupApiResponse =
-  /** status 200 Пользователи удалены */ ApiResponse;
-export type RemoveUsersFromGroupApiArg = {
-  groupId: string;
-  groupUsersRequest: GroupUsersRequest;
-};
 export type GetUserStatsApiResponse =
   /** status 200 Статистика пользователя */ StudentCourseStatDto[];
 export type GetUserStatsApiArg = number;
 export type ExportUsersCsvApiResponse = unknown;
 export type ExportUsersCsvApiArg = void;
-export type GroupUsersByIdApiResponse =
-  /** status 200 Участники группы */ GroupUsersDto;
-export type GroupUsersByIdApiArg = string;
-export type GroupUsersByTitleApiResponse =
-  /** status 200 Результаты поиска */ GroupUsersDto;
-export type GroupUsersByTitleApiArg = string | undefined;
+
 export type UserDto = {
-  id?: number;
-  fullName?: string;
-  email?: string;
-  role?: "ADMIN" | "STUDENT";
+  id: number;
+  fullName: string;
+  email: string;
+  role: "ADMIN" | "STUDENT";
   activation?: boolean;
   enabled?: boolean;
   phone?: string;
+  snils: string;
   comment?: string;
   avatarFilePath?: string;
-  createdAt?: string;
+  createdAt?: number;
   createdBy?: string;
-  lastVisit?: string;
-  deactivatedAt?: string;
+  lastVisit?: number;
+  deactivatedAt?: number;
   deactivatedBy?: string;
+  groups?: GroupDto[];
 };
 export type ApiResponse = {
   message?: string;
@@ -222,29 +137,24 @@ export type UpdateUserRequest = {
   fullName: string;
   email: string;
   role: "ADMIN" | "STUDENT";
+  avatarFilePath?: string;
   phone?: string;
+  snils: string;
   comment?: string;
   password?: string;
-};
-export type GroupDto = {
-  id?: string;
-  title?: string;
-  type?: "GENERAL" | "COMPANY" | "DEPARTMENT" | "POSITION";
-};
-export type UpdateGroupRequest = {
-  title: string;
-  type: "GENERAL" | "COMPANY" | "DEPARTMENT" | "POSITION";
 };
 export type CreateUserRequest = {
   fullName: string;
   email: string;
   role: "ADMIN" | "STUDENT";
+  avatarFilePath?: string;
   phone?: string;
+  snils: string;
   comment?: string;
-  createdAt?: string;
+  createdAt?: number;
   createdBy?: string;
-  lastVisit?: string;
-  deactivatedAt?: string;
+  lastVisit?: number;
+  deactivatedAt?: number;
   deactivatedBy?: string;
   password?: string;
   groupIds?: string[];
@@ -255,13 +165,6 @@ export type IdsRequest = {
 };
 export type ActivationRequest = {
   activate?: boolean;
-  userIds: number[];
-};
-export type CreateGroupRequest = {
-  title: string;
-  type: "GENERAL" | "COMPANY" | "DEPARTMENT" | "POSITION";
-};
-export type GroupUsersRequest = {
   userIds: number[];
 };
 export type StudentCourseStatDto = {
@@ -277,29 +180,15 @@ export type StudentCourseStatDto = {
   startedAt?: string;
   completedAt?: string;
 };
-export type GroupUsersDto = {
-  id?: string;
-  title?: string;
-  type?: "GENERAL" | "COMPANY" | "DEPARTMENT" | "POSITION";
-  users?: UserDto[];
-};
 export const {
   useGetUserQuery,
   useUpdateUserMutation,
   useDeleteUserMutation,
-  useUpdateGroupMutation,
-  useDeleteGroupMutation,
   useGetUsersQuery,
   useCreateUserMutation,
   useDeleteUsersMutation,
   useImportUsersCsvMutation,
   useSetUsersActivationMutation,
-  useGroupsQuery,
-  useCreateGroupMutation,
-  useAddUserToGroupMutation,
-  useRemoveUsersFromGroupMutation,
   useGetUserStatsQuery,
   useExportUsersCsvQuery,
-  useGroupUsersByIdQuery,
-  useGroupUsersByTitleQuery,
 } = injectedRtkApi;

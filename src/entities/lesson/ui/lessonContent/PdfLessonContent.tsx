@@ -1,7 +1,10 @@
-import { LessonDto } from "@/entities/course/model/types";
 import Box from "@mui/material/Box";
 
-export default function PdfLessonContent({ lesson }: { lesson: LessonDto }) {
+export default function PdfLessonContent<T extends { theoryContent?: string }>({
+  lesson,
+}: {
+  lesson: T;
+}) {
   return (
     <Box>
       {lesson.theoryContent && (
@@ -9,7 +12,7 @@ export default function PdfLessonContent({ lesson }: { lesson: LessonDto }) {
           src={"http://217.26.31.189" + lesson.theoryContent}
           type="application/pdf"
           width="100%"
-          height="700px"
+          style={{ aspectRatio: "4 / 3" }}
         />
       )}
     </Box>

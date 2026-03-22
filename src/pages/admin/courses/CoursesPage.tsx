@@ -107,7 +107,8 @@ export default function CoursesPage() {
                 <Typography variant="body2" p={"16px"}>
                   {activeSection.description}
                 </Typography>
-                {"courses" in activeSection && activeSection.courses ? (
+                {"courses" in activeSection &&
+                Array.isArray(activeSection.courses) ? (
                   <Box
                     sx={{
                       display: "grid",

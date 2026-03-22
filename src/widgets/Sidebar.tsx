@@ -1,7 +1,9 @@
 "use client";
 
 import BookOutlinedIcon from "@mui/icons-material/BookOutlined"; //курсы
+import FormatListNumberedOutlinedIcon from "@mui/icons-material/FormatListNumberedOutlined"; //программы
 import EditNoteOutlinedIcon from "@mui/icons-material/EditNoteOutlined"; //проверка
+import Diversity3OutlinedIcon from "@mui/icons-material/Diversity3Outlined"; // группы
 import PeopleAltOutlinedIcon from "@mui/icons-material/PeopleAltOutlined"; //пользователи
 import AutoStoriesOutlinedIcon from "@mui/icons-material/AutoStoriesOutlined"; //обучение
 import SettingsOutlinedIcon from "@mui/icons-material/SettingsOutlined"; //админ
@@ -24,7 +26,7 @@ import {
   Typography,
 } from "@mui/material";
 
-import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { useState } from "react";
 import { routes } from "@/shared/config/routes";
 import { useMyProfileQuery } from "@/features/student/api/studentApi";
@@ -46,7 +48,7 @@ export default function Sidebar() {
 
   const { currentData: myProfile } = useMyProfileQuery();
 
-  const globalRole = myProfile?.user.role;
+  const globalRole = myProfile?.role;
   const activeRole = pathname?.includes("admin") ? "ADMIN" : "STUDENT";
 
   // Определяем, какие разделы показывать
@@ -60,10 +62,22 @@ export default function Sidebar() {
             path: routes.admin.courses.allCourses,
           },
           {
+            id: "programs",
+            label: "Программы",
+            icon: FormatListNumberedOutlinedIcon,
+            path: routes.admin.programs.allPrograms,
+          },
+          {
             id: "verification",
             label: "Проверка",
             icon: EditNoteOutlinedIcon,
             path: routes.admin.checking.allTasks,
+          },
+          {
+            id: "groups",
+            label: "Группы",
+            icon: Diversity3OutlinedIcon,
+            path: "/admin/groups",
           },
           {
             id: "users",
@@ -82,11 +96,7 @@ export default function Sidebar() {
         ];
 
   const handleAvatarClick = (event: React.MouseEvent<HTMLButtonElement>) => {
-    if (globalRole === "STUDENT") {
-      router.push(routes.student.profile);
-    } else {
-      setAvatarAnchorEl(event.currentTarget);
-    }
+    setAvatarAnchorEl(event.currentTarget);
   };
 
   const handleMenuClose = () => {
@@ -122,8 +132,8 @@ export default function Sidebar() {
         <IconButton onClick={handleAvatarClick} sx={{ p: 0 }}>
           <Avatar
             src={
-              myProfile?.user.avatarFilePath
-                ? "http://217.26.31.189" + myProfile.user.avatarFilePath
+              myProfile?.avatarFilePath
+                ? "http://217.26.31.189" + myProfile.avatarFilePath
                 : ""
             }
             sx={{
@@ -157,24 +167,34 @@ export default function Sidebar() {
         sx={{ minWidth: 250 }}
       >
         <MenuItem>
-          <Typography variant="subtitle2">
-            {myProfile?.user.fullName}
-          </Typography>
+          <Typography variant="subtitle2">{myProfile?.fullName}</Typography>
         </MenuItem>
-        <MenuItem onClick={() => handleMenuClick(routes.admin.profile)}>
+        <MenuItem
+          onClick={() =>
+            handleMenuClick(
+              activeRole === "ADMIN"
+                ? routes.admin.profile
+                : routes.student.profile
+            )
+          }
+        >
           <AccountCircleOutlinedIcon sx={{ mr: 1.5 }} />
           <Typography variant="body2">Перейти в профиль</Typography>
         </MenuItem>
-        <MenuItem
-          onClick={() => handleMenuClick(routes.admin.courses.allCourses)}
-        >
-          <SettingsOutlinedIcon sx={{ mr: 1.5 }} />
-          <Typography variant="body2">Войти как администратор</Typography>
-        </MenuItem>
-        <MenuItem onClick={() => handleMenuClick(routes.student.learning)}>
-          <SchoolOutlinedIcon sx={{ mr: 1.5 }} />
-          <Typography variant="body2">Войти как студент</Typography>
-        </MenuItem>
+        {globalRole === "ADMIN" && (
+          <MenuItem
+            onClick={() => handleMenuClick(routes.admin.courses.allCourses)}
+          >
+            <SettingsOutlinedIcon sx={{ mr: 1.5 }} />
+            <Typography variant="body2">Войти как администратор</Typography>
+          </MenuItem>
+        )}
+        {globalRole === "ADMIN" && (
+          <MenuItem onClick={() => handleMenuClick(routes.student.learning)}>
+            <SchoolOutlinedIcon sx={{ mr: 1.5 }} />
+            <Typography variant="body2">Войти как студент</Typography>
+          </MenuItem>
+        )}
         <MenuItem
           onClick={() => {
             removeAuthToken();
@@ -191,7 +211,11 @@ export default function Sidebar() {
           <ListItem key={item.id} disablePadding sx={{ mb: 0.5 }}>
             <ListItemButton
               selected={isActive(item.path)}
-              onClick={() => router.push(item.path)}
+              onClick={
+                item.id === "groups"
+                  ? () => router.push(item.path + "/GENERAL")
+                  : () => router.push(item.path)
+              }
               sx={{
                 minHeight: 56,
                 bgcolor: isActive(item.path) ? "primary.light" : "transparent",

@@ -1,8 +1,6 @@
 import { GridColDef } from "@mui/x-data-grid";
 
 const usersTableColumns: GridColDef[] = [
-  { field: "id" },
-  { field: "enabled" },
   {
     field: "fullName",
     headerName: "Пользователь",
@@ -26,6 +24,21 @@ const usersTableColumns: GridColDef[] = [
     sortable: false,
     valueGetter: (value, row) =>
       value === "ADMIN" ? "Администратор" : "Студент",
+  },
+  {
+    field: "company",
+    headerName: "Компания",
+    width: 240,
+  },
+  {
+    field: "department",
+    headerName: "Подразделение",
+    width: 240,
+  },
+  {
+    field: "position",
+    headerName: "Должность",
+    width: 240,
   },
   {
     field: "createdAt",

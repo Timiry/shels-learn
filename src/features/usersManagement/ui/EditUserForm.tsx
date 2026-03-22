@@ -10,7 +10,7 @@ import {
   Switch,
 } from "@mui/material";
 import { UpdateUserRequest, UserDto } from "@/entities/user/model/usersApi";
-import { UpdateMyProfileRequest } from "@/features/student/api/studentApi";
+import { UpdateUserRequest as UpdateMyProfileRequest } from "@/features/student/api/studentApi";
 
 interface EditUserFormProps {
   onSubmit: (userInfo: UpdateUserRequest | UpdateMyProfileRequest) => void;
@@ -38,6 +38,7 @@ export default function EditUserForm({
     defaultValues: isCreation
       ? {
           fullName: "",
+          snils: "",
           email: "",
           role: "STUDENT",
           phone: "",
@@ -46,6 +47,7 @@ export default function EditUserForm({
         }
       : {
           fullName: currentValues?.fullName,
+          snils: currentValues?.snils || "",
           email: currentValues?.email,
           role: currentValues?.role,
           phone: currentValues?.phone,
@@ -63,15 +65,15 @@ export default function EditUserForm({
   };
 
   const onSubmitForm = (userInfo: UpdateUserRequest) => {
-    if (userInfo.fullName === "") {
-      setError("fullName", { message: "ФИО должно быть заполнено" });
-      return;
-    }
     if (
       !userInfo.email ||
       !/^[\w-.]+@([\w-]+\.)+[\w-]{2,4}$/.test(userInfo.email)
     ) {
       setError("email", { message: "Невалидная почта" });
+      return;
+    }
+    if (!/^\d{3}-\d{3}-\d{3} \d{2}$/.test(userInfo.snils)) {
+      setError("snils", { message: "Невалидный формат снилса" });
       return;
     }
     onSubmit(userInfo);
@@ -86,11 +88,20 @@ export default function EditUserForm({
 
         <Typography variant="body1">ФИО</Typography>
         <TextField
-          {...register("fullName")}
+          {...register("fullName", { required: "ФИО обязательно" })}
           placeholder="ФИО"
           fullWidth
           error={!!errors.fullName}
           helperText={errors.fullName?.message}
+        />
+
+        <Typography variant="body1">СНИЛС</Typography>
+        <TextField
+          {...register("snils", { required: "СНИЛС обязателен" })}
+          placeholder="СНИЛС"
+          fullWidth
+          error={!!errors.snils}
+          helperText={errors.snils?.message}
         />
 
         <Typography variant="body1">Электронная почта</Typography>

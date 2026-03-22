@@ -1,19 +1,20 @@
 "use client";
 
-import { useGetUserQuery } from "@/entities/user/model/usersApi";
 import UserInfoCard from "@/entities/user/ui/UserInfoCard";
+import GroupTable from "@/features/groupsManagement/ui/GroupTable";
 import {
   useMyProfileQuery,
   useMyStatsQuery,
 } from "@/features/student/api/studentApi";
 import UserStatsTable from "@/features/usersManagement/ui/UserStatsTable";
 import { routes } from "@/shared/config/routes";
-import HeaderBox from "@/shared/ui/HeaderBox";
+import TabNavigation from "@/shared/ui/TabNavigation";
 import Box from "@mui/material/Box";
-import Typography from "@mui/material/Typography";
-import { useParams, usePathname, useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
+import { useState } from "react";
 
 export default function ProfilePage() {
+  const [tab, setTab] = useState("courses");
   const { currentData: userInfo } = useMyProfileQuery();
   const { currentData: userStats } = useMyStatsQuery();
 
@@ -25,7 +26,7 @@ export default function ProfilePage() {
     userInfo && (
       <Box display="flex">
         <UserInfoCard
-          user={userInfo.user}
+          user={userInfo}
           onEditClick={() =>
             router.push(
               activeRole === "ADMIN"
@@ -35,10 +36,23 @@ export default function ProfilePage() {
           }
         />
         <Box flexGrow={1}>
-          <HeaderBox>
-            <Typography variant="subtitle1">Обучение</Typography>
-          </HeaderBox>
-          <UserStatsTable stats={userStats || []} />
+          <TabNavigation
+            tabs={
+              userInfo.role === "ADMIN"
+                ? [
+                    { id: "courses", label: "Курсы" },
+                    // { id: "programs", label: "Программы" }, //TODO: добавить вкладку группы с личной стат по прграммам
+                    { id: "groups", label: "Группы" },
+                  ]
+                : [{ id: "courses", label: "Курсы" }]
+            }
+            activeTab={tab}
+            onTabChange={(tabId: string) => setTab(tabId)}
+          >
+            {tab === "courses" && <UserStatsTable stats={userStats || []} />}
+            {/* {tab === "programs" && <GroupProgramsTable />} */}
+            {tab === "groups" && <GroupTable groups={userInfo.groups || []} />}
+          </TabNavigation>
         </Box>
       </Box>
     )

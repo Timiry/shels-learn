@@ -20,7 +20,7 @@ import {
   useGetCourseQuery,
   useGetCourseReviewersQuery,
 } from "@/entities/course/model/coursesApi";
-import { CourseAdminDetailsDto } from "@/entities/course/model/types";
+import { CourseAdminDetailsDto } from "@/entities/course/model/coursesApi";
 import CourseContent from "@/features/coursesManagement/ui/CourseContent";
 import CourseStatsTable from "@/features/coursesManagement/ui/CourseStatsTable";
 import { useCourseStatsQuery } from "@/features/statisticsAndReports/api/statisticsAndReportsApi";
@@ -44,9 +44,9 @@ export default function CourseInfoPage() {
         <Box>
           <Typography variant="caption" color="secondary">
             Курсы{" > "}
-            {courseInfo?.course.title}
+            {courseInfo?.course?.title}
           </Typography>
-          <Typography variant="h1">{courseInfo?.course.title}</Typography>
+          <Typography variant="h1">{courseInfo?.course?.title}</Typography>
         </Box>
         <Tooltip arrow title={"Редактировать курс"}>
           <IconButton

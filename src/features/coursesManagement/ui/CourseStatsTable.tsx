@@ -2,6 +2,7 @@ import { Box, Paper, Typography, Tooltip } from "@mui/material";
 import { DataGrid, GridColDef } from "@mui/x-data-grid";
 import { useMemo } from "react";
 import { CourseStudentStatDto } from "@/features/statisticsAndReports/api/statisticsAndReportsApi";
+import { formatDateTime } from "@/shared/lib/utils/dateTimeFormatting";
 
 interface CourseStatsTableProps {
   stats: CourseStudentStatDto[];
@@ -19,9 +20,9 @@ const prepareRows = (stats: CourseStudentStatDto[]) => {
     progressPercent: stat.progressPercent || 0,
     completedLessons: stat.completedLessons || 0,
     totalLessons: stat.totalLessons || 0,
-    enrolledAt: stat.enrolledAt,
-    startedAt: stat.startedAt,
-    completedAt: stat.completedAt,
+    enrolledAt: formatDateTime(stat.enrolledAt || ""),
+    startedAt: formatDateTime(stat.startedAt || ""),
+    completedAt: formatDateTime(stat.completedAt || ""),
   }));
 };
 
@@ -151,7 +152,7 @@ export default function CourseStatsTable({
             },
           },
         }}
-        pageSizeOptions={[5, 10, 25, 50]}
+        pageSizeOptions={[10, 50, 100]}
         disableRowSelectionOnClick
         disableColumnMenu={true}
         sx={{

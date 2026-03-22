@@ -1,18 +1,17 @@
 "use client";
 
 import {
-  UpdateMyProfileRequest,
+  UpdateUserRequest,
   useMyProfileQuery,
   useUpdateMyProfileMutation,
 } from "@/features/student/api/studentApi";
 import EditUserForm from "@/features/usersManagement/ui/EditUserForm";
 import { useUploadMutation } from "@/shared/api/filesApi";
 import { routes } from "@/shared/config/routes";
-import ConfirmDeleteModal from "@/shared/ui/ConfirmDeleteModal";
 import HeaderBox from "@/shared/ui/HeaderBox";
 import ImageUpload from "@/shared/ui/ImageUpload";
 import { Box, Button, Typography } from "@mui/material";
-import { useParams, usePathname } from "next/navigation";
+import { usePathname } from "next/navigation";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
@@ -48,9 +47,9 @@ export default function EditProfilePage() {
             <ImageUpload
               value={
                 photo === null
-                  ? profileInfo.user.avatarFilePath
-                    ? "http://217.26.31.189" + profileInfo.user.avatarFilePath
-                    : profileInfo.user.avatarFilePath
+                  ? profileInfo.avatarFilePath
+                    ? "http://217.26.31.189" + profileInfo.avatarFilePath
+                    : profileInfo.avatarFilePath
                   : photo
               }
               onChange={(file: File) => {
@@ -63,7 +62,7 @@ export default function EditProfilePage() {
           </Box>
           <Box pl={"50px"} flex={1}>
             <EditUserForm
-              onSubmit={async (userInfo: UpdateMyProfileRequest) => {
+              onSubmit={async (userInfo: UpdateUserRequest) => {
                 if (photoWasChange && photo) {
                   const avatar = await uploadImage({
                     file: photo,
@@ -82,8 +81,8 @@ export default function EditProfilePage() {
               }}
               formId={formId}
               isCreation={false}
-              isAdmin={profileInfo.user.role === "ADMIN"}
-              currentValues={profileInfo.user}
+              isAdmin={profileInfo.role === "ADMIN"}
+              currentValues={profileInfo}
             />
           </Box>
         </Box>

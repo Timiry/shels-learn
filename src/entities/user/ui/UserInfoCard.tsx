@@ -1,5 +1,6 @@
 import { Avatar, Button, Stack, Typography } from "@mui/material";
 import { UserDto } from "../model/usersApi";
+import { formatDateTime } from "@/shared/lib/utils/dateTimeFormatting";
 
 export default function UserInfoCard({
   user,
@@ -8,6 +9,10 @@ export default function UserInfoCard({
   user: UserDto;
   onEditClick: () => void;
 }) {
+  const company = user?.groups?.find((group) => group.type === "COMPANY");
+  const department = user?.groups?.find((group) => group.type === "DEPARTMENT");
+  const position = user?.groups?.find((group) => group.type === "POSITION");
+
   return (
     <Stack
       width={"350px"}
@@ -52,8 +57,25 @@ export default function UserInfoCard({
           {user.createdBy}
         </Typography>
         <Typography variant="caption" color="text.secondary">
-          {user.createdAt}
+          {formatDateTime(user.createdAt || "")}
         </Typography>
+      </Stack>
+      <Stack alignItems={"center"}>
+        {company && (
+          <Typography variant="caption" color="text.secondary">
+            Компания: {company.title}
+          </Typography>
+        )}
+        {department && (
+          <Typography variant="caption" color="text.secondary">
+            Подразделение: {department.title}
+          </Typography>
+        )}
+        {position && (
+          <Typography variant="caption" color="text.secondary">
+            Должность: {position.title}
+          </Typography>
+        )}
       </Stack>
     </Stack>
   );

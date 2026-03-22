@@ -1,6 +1,5 @@
 "use client";
 
-import { CourseDto, CourseMiniInfo } from "../model/types";
 import Card from "@mui/material/Card";
 import CardContent from "@mui/material/CardContent";
 import CardMedia from "@mui/material/CardMedia";
@@ -9,11 +8,12 @@ import CardActionArea from "@mui/material/CardActionArea";
 import { useRouter } from "next/navigation";
 import { routes } from "@/shared/config/routes";
 import { Divider } from "@mui/material";
+import { CourseSummaryDto } from "../model/coursesApi";
 
 export default function CourseInfoCard({
   courseInfo,
 }: {
-  courseInfo: CourseMiniInfo;
+  courseInfo: CourseSummaryDto;
 }) {
   const router = useRouter();
 

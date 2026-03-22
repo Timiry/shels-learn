@@ -14,19 +14,30 @@ import { useRouter } from "next/navigation";
 import { routes } from "@/shared/config/routes";
 import usersTableColumns from "../model/usersTableColumns";
 import { UserDto } from "@/entities/user/model/usersApi";
+import { formatDateTime } from "@/shared/lib/utils/dateTimeFormatting";
 
 const makeUsersRows = (users: UserDto[]) =>
-  users.map((user) => ({
-    id: user.id,
-    fullName: user.fullName,
-    email: user.email,
-    role: user.role,
-    enabled: user.enabled,
-    createdAt: user.createdAt,
-    lastVisit: user.lastVisit,
-  }));
+  users.map((user) => {
+    const company = user?.groups?.find((group) => group.type === "COMPANY");
+    const department = user?.groups?.find(
+      (group) => group.type === "DEPARTMENT"
+    );
+    const position = user?.groups?.find((group) => group.type === "POSITION");
+    return {
+      id: user.id,
+      fullName: user.fullName,
+      email: user.email,
+      role: user.role,
+      company: company?.title || "-",
+      department: department?.title || "-",
+      position: position?.title || "-",
+      enabled: user.enabled,
+      createdAt: formatDateTime(user.createdAt || ""),
+      lastVisit: formatDateTime(user.lastVisit || ""),
+    };
+  });
 
-const paginationModel = { page: 0, pageSize: 5 };
+const paginationModel = { page: 0, pageSize: 10 };
 
 interface UserToolBar {
   idsCount: number;
@@ -122,7 +133,13 @@ export default function UserTable({
   };
 
   return (
-    <Paper sx={{ minHeight: "calc(100vh - 75px)", width: "100%", p: "28px" }}>
+    <Paper
+      sx={{
+        minHeight: "calc(100vh - 75px)",
+        width: "100%",
+        p: "28px",
+      }}
+    >
       {toolBarState?.idsCount > 0 ? (
         <Stack direction={"row"} spacing={2} alignItems={"center"} p={"10px"}>
           <Typography display={"inline"}>
@@ -170,17 +187,19 @@ export default function UserTable({
         rows={usersRows}
         columns={usersTableColumns}
         initialState={{ pagination: { paginationModel } }}
-        pageSizeOptions={[5, 10, 100]}
+        pageSizeOptions={[10, 50, 100]}
         // checkboxSelection
         onRowSelectionModelChange={onRowSelectionModeChange}
         onRowClick={(params, event, details) => {
-          router.push(routes.admin.users.userById(params.id));
+          router.push(routes.admin.users.userByIdAndTab(params.id, "courses"));
         }}
         columnVisibilityModel={{ id: false, enabled: false }}
         disableColumnMenu={true}
         hideFooterSelectedRowCount={true}
         disableRowSelectionOnClick
         sx={{
+          width: "100%",
+          overflowX: "auto",
           border: 0,
           "& .MuiDataGrid-columnHeader": {
             backgroundColor: "#F2F2F2",

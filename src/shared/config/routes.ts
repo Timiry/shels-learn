@@ -1,4 +1,4 @@
-import { LessonType } from "@/entities/course/model/types";
+import { LessonType } from "@/entities/course/model/coursesApi";
 
 export const routes = {
   auth: {
@@ -19,7 +19,7 @@ export const routes = {
       createCourseInSection: (sectionId: string | number) =>
         `/admin/courses/create?sectionId=${sectionId}`,
       courseInfoByIdAndTab: (id: string | number, tab: string) =>
-        `/admin/courses/${id}/?tab=${tab}`,
+        `/admin/courses/${id}?tab=${tab}`,
       editCourseByIdAndTab: (id: string | number, tab: string) =>
         `/admin/courses/${id}/edit?tab=${tab}`,
       viewCourseLesson: (
@@ -40,13 +40,34 @@ export const routes = {
       manageReviewers: (id: string | number) =>
         `/admin/courses/${id}/manage-reviewers`,
     },
-    groups: "/admin/groups",
+    groups: {
+      allGroupsByType: (type: string) => `/admin/groups/${type}`,
+      groupInfoByIdAndTab: (type: string, id: string | number, tab: string) =>
+        `/admin/groups/${type}/${id}?tab=${tab}`,
+      manageStudents: (type: string, id: string | number) =>
+        `/admin/groups/${type}/${id}/manage-students`,
+      manageCourses: (type: string, id: string | number) =>
+        `/admin/groups/${type}/${id}/manage-courses`,
+      managePrograms: (type: string, id: string | number) =>
+        `/admin/groups/${type}/${id}/manage-programs`,
+    },
+    programs: {
+      allPrograms: "/admin/programs",
+      createProgram: "/admin/programs/create",
+      programInfoByIdAndTab: (id: string | number, tab: string) =>
+        `/admin/programs/${id}/?tab=${tab}`,
+      editProgramByIdAndTab: (id: string | number, tab: string) =>
+        `/admin/programs/${id}/edit?tab=${tab}`,
+      manageStudents: (id: string | number) =>
+        `/admin/programs/${id}/manage-students`,
+    },
     profile: "/admin/profile",
     editProfile: "/admin/profile/edit",
     users: {
       allUsers: "/admin/users",
       createUser: "/admin/users/create",
-      userById: (id: string | number) => `/admin/users/${id}`,
+      userByIdAndTab: (id: string | number, tab: string) =>
+        `/admin/users/${id}?tab=${tab}`,
       editUserById: (id: string | number) => `/admin/users/${id}/edit`,
     },
   },
@@ -57,6 +78,6 @@ export const routes = {
     learning: "/student/learning",
     profile: "/student/profile",
     editProfile: "/student/profile/edit",
-    programs: "/student/programs",
+    programById: (id: string | number) => `/student/learning/program/${id}`,
   },
 };
