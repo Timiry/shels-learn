@@ -66,7 +66,7 @@ export const routes = {
     users: {
       allUsers: "/admin/users",
       createUser: "/admin/users/create",
-      userByIdAndTag: (id: string | number, tab: string) =>
+      userByIdAndTab: (id: string | number, tab: string) =>
         `/admin/users/${id}?tab=${tab}`,
       editUserById: (id: string | number) => `/admin/users/${id}/edit`,
     },

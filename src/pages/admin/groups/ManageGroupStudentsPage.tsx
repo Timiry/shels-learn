@@ -38,9 +38,9 @@ export default function ManageGroupStudentsPage() {
         notIn={notInStudents || []}
         onSubmit={(listIn: number[], listNotIn: number[]) => {
           try {
-            if (listIn)
+            if (listIn.length)
               assignStudents({ groupId: groupId, idsRequest: { ids: listIn } });
-            if (listNotIn)
+            if (listNotIn.length)
               unAssignStudents({
                 groupId: groupId,
                 idsRequest: { ids: listNotIn },

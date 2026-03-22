@@ -47,7 +47,7 @@ export default function EditUserPage() {
                   updateUserRequest: userInfo,
                 });
                 router.push(
-                  routes.admin.users.userByIdAndTag(userId, "courses")
+                  routes.admin.users.userByIdAndTab(userId, "courses")
                 );
               }}
               formId={formId}

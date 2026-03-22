@@ -32,7 +32,7 @@ export default function CreateUserPage() {
               const user = await createUser(userInfo).unwrap();
               if (user.id)
                 router.push(
-                  routes.admin.users.userByIdAndTag(user.id, "courses")
+                  routes.admin.users.userByIdAndTab(user.id, "courses")
                 );
             }}
             formId={formId}

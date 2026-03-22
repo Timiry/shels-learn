@@ -1,6 +1,6 @@
 export function formatDateFromTimestamp(timestamp: number): string {
   try {
-    const date = new Date(timestamp);
+    const date = new Date(timestamp * 1000);
     if (isNaN(date.getTime())) return "";
 
     return date.toLocaleDateString("ru-RU", {

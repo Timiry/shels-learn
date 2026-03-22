@@ -36,7 +36,7 @@ const makeUsersRows = (users: UserDto[]) =>
     };
   });
 
-const paginationModel = { page: 0, pageSize: 5 };
+const paginationModel = { page: 0, pageSize: 10 };
 
 interface UserToolBar {
   idsCount: number;
@@ -132,7 +132,13 @@ export default function UserTable({
   };
 
   return (
-    <Paper sx={{ minHeight: "calc(100vh - 75px)", width: "100%", p: "28px" }}>
+    <Paper
+      sx={{
+        minHeight: "calc(100vh - 75px)",
+        width: "100%",
+        p: "28px",
+      }}
+    >
       {toolBarState?.idsCount > 0 ? (
         <Stack direction={"row"} spacing={2} alignItems={"center"} p={"10px"}>
           <Typography display={"inline"}>
@@ -180,17 +186,19 @@ export default function UserTable({
         rows={usersRows}
         columns={usersTableColumns}
         initialState={{ pagination: { paginationModel } }}
-        pageSizeOptions={[5, 10, 100]}
+        pageSizeOptions={[10, 50, 100]}
         // checkboxSelection
         onRowSelectionModelChange={onRowSelectionModeChange}
         onRowClick={(params, event, details) => {
-          router.push(routes.admin.users.userByIdAndTag(params.id, "courses"));
+          router.push(routes.admin.users.userByIdAndTab(params.id, "courses"));
         }}
         columnVisibilityModel={{ id: false, enabled: false }}
         disableColumnMenu={true}
         hideFooterSelectedRowCount={true}
         disableRowSelectionOnClick
         sx={{
+          width: "100%",
+          overflowX: "auto",
           border: 0,
           "& .MuiDataGrid-columnHeader": {
             backgroundColor: "#F2F2F2",

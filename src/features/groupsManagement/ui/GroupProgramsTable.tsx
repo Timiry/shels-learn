@@ -69,12 +69,17 @@ export default function GroupProgramsTable({
             },
           },
         }}
-        pageSizeOptions={[5, 10, 25, 50]}
+        pageSizeOptions={[10, 50, 100]}
         disableRowSelectionOnClick
         disableColumnMenu={true}
-        // onRowClick={(params, event, details) => {  //TODO: сделать ссылку на программу по id
-        //   router.push();
-        // }}
+        onRowClick={(params, event, details) => {
+          router.push(
+            routes.admin.programs.programInfoByIdAndTab(
+              params.id,
+              "description"
+            )
+          );
+        }}
         sx={{
           border: 0,
           "& .MuiDataGrid-columnHeader": {
@@ -95,7 +100,7 @@ export default function GroupProgramsTable({
               }}
             >
               <Typography color="text.secondary">
-                Не добавлено курсов
+                Не добавлено программ
               </Typography>
             </Box>
           ),

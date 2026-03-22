@@ -87,7 +87,7 @@ export default function GroupTable({
             },
           },
         }}
-        pageSizeOptions={[5, 10, 25, 50]}
+        pageSizeOptions={[10, 50, 100]}
         disableRowSelectionOnClick
         disableColumnMenu={true}
         onRowClick={(params, event, details) => {

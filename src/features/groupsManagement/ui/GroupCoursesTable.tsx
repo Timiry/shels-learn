@@ -72,7 +72,7 @@ export default function GroupCoursesTable({
             },
           },
         }}
-        pageSizeOptions={[5, 10, 25, 50]}
+        pageSizeOptions={[10, 50, 100]}
         disableRowSelectionOnClick
         disableColumnMenu={true}
         onRowClick={(params, event, details) => {

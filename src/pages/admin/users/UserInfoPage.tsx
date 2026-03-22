@@ -1,25 +1,22 @@
 "use client";
 
 import {
-  StudentCourseStatDto,
   useGetUserQuery,
   useGetUserStatsQuery,
 } from "@/entities/user/model/usersApi";
 import UserInfoCard from "@/entities/user/ui/UserInfoCard";
-import GroupProgramsTable from "@/features/groupsManagement/ui/GroupProgramsTable";
 import GroupTable from "@/features/groupsManagement/ui/GroupTable";
 import UserStatsTable from "@/features/usersManagement/ui/UserStatsTable";
 import { routes } from "@/shared/config/routes";
-import HeaderBox from "@/shared/ui/HeaderBox";
 import TabNavigation from "@/shared/ui/TabNavigation";
-import { Typography } from "@mui/material";
 import Box from "@mui/material/Box";
-import { useParams, useRouter } from "next/navigation";
+import { useParams, useRouter, useSearchParams } from "next/navigation";
 
 export default function UserInfoPage() {
   const params = useParams();
   const userId = params?.id as string;
-  const tab = params?.tab as string;
+  const searchParams = useSearchParams();
+  const tab = searchParams?.get("tab") as string;
 
   const { currentData: userInfo } = useGetUserQuery(+userId);
   const { currentData: userStats } = useGetUserStatsQuery(+userId);
@@ -43,7 +40,7 @@ export default function UserInfoPage() {
             ]}
             activeTab={tab}
             onTabChange={(tabId: string) =>
-              router.push(routes.admin.groups.allGroupsByType(tabId))
+              router.push(routes.admin.users.userByIdAndTab(userId, tabId))
             }
           >
             {tab === "courses" && <UserStatsTable stats={userStats || []} />}

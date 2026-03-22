@@ -27,21 +27,21 @@ export default function LearningPage() {
         <Typography variant="h1">Обучение</Typography>
       </HeaderBox>
       <Typography variant="h5">Мои программы</Typography>
-      <Box
-        sx={{
-          display: "grid",
-          gridTemplateColumns: {
-            xs: "1fr",
-            sm: "repeat(3, 1fr)",
-            md: "repeat(4, 1fr)",
-            lg: "repeat(5, 1fr)",
-          },
-          gap: 3,
-          p: 2,
-        }}
-      >
-        {programs &&
-          programs.map((program) => (
+      {programs && (
+        <Box
+          sx={{
+            display: "grid",
+            gridTemplateColumns: {
+              xs: "1fr",
+              sm: "repeat(3, 1fr)",
+              md: "repeat(4, 1fr)",
+              lg: "repeat(5, 1fr)",
+            },
+            gap: 3,
+            p: 2,
+          }}
+        >
+          {programs.map((program) => (
             <Card sx={{ maxWidth: 270 }} key={program.id}>
               <CardActionArea
                 onClick={() =>
@@ -111,7 +111,8 @@ export default function LearningPage() {
               </CardActionArea>
             </Card>
           ))}
-      </Box>
+        </Box>
+      )}
       <Typography variant="h5">Мои курсы</Typography>
       <Box
         sx={{

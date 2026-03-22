@@ -71,11 +71,11 @@ export default function GroupStudentsTable({
             },
           },
         }}
-        pageSizeOptions={[5, 10, 25, 50]}
+        pageSizeOptions={[10, 50, 100]}
         disableRowSelectionOnClick
         disableColumnMenu={true}
         onRowClick={(params, event, details) => {
-          router.push(routes.admin.users.userByIdAndTag(params.id, "courses"));
+          router.push(routes.admin.users.userByIdAndTab(params.id, "courses"));
         }}
         sx={{
           border: 0,

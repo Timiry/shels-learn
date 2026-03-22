@@ -151,7 +151,7 @@ export default function CourseStatsTable({
             },
           },
         }}
-        pageSizeOptions={[5, 10, 25, 50]}
+        pageSizeOptions={[10, 50, 100]}
         disableRowSelectionOnClick
         disableColumnMenu={true}
         sx={{

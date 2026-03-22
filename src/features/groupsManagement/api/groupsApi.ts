@@ -77,7 +77,7 @@ const injectedRtkApi = api.injectEndpoints({
         method: "POST",
         body: queryArg.idsRequest,
       }),
-      invalidatesTags: ["Groups", "Learning", "User", "AllUsers"],
+      invalidatesTags: ["Groups", "Learning", "User", "AllUsers", "Programs"],
     }),
     removeUsersFromGroup: build.mutation<
       RemoveUsersFromGroupApiResponse,

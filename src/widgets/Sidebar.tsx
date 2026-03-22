@@ -182,18 +182,18 @@ export default function Sidebar() {
           <Typography variant="body2">Перейти в профиль</Typography>
         </MenuItem>
         {globalRole === "ADMIN" && (
-          <>
-            <MenuItem
-              onClick={() => handleMenuClick(routes.admin.courses.allCourses)}
-            >
-              <SettingsOutlinedIcon sx={{ mr: 1.5 }} />
-              <Typography variant="body2">Войти как администратор</Typography>
-            </MenuItem>
-            <MenuItem onClick={() => handleMenuClick(routes.student.learning)}>
-              <SchoolOutlinedIcon sx={{ mr: 1.5 }} />
-              <Typography variant="body2">Войти как студент</Typography>
-            </MenuItem>
-          </>
+          <MenuItem
+            onClick={() => handleMenuClick(routes.admin.courses.allCourses)}
+          >
+            <SettingsOutlinedIcon sx={{ mr: 1.5 }} />
+            <Typography variant="body2">Войти как администратор</Typography>
+          </MenuItem>
+        )}
+        {globalRole === "ADMIN" && (
+          <MenuItem onClick={() => handleMenuClick(routes.student.learning)}>
+            <SchoolOutlinedIcon sx={{ mr: 1.5 }} />
+            <Typography variant="body2">Войти как студент</Typography>
+          </MenuItem>
         )}
         <MenuItem
           onClick={() => {

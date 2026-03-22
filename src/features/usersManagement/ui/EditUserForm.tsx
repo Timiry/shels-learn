@@ -100,8 +100,8 @@ export default function EditUserForm({
           {...register("snils", { required: "СНИЛС обязателен" })}
           placeholder="СНИЛС"
           fullWidth
-          error={!!errors.fullName}
-          helperText={errors.fullName?.message}
+          error={!!errors.snils}
+          helperText={errors.snils?.message}
         />
 
         <Typography variant="body1">Электронная почта</Typography>
