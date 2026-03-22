@@ -19,7 +19,7 @@ export const routes = {
       createCourseInSection: (sectionId: string | number) =>
         `/admin/courses/create?sectionId=${sectionId}`,
       courseInfoByIdAndTab: (id: string | number, tab: string) =>
-        `/admin/courses/${id}/?tab=${tab}`,
+        `/admin/courses/${id}?tab=${tab}`,
       editCourseByIdAndTab: (id: string | number, tab: string) =>
         `/admin/courses/${id}/edit?tab=${tab}`,
       viewCourseLesson: (
@@ -40,6 +40,17 @@ export const routes = {
       manageReviewers: (id: string | number) =>
         `/admin/courses/${id}/manage-reviewers`,
     },
+    groups: {
+      allGroupsByType: (type: string) => `/admin/groups/${type}`,
+      groupInfoByIdAndTab: (type: string, id: string | number, tab: string) =>
+        `/admin/groups/${type}/${id}?tab=${tab}`,
+      manageStudents: (type: string, id: string | number) =>
+        `/admin/groups/${type}/${id}/manage-students`,
+      manageCourses: (type: string, id: string | number) =>
+        `/admin/groups/${type}/${id}/manage-courses`,
+      managePrograms: (type: string, id: string | number) =>
+        `/admin/groups/${type}/${id}/manage-programs`,
+    },
     programs: {
       allPrograms: "/admin/programs",
       createProgram: "/admin/programs/create",
@@ -50,7 +61,6 @@ export const routes = {
       manageStudents: (id: string | number) =>
         `/admin/programs/${id}/manage-students`,
     },
-    groups: "/admin/groups",
     profile: "/admin/profile",
     editProfile: "/admin/profile/edit",
     users: {

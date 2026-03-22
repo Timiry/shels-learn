@@ -3,6 +3,7 @@
 import BookOutlinedIcon from "@mui/icons-material/BookOutlined"; //курсы
 import FormatListNumberedOutlinedIcon from "@mui/icons-material/FormatListNumberedOutlined"; //программы
 import EditNoteOutlinedIcon from "@mui/icons-material/EditNoteOutlined"; //проверка
+import Diversity3OutlinedIcon from "@mui/icons-material/Diversity3Outlined"; // группы
 import PeopleAltOutlinedIcon from "@mui/icons-material/PeopleAltOutlined"; //пользователи
 import AutoStoriesOutlinedIcon from "@mui/icons-material/AutoStoriesOutlined"; //обучение
 import SettingsOutlinedIcon from "@mui/icons-material/SettingsOutlined"; //админ
@@ -71,6 +72,12 @@ export default function Sidebar() {
             label: "Проверка",
             icon: EditNoteOutlinedIcon,
             path: routes.admin.checking.allTasks,
+          },
+          {
+            id: "groups",
+            label: "Группы",
+            icon: Diversity3OutlinedIcon,
+            path: "/admin/groups",
           },
           {
             id: "users",
@@ -196,7 +203,11 @@ export default function Sidebar() {
           <ListItem key={item.id} disablePadding sx={{ mb: 0.5 }}>
             <ListItemButton
               selected={isActive(item.path)}
-              onClick={() => router.push(item.path)}
+              onClick={
+                item.id === "groups"
+                  ? () => router.push(item.path + "/GENERAL")
+                  : () => router.push(item.path)
+              }
               sx={{
                 minHeight: 56,
                 bgcolor: isActive(item.path) ? "primary.light" : "transparent",
