@@ -23,6 +23,7 @@ export const baseApi = createApi({
     "Review",
     "Sections",
     "Programs",
+    "Groups",
   ],
   endpoints: () => ({}),
 });

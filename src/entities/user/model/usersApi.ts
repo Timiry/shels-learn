@@ -116,14 +116,14 @@ export type GroupDto = {
   type?: "GENERAL" | "COMPANY" | "DEPARTMENT" | "POSITION";
 };
 export type UserDto = {
-  id?: number;
-  fullName?: string;
-  email?: string;
-  role?: "ADMIN" | "STUDENT";
+  id: number;
+  fullName: string;
+  email: string;
+  role: "ADMIN" | "STUDENT";
   activation?: boolean;
   enabled?: boolean;
   phone?: string;
-  snils?: string;
+  snils: string;
   comment?: string;
   avatarFilePath?: string;
   createdAt?: number;

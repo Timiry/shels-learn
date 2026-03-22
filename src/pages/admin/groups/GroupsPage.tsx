@@ -2,8 +2,11 @@
 
 import {
   CreateGroupRequest,
-  GroupSummaryDto,
+  GroupDto,
   GroupType,
+  useCreateGroupMutation,
+  useDeleteGroupMutation,
+  useGroupsQuery,
 } from "@/features/groupsManagement/api/groupsApi";
 import HeaderBox from "@/shared/ui/HeaderBox";
 import Box from "@mui/material/Box";
@@ -25,93 +28,12 @@ export default function GroupsPage() {
   const groupType = params?.type as GroupType;
 
   const [isGroupModalOpen, setIsGroupModalOpen] = useState(false);
+  const { currentData: allGroups } = useGroupsQuery();
+  const [createGroup] = useCreateGroupMutation();
+  const [deleteGroup] = useDeleteGroupMutation();
 
-  // мок получения всех групп
-  const allGroups: GroupSummaryDto[] = [
-    {
-      id: "1",
-      title: "Группа А-101",
-      type: "GENERAL",
-      studentsCount: 25,
-      coursesCount: 3,
-      programsCount: 1,
-    },
-    {
-      id: "2",
-      title: 'ООО "ТехноСофт"',
-      type: "COMPANY",
-      studentsCount: 150,
-      coursesCount: 8,
-      programsCount: 2,
-    },
-    {
-      id: "3",
-      title: "Отдел разработки",
-      type: "DEPARTMENT",
-      studentsCount: 45,
-      coursesCount: 5,
-      programsCount: 1,
-    },
-    {
-      id: "4",
-      title: "Менеджеры проектов",
-      type: "POSITION",
-      studentsCount: 18,
-      coursesCount: 4,
-      programsCount: 1,
-    },
-    {
-      id: "5",
-      title: "Группа Б-205",
-      type: "GENERAL",
-      studentsCount: 22,
-      coursesCount: 3,
-      programsCount: 1,
-    },
-    {
-      id: "6",
-      title: 'ЗАО "Диджитал Эдьюкейшн"',
-      type: "COMPANY",
-      studentsCount: 200,
-      coursesCount: 12,
-      programsCount: 3,
-    },
-    {
-      id: "7",
-      title: "Отдел маркетинга",
-      type: "DEPARTMENT",
-      studentsCount: 30,
-      coursesCount: 4,
-      programsCount: 1,
-    },
-    {
-      id: "8",
-      title: "Frontend разработчики",
-      type: "POSITION",
-      studentsCount: 28,
-      coursesCount: 6,
-      programsCount: 2,
-    },
-    {
-      id: "9",
-      title: "Группа В-303",
-      type: "GENERAL",
-      studentsCount: 20,
-      coursesCount: 2,
-      programsCount: 1,
-    },
-    {
-      id: "10",
-      title: 'ООО "Бизнес Тренинг"',
-      type: "COMPANY",
-      studentsCount: 120,
-      coursesCount: 7,
-      programsCount: 2,
-    },
-  ];
-  const groupsByType: GroupSummaryDto[] = allGroups.filter(
-    (item) => item.type === groupType
-  );
+  const groupsByType: GroupDto[] =
+    allGroups?.filter((item) => item.type === groupType) || [];
 
   return (
     <Box>
@@ -145,11 +67,21 @@ export default function GroupsPage() {
       <GroupModalForm
         open={isGroupModalOpen}
         onSubmit={(groupInfo: CreateGroupRequest) => {
-          console.log("Создание группы", groupInfo);
-          //TODO: добавить метод создания группы
-          setIsGroupModalOpen(false);
+          try {
+            createGroup(groupInfo);
+            setIsGroupModalOpen(false);
+          } catch (err) {
+            console.log(err);
+          }
         }}
-        onDelete={(groupId: string) => {}}
+        onDelete={(groupId: string) => {
+          try {
+            deleteGroup(groupId);
+            setIsGroupModalOpen(false);
+          } catch (err) {
+            console.log(err);
+          }
+        }}
         onClose={() => {
           setIsGroupModalOpen(false);
         }}

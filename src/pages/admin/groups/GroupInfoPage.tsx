@@ -8,15 +8,14 @@ import { useRouter, useParams, useSearchParams } from "next/navigation";
 import TabNavigation from "@/shared/ui/TabNavigation";
 import {
   CreateGroupRequest,
-  GroupDto,
   GroupType,
-  LearningProgramDto,
+  useDeleteGroupMutation,
+  useGetGroupFullInfoByIdQuery,
+  useUpdateGroupMutation,
 } from "@/features/groupsManagement/api/groupsApi";
 import groupTypeToWord from "@/features/groupsManagement/lib/groupTypeToWord";
 import GroupStudentsTable from "@/features/groupsManagement/ui/GroupStudentsTable";
-import { UserDto } from "@/entities/user/model/usersApi";
 import GroupCoursesTable from "@/features/groupsManagement/ui/GroupCoursesTable";
-import { CourseMiniInfo } from "@/entities/course/model/types";
 import GroupProgramsTable from "@/features/groupsManagement/ui/GroupProgramsTable";
 import { useState } from "react";
 import GroupModalForm from "@/features/groupsManagement/ui/GroupModalForm";
@@ -32,74 +31,9 @@ export default function GroupInfoPage() {
 
   const [isGroupModalOpen, setIsGroupModalOpen] = useState(false);
 
-  // const { currentData: groupInfo } = useGetGroupQuery(+groupId); // предполагаем получение группы
-  // методы получения студентов, курсов, программ
-
-  // моки:
-  const groupInfo: GroupDto = {
-    id: groupId,
-    title: "Тестовая группа",
-    type: "GENERAL",
-  };
-  const students: UserDto[] = [
-    {
-      id: 1,
-      fullName: "Иван Иванович",
-      email: "ivan@mail.ru",
-      role: "STUDENT",
-    },
-    {
-      id: 2,
-      fullName: "Иван Иванович",
-      email: "ivan@mail.ru",
-      role: "STUDENT",
-    },
-    {
-      id: 3,
-      fullName: "Иван Иванович",
-      email: "ivan@mail.ru",
-      role: "STUDENT",
-    },
-  ];
-
-  const courses: CourseMiniInfo[] = [
-    {
-      id: 1,
-      title: "Тестовый курс1",
-      theoryLessonsCount: 5,
-      practiceLessonsCount: 0,
-    },
-    {
-      id: 2,
-      title: "Тестовый курс2",
-      theoryLessonsCount: 5,
-      practiceLessonsCount: 10,
-    },
-    {
-      id: 3,
-      title: "Тестовый курс3",
-      theoryLessonsCount: 10,
-      practiceLessonsCount: 10,
-    },
-  ];
-
-  const programs: LearningProgramDto[] = [
-    {
-      id: 1,
-      title: "Тестовая программа1",
-      courses: [1],
-    },
-    {
-      id: 2,
-      title: "Тестовая программа1",
-      courses: [2, 3, 5],
-    },
-    {
-      id: 3,
-      title: "Тестовая программа1",
-      courses: [4, 7],
-    },
-  ];
+  const { currentData: groupInfo } = useGetGroupFullInfoByIdQuery(groupId);
+  const [updateGroup] = useUpdateGroupMutation();
+  const [deleteGroup] = useDeleteGroupMutation();
 
   return (
     <Box>
@@ -109,7 +43,7 @@ export default function GroupInfoPage() {
             Группы{" > "}
             {groupTypeToWord[groupType]}
           </Typography>
-          <Typography variant="h1">{groupInfo?.title}</Typography>
+          <Typography variant="h1">{groupInfo?.group.title}</Typography>
         </Box>
         <Tooltip arrow title={"Редактировать группу"}>
           <IconButton
@@ -121,96 +55,117 @@ export default function GroupInfoPage() {
           </IconButton>
         </Tooltip>
       </HeaderBox>
-      <TabNavigation
-        tabs={[
-          { id: "students", label: "СТУДЕНТЫ" },
-          { id: "courses", label: "Курсы" },
-          { id: "programs", label: "Программы" },
-        ]}
-        activeTab={activeTab}
-        onTabChange={(tabId: string) =>
-          router.push(
-            routes.admin.groups.groupInfoByIdAndTab(
-              groupInfo.type,
-              groupInfo.id,
-              tabId
+
+      {groupInfo && (
+        <TabNavigation
+          tabs={[
+            { id: "students", label: "СТУДЕНТЫ" },
+            { id: "courses", label: "Курсы" },
+            { id: "programs", label: "Программы" },
+          ]}
+          activeTab={activeTab}
+          onTabChange={(tabId: string) =>
+            router.push(
+              routes.admin.groups.groupInfoByIdAndTab(
+                groupInfo?.group.type,
+                groupInfo.group.id,
+                tabId
+              )
             )
-          )
-        }
-      >
-        {activeTab === "students" && (
-          <Box px={"28px"}>
-            <Box pb={2} display={"flex"} justifyContent={"end"}>
-              <Button
-                variant="outlined"
-                onClick={() => {
-                  router.push(
-                    routes.admin.groups.manageStudents(groupInfo.type, groupId)
-                  );
-                }}
-              >
-                Управление студентами
-              </Button>
+          }
+        >
+          {activeTab === "students" && (
+            <Box px={"28px"}>
+              <Box pb={2} display={"flex"} justifyContent={"end"}>
+                <Button
+                  variant="outlined"
+                  onClick={() => {
+                    router.push(
+                      routes.admin.groups.manageStudents(
+                        groupInfo.group.type,
+                        groupId
+                      )
+                    );
+                  }}
+                >
+                  Управление студентами
+                </Button>
+              </Box>
+              <GroupStudentsTable students={groupInfo.users || []} />
             </Box>
-            <GroupStudentsTable students={students} />
-          </Box>
-        )}
+          )}
 
-        {activeTab === "courses" && (
-          <Box px={"28px"}>
-            <Box pb={2} display={"flex"} justifyContent={"end"}>
-              <Button
-                variant="outlined"
-                onClick={() => {
-                  router.push(
-                    routes.admin.groups.manageCourses(groupInfo.type, groupId)
-                  );
-                }}
-              >
-                Управление курсами
-              </Button>
+          {activeTab === "courses" && (
+            <Box px={"28px"}>
+              <Box pb={2} display={"flex"} justifyContent={"end"}>
+                <Button
+                  variant="outlined"
+                  onClick={() => {
+                    router.push(
+                      routes.admin.groups.manageCourses(
+                        groupInfo.group.type,
+                        groupId
+                      )
+                    );
+                  }}
+                >
+                  Управление курсами
+                </Button>
+              </Box>
+              <GroupCoursesTable courses={groupInfo.courses || []} />
             </Box>
-            <GroupCoursesTable courses={courses} />
-          </Box>
-        )}
+          )}
 
-        {activeTab === "programs" && (
-          <Box px={"28px"}>
-            <Box pb={2} display={"flex"} justifyContent={"end"}>
-              <Button
-                variant="outlined"
-                onClick={() => {
-                  router.push(
-                    routes.admin.groups.managePrograms(groupInfo.type, groupId)
-                  );
-                }}
-              >
-                Управление программами
-              </Button>
+          {activeTab === "programs" && (
+            <Box px={"28px"}>
+              <Box pb={2} display={"flex"} justifyContent={"end"}>
+                <Button
+                  variant="outlined"
+                  onClick={() => {
+                    router.push(
+                      routes.admin.groups.managePrograms(
+                        groupInfo.group.type,
+                        groupId
+                      )
+                    );
+                  }}
+                >
+                  Управление программами
+                </Button>
+              </Box>
+              <GroupProgramsTable programs={groupInfo.programs || []} />
             </Box>
-            <GroupProgramsTable programs={programs} />
-          </Box>
-        )}
-      </TabNavigation>
-      <GroupModalForm
-        open={isGroupModalOpen}
-        onSubmit={(groupInfo: CreateGroupRequest) => {
-          console.log("Изменение группы", groupInfo);
-          //TODO: добавить метод редактирования группы
-          setIsGroupModalOpen(false);
-        }}
-        onDelete={(groupId: string) => {
-          console.log("Удаление группы", groupId);
-          //TODO: добавить метод удаления группы
-          setIsGroupModalOpen(false);
-          router.push(routes.admin.groups.allGroupsByType(groupType));
-        }}
-        onClose={() => {
-          setIsGroupModalOpen(false);
-        }}
-        isCreation={false}
-        currentValues={groupInfo}
-      />
+          )}
+        </TabNavigation>
+      )}
+
+      {groupInfo?.group && (
+        <GroupModalForm
+          open={isGroupModalOpen}
+          onSubmit={(groupInfo: CreateGroupRequest) => {
+            try {
+              updateGroup({ groupId: groupId, updateGroupRequest: groupInfo });
+              setIsGroupModalOpen(false);
+            } catch (err) {
+              console.log(err);
+            }
+          }}
+          onDelete={(groupId: string) => {
+            try {
+              deleteGroup(groupId);
+              setIsGroupModalOpen(false);
+              router.push(routes.admin.groups.allGroupsByType(groupType));
+            } catch (err) {
+              console.log(err);
+            }
+          }}
+          onClose={() => {
+            setIsGroupModalOpen(false);
+          }}
+          isCreation={false}
+          currentValues={groupInfo.group}
+        />
+      )}
     </Box>
   );
 }

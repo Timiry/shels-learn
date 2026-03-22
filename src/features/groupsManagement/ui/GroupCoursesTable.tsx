@@ -3,15 +3,15 @@ import { DataGrid, GridColDef } from "@mui/x-data-grid";
 import { useMemo } from "react";
 import { useRouter } from "next/navigation";
 import { routes } from "@/shared/config/routes";
-import { CourseMiniInfo } from "@/entities/course/model/types";
+import { CourseSummaryDto } from "@/entities/course/model/coursesApi";
 
 interface GroupCoursesTableProps {
-  courses: CourseMiniInfo[];
+  courses: CourseSummaryDto[];
   loading?: boolean;
 }
 
 // Функция для формирования строк таблицы
-const prepareRows = (courses: CourseMiniInfo[]) => {
+const prepareRows = (courses: CourseSummaryDto[]) => {
   return courses.map((course, index) => ({
     id: course.id || index,
     title: course.title,

@@ -3,19 +3,18 @@ import { DataGrid, GridColDef } from "@mui/x-data-grid";
 import { useMemo } from "react";
 import { useRouter } from "next/navigation";
 import { routes } from "@/shared/config/routes";
-import { LearningProgramDto } from "../api/groupsApi";
+import { ProgramSummaryDto } from "../api/groupsApi";
 
 interface GroupProgramsTableProps {
-  programs: LearningProgramDto[];
+  programs: ProgramSummaryDto[];
   loading?: boolean;
 }
 
 // Функция для формирования строк таблицы
-const prepareRows = (programs: LearningProgramDto[]) => {
+const prepareRows = (programs: ProgramSummaryDto[]) => {
   return programs.map((program, index) => ({
     id: program.id || index,
     title: program.title,
-    coursesCount: program.courses.length,
   }));
 };
 
@@ -48,7 +47,6 @@ const columns: GridColDef[] = [
       </Box>
     ),
   },
-  { field: "coursesCount", headerName: "Курсов", width: 200 },
 ];
 
 export default function GroupProgramsTable({

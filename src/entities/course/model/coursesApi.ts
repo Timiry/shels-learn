@@ -354,7 +354,7 @@ export type UpdatePracticeLessonRequest = {
 };
 export type CourseSummaryDto = {
   id: number;
-  title?: string;
+  title: string;
   description?: string;
   coverFilePath?: string;
   sectionId?: number;

@@ -1,5 +1,11 @@
 "use client";
 
+import {
+  useGetGroupFullInfoByIdQuery,
+  useGetAvailableToAssignProgramsQuery,
+  useAssignProgramsToGroupMutation,
+  useUnassignProgramsFromGroupMutation,
+} from "@/features/groupsManagement/api/groupsApi";
 import { routes } from "@/shared/config/routes";
 import HeaderBox from "@/shared/ui/HeaderBox";
 import ManageAnyLists from "@/shared/ui/ManageAnyLists";
@@ -12,34 +18,11 @@ export default function ManageGroupProgramsPage() {
   const params = useParams();
   const groupId = params?.id as string;
 
-  //TODO: добавить получение инфы, списков in notIn, метод редактирования назнчения
-  //моки:
-  const groupInfo = { id: groupId, title: "Тестовая группа", type: "GENERAL" };
-  const programsLists = {
-    in: [
-      {
-        id: 1,
-        title: "Программа",
-      },
-      {
-        id: 2,
-        title: "Программа",
-      },
-      {
-        id: 3,
-        title: "Программа",
-      },
-      {
-        id: 4,
-        title: "Программа",
-      },
-      {
-        id: 5,
-        title: "Программа",
-      },
-    ],
-    notIn: [],
-  };
+  const { currentData: groupInfo } = useGetGroupFullInfoByIdQuery(groupId);
+  const { currentData: notInPrograms } =
+    useGetAvailableToAssignProgramsQuery(groupId);
+  const [assignPrograms] = useAssignProgramsToGroupMutation();
+  const [unAssignPrograms] = useUnassignProgramsFromGroupMutation();
 
   return (
     <Box>
@@ -47,31 +30,44 @@ export default function ManageGroupProgramsPage() {
         <Box>
           <Typography variant="h2">Управление программами</Typography>
           <Typography variant="body2" color="secondary">
-            {groupInfo?.title}
+            {groupInfo?.group.title}
           </Typography>
         </Box>
       </HeaderBox>
       <ManageAnyLists
-        in={programsLists?.in || []}
-        notIn={programsLists?.notIn || []}
-        onSubmit={() => {
-          router.push(
-            routes.admin.groups.groupInfoByIdAndTab(
-              groupInfo.type,
-              groupId,
-              "programs"
-            )
-          );
+        in={groupInfo?.programs || []}
+        notIn={notInPrograms || []}
+        onSubmit={(listIn: number[], listNotIn: number[]) => {
+          try {
+            if (listIn)
+              assignPrograms({ groupId: groupId, idsRequest: { ids: listIn } });
+            if (listNotIn)
+              unAssignPrograms({
+                groupId: groupId,
+                idsRequest: { ids: listNotIn },
+              });
+            if (groupInfo)
+              router.push(
+                routes.admin.groups.groupInfoByIdAndTab(
+                  groupInfo?.group.type,
+                  groupId,
+                  "programs"
+                )
+              );
+          } catch (err) {
+            console.log(err);
+          }
         }}
-        onCancel={() =>
-          router.push(
-            routes.admin.groups.groupInfoByIdAndTab(
-              groupInfo.type,
-              groupId,
-              "programs"
-            )
-          )
-        }
+        onCancel={() => {
+          if (groupInfo)
+            router.push(
+              routes.admin.groups.groupInfoByIdAndTab(
+                groupInfo?.group.type,
+                groupId,
+                "programs"
+              )
+            );
+        }}
       />
     </Box>
   );

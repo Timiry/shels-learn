@@ -1,5 +1,11 @@
 "use client";
 
+import {
+  useAssignCoursesToGroupMutation,
+  useGetAvailableToAssignCoursesQuery,
+  useGetGroupFullInfoByIdQuery,
+  useUnassignCoursesFromGroupMutation,
+} from "@/features/groupsManagement/api/groupsApi";
 import { routes } from "@/shared/config/routes";
 import HeaderBox from "@/shared/ui/HeaderBox";
 import ManageAnyLists from "@/shared/ui/ManageAnyLists";
@@ -12,34 +18,11 @@ export default function ManageGroupCoursesPage() {
   const params = useParams();
   const groupId = params?.id as string;
 
-  //TODO: добавить получение инфы, списков in notIn, метод редактирования назнчения
-  //моки:
-  const groupInfo = { id: groupId, title: "Тестовая группа", type: "GENERAL" };
-  const coursesLists = {
-    in: [
-      {
-        id: 1,
-        title: "Курс",
-      },
-      {
-        id: 2,
-        title: "Курс",
-      },
-      {
-        id: 3,
-        title: "Курс",
-      },
-      {
-        id: 4,
-        title: "Курс",
-      },
-      {
-        id: 5,
-        title: "Курс",
-      },
-    ],
-    notIn: [],
-  };
+  const { currentData: groupInfo } = useGetGroupFullInfoByIdQuery(groupId);
+  const { currentData: notInCourses } =
+    useGetAvailableToAssignCoursesQuery(groupId);
+  const [assignCourses] = useAssignCoursesToGroupMutation();
+  const [unAssignCourses] = useUnassignCoursesFromGroupMutation();
 
   return (
     <Box>
@@ -47,31 +30,44 @@ export default function ManageGroupCoursesPage() {
         <Box>
           <Typography variant="h2">Управление курсами</Typography>
           <Typography variant="body2" color="secondary">
-            {groupInfo?.title}
+            {groupInfo?.group.title}
           </Typography>
         </Box>
       </HeaderBox>
       <ManageAnyLists
-        in={coursesLists?.in || []}
-        notIn={coursesLists?.notIn || []}
-        onSubmit={() => {
-          router.push(
-            routes.admin.groups.groupInfoByIdAndTab(
-              groupInfo.type,
-              groupId,
-              "courses"
-            )
-          );
+        in={groupInfo?.courses || []}
+        notIn={notInCourses || []}
+        onSubmit={(listIn: number[], listNotIn: number[]) => {
+          try {
+            if (listIn)
+              assignCourses({ groupId: groupId, idsRequest: { ids: listIn } });
+            if (listNotIn)
+              unAssignCourses({
+                groupId: groupId,
+                idsRequest: { ids: listNotIn },
+              });
+            if (groupInfo)
+              router.push(
+                routes.admin.groups.groupInfoByIdAndTab(
+                  groupInfo?.group.type,
+                  groupId,
+                  "courses"
+                )
+              );
+          } catch (err) {
+            console.log(err);
+          }
         }}
-        onCancel={() =>
-          router.push(
-            routes.admin.groups.groupInfoByIdAndTab(
-              groupInfo.type,
-              groupId,
-              "courses"
-            )
-          )
-        }
+        onCancel={() => {
+          if (groupInfo)
+            router.push(
+              routes.admin.groups.groupInfoByIdAndTab(
+                groupInfo.group.type,
+                groupId,
+                "courses"
+              )
+            );
+        }}
       />
     </Box>
   );
