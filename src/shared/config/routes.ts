@@ -67,6 +67,6 @@ export const routes = {
     learning: "/student/learning",
     profile: "/student/profile",
     editProfile: "/student/profile/edit",
-    programs: "/student/programs",
+    programById: (id: string | number) => `/student/learning/program/${id}`,
   },
 };

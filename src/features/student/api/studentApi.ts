@@ -187,7 +187,7 @@ export type StudentCourseStatDto = {
   completedAt?: string;
 };
 export type ProgramCourseDto = {
-  courseId?: number;
+  courseId: number;
   orderIndex?: number;
   available?: boolean;
   viewed?: boolean;
@@ -200,7 +200,7 @@ export type AccessCondition =
   | "ALL_OPEN";
 
 export type ProgramDto = {
-  id?: number;
+  id: number;
   title?: string;
   description?: string;
   accessCondition?: AccessCondition;
