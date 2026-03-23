@@ -41,22 +41,20 @@ const columns: GridColDef[] = [
   {
     field: "courseTitle",
     headerName: "Название курса",
-    width: 270,
+    flex: 1,
     renderCell: (params) => (
-      <Tooltip title={params.value}>
-        <Box sx={{ height: "100%", display: "flex", alignItems: "center" }}>
-          <Typography
-            variant="body1"
-            sx={{
-              overflow: "hidden",
-              textOverflow: "ellipsis",
-              whiteSpace: "nowrap",
-            }}
-          >
-            {params.value}
-          </Typography>
-        </Box>
-      </Tooltip>
+      <Box sx={{ height: "100%", display: "flex", alignItems: "center" }}>
+        <Typography
+          variant="body1"
+          sx={{
+            overflow: "hidden",
+            textOverflow: "ellipsis",
+            whiteSpace: "nowrap",
+          }}
+        >
+          {params.value}
+        </Typography>
+      </Box>
     ),
   },
   {

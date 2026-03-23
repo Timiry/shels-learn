@@ -140,7 +140,7 @@ export default function UserTable({
         p: "28px",
       }}
     >
-      {toolBarState?.idsCount > 0 ? (
+      {/* /* {toolBarState?.idsCount > 0 ? (
         <Stack direction={"row"} spacing={2} alignItems={"center"} p={"10px"}>
           <Typography display={"inline"}>
             Выбрано пользователей: {toolBarState?.idsCount}
@@ -181,7 +181,7 @@ export default function UserTable({
         </Stack>
       ) : (
         <Box height={"57px"} />
-      )}
+      )} */}
 
       <DataGrid
         rows={usersRows}
@@ -198,7 +198,7 @@ export default function UserTable({
         hideFooterSelectedRowCount={true}
         disableRowSelectionOnClick
         sx={{
-          width: "100%",
+          maxWidth: "100%",
           overflowX: "auto",
           border: 0,
           "& .MuiDataGrid-columnHeader": {

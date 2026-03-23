@@ -15,6 +15,8 @@ import { routes } from "@/shared/config/routes";
 import CardMedia from "@mui/material/CardMedia";
 import CardContent from "@mui/material/CardContent";
 import { formatDateFromTimestamp } from "@/shared/lib/utils/dateTimeFormatting";
+import DoneOutlinedIcon from "@mui/icons-material/DoneOutlined";
+import CloseOutlinedIcon from "@mui/icons-material/CloseOutlined";
 
 export default function LearningPage() {
   const router = useRouter();
@@ -26,8 +28,7 @@ export default function LearningPage() {
       <HeaderBox>
         <Typography variant="h1">Обучение</Typography>
       </HeaderBox>
-      <Typography variant="h5">Мои программы</Typography>
-      {programs && (
+      {programs && programs?.length > 0 && (
         <Box
           sx={{
             display: "grid",
@@ -41,6 +42,10 @@ export default function LearningPage() {
             p: 2,
           }}
         >
+          <Typography variant="h5" sx={{ px: "28px" }}>
+            Мои программы
+          </Typography>
+
           {programs.map((program) => (
             <Card sx={{ maxWidth: 270 }} key={program.id}>
               <CardActionArea
@@ -113,84 +118,99 @@ export default function LearningPage() {
           ))}
         </Box>
       )}
-      <Typography variant="h5">Мои курсы</Typography>
-      <Box
-        sx={{
-          display: "grid",
-          gridTemplateColumns: {
-            xs: "1fr",
-            sm: "repeat(3, 1fr)",
-            md: "repeat(4, 1fr)",
-            lg: "repeat(5, 1fr)",
-          },
-          gap: 3,
-          p: 2,
-        }}
-      >
-        {courses &&
-          courses.map((course) => (
-            <Card sx={{ maxWidth: 270 }} key={course.id}>
-              <CardActionArea
-                onClick={() =>
-                  router.push(routes.student.courseById(course.id))
-                }
-              >
-                <CardMedia
-                  component="img"
-                  height="140"
-                  image={
-                    course.coverFilePath
-                      ? "http://217.26.31.189" + course.coverFilePath
-                      : "/coverFiller.png"
-                  }
-                  alt={course.title}
-                />
-                <CardContent>
-                  <Typography
-                    gutterBottom
-                    variant="h6"
-                    component="div"
-                    noWrap
-                    sx={{
-                      overflow: "hidden",
-                      textOverflow: "ellipsis",
-                      whiteSpace: "nowrap",
-                    }}
+      {courses && courses?.length > 0 && (
+        <>
+          <Typography variant="h5" sx={{ px: "28px" }}>
+            Мои курсы
+          </Typography>
+          <Box
+            sx={{
+              display: "grid",
+              gridTemplateColumns: {
+                xs: "1fr",
+                sm: "repeat(3, 1fr)",
+                md: "repeat(4, 1fr)",
+                lg: "repeat(5, 1fr)",
+              },
+              gap: 3,
+              p: 2,
+            }}
+          >
+            {courses &&
+              courses.map((course) => (
+                <Card sx={{ maxWidth: 270 }} key={course.id}>
+                  <CardActionArea
+                    onClick={() =>
+                      router.push(routes.student.courseById(course.id))
+                    }
                   >
-                    {course.title}
-                  </Typography>
-                  <Typography
-                    variant="caption"
-                    sx={{
-                      display: "-webkit-box",
-                      WebkitLineClamp: 4,
-                      WebkitBoxOrient: "vertical",
-                      overflow: "hidden",
-                      textOverflow: "ellipsis",
-                    }}
-                  >
-                    {course.description}
-                  </Typography>
-                  <Box
-                    display={"flex"}
-                    justifyContent={"space-between"}
-                    alignItems={"center"}
-                  >
-                    {course?.progress?.deadlineAt && (
-                      <Typography color="error">
-                        {formatDateFromTimestamp(course?.progress?.deadlineAt)}
+                    <CardMedia
+                      component="img"
+                      height="140"
+                      image={
+                        course.coverFilePath
+                          ? "http://217.26.31.189" + course.coverFilePath
+                          : "/coverFiller.png"
+                      }
+                      alt={course.title}
+                    />
+                    <CardContent>
+                      <Typography
+                        gutterBottom
+                        variant="h6"
+                        component="div"
+                        noWrap
+                        sx={{
+                          overflow: "hidden",
+                          textOverflow: "ellipsis",
+                          whiteSpace: "nowrap",
+                        }}
+                      >
+                        {course.title}
                       </Typography>
-                    )}
-
-                    <Typography variant="h6" color="primary.main">
-                      {course.progress?.completionPercent || 0} %
-                    </Typography>
-                  </Box>
-                </CardContent>
-              </CardActionArea>
-            </Card>
-          ))}
-      </Box>
+                      <Typography
+                        variant="caption"
+                        sx={{
+                          display: "-webkit-box",
+                          WebkitLineClamp: 4,
+                          WebkitBoxOrient: "vertical",
+                          overflow: "hidden",
+                          textOverflow: "ellipsis",
+                        }}
+                      >
+                        {course.description}
+                      </Typography>
+                      <Box
+                        display={"flex"}
+                        justifyContent={"space-between"}
+                        flexDirection={"row-reverse"}
+                        alignItems={"center"}
+                      >
+                        {course.progress?.completionStatus === "COMPLETED" ? (
+                          <DoneOutlinedIcon color="primary" fontSize="large" />
+                        ) : course.progress?.completionStatus ===
+                          "INCOMPLETED" ? (
+                          <CloseOutlinedIcon color="error" fontSize="large" />
+                        ) : (
+                          <Typography variant="h6" color="primary.main">
+                            {course.progress?.completionPercent || 0} %
+                          </Typography>
+                        )}
+                        {course?.progress?.deadlineAt && (
+                          <Typography color="error">
+                            {formatDateFromTimestamp(
+                              course?.progress?.deadlineAt
+                            )}
+                          </Typography>
+                        )}
+                      </Box>
+                    </CardContent>
+                  </CardActionArea>
+                </Card>
+              ))}
+          </Box>
+        </>
+      )}
     </Box>
   );
 }

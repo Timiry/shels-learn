@@ -53,7 +53,7 @@ const injectedRtkApi = api.injectEndpoints({
         method: "POST",
         body: queryArg,
       }),
-      invalidatesTags: ["Course"],
+      invalidatesTags: ["Course", "Sections"],
     }),
     getCourseReviewers: build.query<
       GetCourseReviewersApiResponse,
