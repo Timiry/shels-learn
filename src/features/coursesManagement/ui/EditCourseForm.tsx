@@ -64,16 +64,6 @@ export default function EditCourseForm({
   const lessonsFreeOrder = watch("lessonsFreeOrder");
 
   const onSubmitForm = (courseInfo: CreateCourseRequest) => {
-    if (courseInfo.title === "") {
-      setError("title", { message: "Название должно быть заполнено" });
-      return;
-    }
-    if (courseInfo.deadlineDays !== undefined && courseInfo.deadlineDays < 1) {
-      setError("deadlineDays", {
-        message: "Срок прохождения должен быть не менее 1 дня",
-      });
-      return;
-    }
     onSubmit(courseInfo);
   };
 
@@ -82,7 +72,7 @@ export default function EditCourseForm({
       <Stack spacing={2}>
         <Typography variant="body1">Название</Typography>
         <TextField
-          {...register("title")}
+          {...register("title", { required: "Название обязательно" })}
           placeholder="Название"
           fullWidth
           error={!!errors.title}
@@ -134,7 +124,10 @@ export default function EditCourseForm({
 
         <Typography variant="body1">Дедлайн</Typography>
         <TextField
-          {...register("deadlineDays")}
+          {...register("deadlineDays", {
+            valueAsNumber: true,
+            min: { value: 1, message: "Минимум 1 день" },
+          })}
           placeholder="?"
           helperText={
             errors.deadlineDays?.message ||

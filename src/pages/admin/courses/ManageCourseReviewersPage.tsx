@@ -7,7 +7,7 @@ import {
 } from "@/entities/course/model/coursesApi";
 import { routes } from "@/shared/config/routes";
 import HeaderBox from "@/shared/ui/HeaderBox";
-import ManageLists from "@/shared/ui/ManageLists";
+import ManageAnyLists from "@/shared/ui/ManageAnyLists";
 import { Typography } from "@mui/material";
 import Box from "@mui/material/Box";
 import { useParams, useRouter } from "next/navigation";
@@ -31,18 +31,15 @@ export default function ManageCourseReviewersPage() {
           </Typography>
         </Box>
       </HeaderBox>
-      <ManageLists
+      <ManageAnyLists
         in={reviewersLists?.in || []}
         notIn={reviewersLists?.notIn || []}
-        onSubmit={(lists: {
-          idsToEnroll?: number[];
-          idsToUnenroll?: number[];
-        }) => {
+        onSubmit={(idsToEnroll: number[], idsToUnenroll: number[]) => {
           asignReviewers({
             courseId: +courseId,
             userInNotInRequest: {
-              idsIn: lists.idsToEnroll,
-              idsNotIn: lists.idsToUnenroll,
+              idsIn: idsToEnroll,
+              idsNotIn: idsToUnenroll,
             },
           });
           router.push(

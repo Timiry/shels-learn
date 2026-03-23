@@ -22,7 +22,7 @@ export const formatDateTime = (date: number | string): string => {
   const dateObj =
     typeof date === "number"
       ? new Date(date * 1000) // конвертируем секунды → миллисекунды
-      : new Date(date); // парсим ISO-строку
+      : new Date(new Date(date).getTime() + 3 * 60 * 60 * 1000); // парсим ISO-строку
 
   if (isNaN(dateObj.getTime())) {
     return "-"; // fallback для невалидных дат

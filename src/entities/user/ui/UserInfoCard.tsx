@@ -46,7 +46,7 @@ export default function UserInfoCard({
           Последний визит:
         </Typography>
         <Typography variant="caption" color="text.secondary">
-          {user.lastVisit}
+          {formatDateTime(user.lastVisit || "")}
         </Typography>
       </Stack>
       <Stack alignItems={"center"}>

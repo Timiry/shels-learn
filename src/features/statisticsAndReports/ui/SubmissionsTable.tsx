@@ -26,35 +26,33 @@ const columns: GridColDef[] = [
   {
     field: "studentFullname",
     headerName: "ФИО студента",
-    width: 280,
+    flex: 1,
     renderCell: (params) => (
-      <Tooltip title={params.value}>
-        <Box
+      <Box
+        sx={{
+          height: "100%",
+          display: "flex",
+          alignItems: "center",
+          cursor: "pointer",
+        }}
+      >
+        <Typography
+          variant="body1"
           sx={{
-            height: "100%",
-            display: "flex",
-            alignItems: "center",
-            cursor: "pointer",
+            overflow: "hidden",
+            textOverflow: "ellipsis",
+            whiteSpace: "nowrap",
           }}
         >
-          <Typography
-            variant="body1"
-            sx={{
-              overflow: "hidden",
-              textOverflow: "ellipsis",
-              whiteSpace: "nowrap",
-            }}
-          >
-            {params.value}
-          </Typography>
-        </Box>
-      </Tooltip>
+          {params.value}
+        </Typography>
+      </Box>
     ),
   },
   {
     field: "courseTitle",
     headerName: "Курс",
-    width: 250,
+    width: 300,
     renderCell: (params) => (
       <Tooltip title={params.value}>
         <Box sx={{ height: "100%", display: "flex", alignItems: "center" }}>

@@ -3,6 +3,8 @@ import { DataGrid, GridColDef } from "@mui/x-data-grid";
 import { useMemo } from "react";
 import { CourseStudentStatDto } from "@/features/statisticsAndReports/api/statisticsAndReportsApi";
 import { formatDateTime } from "@/shared/lib/utils/dateTimeFormatting";
+import { useRouter } from "next/navigation";
+import { routes } from "@/shared/config/routes";
 
 interface CourseStatsTableProps {
   stats: CourseStudentStatDto[];
@@ -41,22 +43,27 @@ const columns: GridColDef[] = [
   {
     field: "fullName",
     headerName: "ФИО студента",
-    width: 270,
+    flex: 1,
     renderCell: (params) => (
-      <Tooltip title={params.value}>
-        <Box sx={{ height: "100%", display: "flex", alignItems: "center" }}>
-          <Typography
-            variant="body1"
-            sx={{
-              overflow: "hidden",
-              textOverflow: "ellipsis",
-              whiteSpace: "nowrap",
-            }}
-          >
-            {params.value}
-          </Typography>
-        </Box>
-      </Tooltip>
+      <Box
+        sx={{
+          height: "100%",
+          display: "flex",
+          alignItems: "center",
+          cursor: "pointer",
+        }}
+      >
+        <Typography
+          variant="body1"
+          sx={{
+            overflow: "hidden",
+            textOverflow: "ellipsis",
+            whiteSpace: "nowrap",
+          }}
+        >
+          {params.value}
+        </Typography>
+      </Box>
     ),
   },
   {
@@ -138,6 +145,7 @@ export default function CourseStatsTable({
   loading = false,
 }: CourseStatsTableProps) {
   const rows = useMemo(() => prepareRows(stats), [stats]);
+  const router = useRouter();
 
   return (
     <Box sx={{ height: "calc(100vh - 76px)", width: "100%" }}>
@@ -154,6 +162,9 @@ export default function CourseStatsTable({
         }}
         pageSizeOptions={[10, 50, 100]}
         disableRowSelectionOnClick
+        onRowClick={(params, event, details) => {
+          router.push(routes.admin.users.userByIdAndTab(params.id, "courses"));
+        }}
         disableColumnMenu={true}
         sx={{
           border: 0,
