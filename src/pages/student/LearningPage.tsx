@@ -15,6 +15,8 @@ import { routes } from "@/shared/config/routes";
 import CardMedia from "@mui/material/CardMedia";
 import CardContent from "@mui/material/CardContent";
 import { formatDateFromTimestamp } from "@/shared/lib/utils/dateTimeFormatting";
+import DoneOutlinedIcon from "@mui/icons-material/DoneOutlined";
+import CloseOutlinedIcon from "@mui/icons-material/CloseOutlined";
 
 export default function LearningPage() {
   const router = useRouter();
@@ -181,8 +183,19 @@ export default function LearningPage() {
                       <Box
                         display={"flex"}
                         justifyContent={"space-between"}
+                        flexDirection={"row-reverse"}
                         alignItems={"center"}
                       >
+                        {course.progress?.completionStatus === "COMPLETED" ? (
+                          <DoneOutlinedIcon color="primary" fontSize="large" />
+                        ) : course.progress?.completionStatus ===
+                          "INCOMPLETED" ? (
+                          <CloseOutlinedIcon color="error" fontSize="large" />
+                        ) : (
+                          <Typography variant="h6" color="primary.main">
+                            {course.progress?.completionPercent || 0} %
+                          </Typography>
+                        )}
                         {course?.progress?.deadlineAt && (
                           <Typography color="error">
                             {formatDateFromTimestamp(
@@ -190,10 +203,6 @@ export default function LearningPage() {
                             )}
                           </Typography>
                         )}
-
-                        <Typography variant="h6" color="primary.main">
-                          {course.progress?.completionPercent || 0} %
-                        </Typography>
                       </Box>
                     </CardContent>
                   </CardActionArea>

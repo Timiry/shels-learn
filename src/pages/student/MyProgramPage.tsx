@@ -14,6 +14,7 @@ import {
 import { useRouter, useParams } from "next/navigation";
 import { useMyProgramQuery } from "@/features/student/api/studentApi";
 import DoneOutlinedIcon from "@mui/icons-material/DoneOutlined";
+import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
 import { formatDateFromTimestamp } from "@/shared/lib/utils/dateTimeFormatting";
 
 export default function MyProgramPage() {
@@ -110,8 +111,11 @@ export default function MyProgramPage() {
                       <Typography variant="h5" color="secondary">
                         {index + 1}
                       </Typography>
-                      {program.completed && (
-                        <DoneOutlinedIcon color="success" />
+                      {course.completed && (
+                        <DoneOutlinedIcon color="primary" fontSize="large" />
+                      )}
+                      {course.available === false && (
+                        <LockOutlinedIcon fontSize="large" />
                       )}
                     </Box>
                   </CardContent>
