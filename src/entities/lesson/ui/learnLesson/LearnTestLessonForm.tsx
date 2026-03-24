@@ -97,7 +97,7 @@ export default function LearnTestLessonForm({
       lessonId: lesson.id,
       practiceSubmissionRequest: {
         questionAnswers: answers,
-        submittedAt: Date.now(),
+        submittedAt: Math.floor(Date.now() / 1000),
       },
     };
 
@@ -126,7 +126,7 @@ export default function LearnTestLessonForm({
     <Box component="form" id={formId} onSubmit={handleSubmit}>
       <Stack spacing={3}>
         {/* Вопросы */}
-        {lesson.questions.map((question) => (
+        {lesson.questions.map((question, index) => (
           <Box
             key={question.id}
             sx={{
@@ -143,7 +143,7 @@ export default function LearnTestLessonForm({
               alignItems={"center"}
             >
               <Typography variant="h6" gutterBottom sx={{ mb: 2 }}>
-                {`Вопрос № ${question.position}`}
+                {`Вопрос № ${index + 1}`}
               </Typography>
               {lessonStatus && lessonStatus !== "STARTED" && (
                 <LessonOption

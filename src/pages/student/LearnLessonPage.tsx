@@ -200,8 +200,11 @@ export default function LearnLessonPage() {
                   </Typography>
                   {lesson?.maxAttempts ? (
                     <Typography variant="body2">
-                      Осталось попыток ( {lesson?.attempts} /{" "}
-                      {lesson?.maxAttempts})
+                      Осталось попыток{" "}
+                      {lesson?.attempts
+                        ? lesson?.maxAttempts - lesson?.attempts
+                        : lesson?.maxAttempts}{" "}
+                      / {lesson?.maxAttempts}
                     </Typography>
                   ) : (
                     <></>
@@ -288,8 +291,7 @@ export default function LearnLessonPage() {
                     <Typography variant="body1" display={"inline"}>
                       Урок не пройден, но вы можете его пересдать.
                       {lesson?.attempts && lesson?.maxAttempts
-                        ? ` Осталось попыток (
-                  ${lesson?.attempts} / ${lesson?.maxAttempts})`
+                        ? ` Осталось попыток ${lesson?.maxAttempts - lesson?.attempts} / ${lesson?.maxAttempts}`
                         : ""}
                     </Typography>
                   )}
@@ -330,16 +332,24 @@ export default function LearnLessonPage() {
                         : taskFormId
                     }
                     onSubmit={(data: SubmitPracticeApiArg) => {
-                      try {
-                        completePractice(data);
-                      } catch (err) {
-                        setSnackbar({
-                          open: true,
-                          message: "Ошибка при отправке ответов",
-                          severity: "error",
+                      completePractice(data)
+                        .unwrap()
+                        .then(() => {
+                          localStorage.removeItem(`lesson-timer-${lessonId}`);
+                          setSnackbar({
+                            open: true,
+                            message: "Ответы успешно отправлены",
+                            severity: "success",
+                          });
+                        })
+                        .catch((err: any) => {
+                          console.error("Ошибка завершения урока:", err);
+                          setSnackbar({
+                            open: true,
+                            message: `Ошибка отправки ответов: ${err?.data?.message || "Неизвестная ошибка"}`,
+                            severity: "error",
+                          });
                         });
-                        console.log(err);
-                      }
                     }}
                   />
                 )}
@@ -363,7 +373,14 @@ export default function LearnLessonPage() {
                   <Button
                     variant="contained"
                     color="primary"
-                    onClick={() => completeTheory(lesson.id)}
+                    onClick={() => {
+                      try {
+                        completeTheory(lesson.id);
+                      } catch (err: any) {
+                        console.error("Ошибка завершения урока:", err);
+                        alert(`Ошибка завершения урока: ${err?.data?.message}`);
+                      }
+                    }}
                     disabled={isLessonCompleted}
                   >
                     {isLessonCompleted ? "Урок завершен" : "Завершить урок"}

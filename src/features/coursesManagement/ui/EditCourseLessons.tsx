@@ -146,18 +146,42 @@ export default function EditCourseLessons({
                       updateTheoryLessonRequest:
                         lessonInfo as CreateTheoryLessonRequest,
                     })
+                      .unwrap()
+                      .then(() =>
+                        router.push(
+                          routes.admin.courses.viewCourseLesson(
+                            courseId,
+                            activeLesson.id
+                          )
+                        )
+                      )
+                      .catch((err: any) => {
+                        console.error("Ошибка редактирования урока:", err);
+                        alert(
+                          `Ошибка редактирования урока: ${err?.data?.message}`
+                        );
+                      })
                   : updatePracticeLesson({
                       courseId: activeLesson.courseId,
                       lessonId: activeLesson.id,
                       updatePracticeLessonRequest:
                         lessonInfo as CreatePracticeLessonRequest,
-                    });
-                router.push(
-                  routes.admin.courses.viewCourseLesson(
-                    courseId,
-                    activeLesson.id
-                  )
-                );
+                    })
+                      .unwrap()
+                      .then(() =>
+                        router.push(
+                          routes.admin.courses.viewCourseLesson(
+                            courseId,
+                            activeLesson.id
+                          )
+                        )
+                      )
+                      .catch((err: any) => {
+                        console.error("Ошибка редактирования урока:", err);
+                        alert(
+                          `Ошибка редактирования урока: ${err?.data?.message}`
+                        );
+                      });
               }}
               onCancel={() => {
                 router.push(
@@ -185,20 +209,37 @@ export default function EditCourseLessons({
             </Box>
             <EditLesson
               onSubmit={async (lessonInfo) => {
-                const newLesson = lessonType.startsWith("THEORY")
-                  ? await createTheoryLesson({
+                lessonInfo.lessonType.startsWith("THEORY")
+                  ? createTheoryLesson({
                       courseId: courseId,
                       createTheoryLessonRequest:
                         lessonInfo as CreateTheoryLessonRequest,
-                    }).unwrap()
-                  : await createPracticeLesson({
+                    })
+                      .unwrap()
+                      .then((l) =>
+                        router.push(
+                          routes.admin.courses.viewCourseLesson(courseId, l.id)
+                        )
+                      )
+                      .catch((err: any) => {
+                        console.error("Ошибка редактирования урока:", err);
+                        alert(`Ошибка создания урока: ${err?.data?.message}`);
+                      })
+                  : createPracticeLesson({
                       courseId: courseId,
                       createPracticeLessonRequest:
                         lessonInfo as CreatePracticeLessonRequest,
-                    }).unwrap();
-                router.push(
-                  routes.admin.courses.viewCourseLesson(courseId, newLesson.id)
-                );
+                    })
+                      .unwrap()
+                      .then((l) =>
+                        router.push(
+                          routes.admin.courses.viewCourseLesson(courseId, l.id)
+                        )
+                      )
+                      .catch((err: any) => {
+                        console.error("Ошибка редактирования урока:", err);
+                        alert(`Ошибка создания урока: ${err?.data?.message}`);
+                      });
               }}
               onCancel={() => {
                 router.push(
