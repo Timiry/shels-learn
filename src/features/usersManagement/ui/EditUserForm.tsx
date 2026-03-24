@@ -50,7 +50,7 @@ export default function EditUserForm({
           snils: currentValues?.snils || "",
           email: currentValues?.email,
           role: currentValues?.role,
-          phone: currentValues?.phone,
+          phone: currentValues?.phone || "",
           comment: currentValues?.comment,
           password: "",
         },
@@ -76,43 +76,60 @@ export default function EditUserForm({
       setError("snils", { message: "Невалидный формат снилса" });
       return;
     }
+    if (userInfo.phone?.length && !/^\+7\d{10}$/.test(userInfo.phone)) {
+      setError("phone", { message: "Невалидный формат телефона" });
+      return;
+    }
     onSubmit(userInfo);
   };
 
   return (
     <Box component="form" onSubmit={handleSubmit(onSubmitForm)} id={formId}>
-      <Stack spacing={2}>
+      <Stack spacing={3}>
         <Typography variant="subtitle1" mb={"14px"}>
           Общая информация
         </Typography>
 
-        <Typography variant="body1">ФИО</Typography>
-        <TextField
-          {...register("fullName", { required: "ФИО обязательно" })}
-          placeholder="ФИО"
-          fullWidth
-          error={!!errors.fullName}
-          helperText={errors.fullName?.message}
-        />
+        <Box>
+          <Typography variant="body1" gutterBottom>
+            ФИО
+          </Typography>
+          <TextField
+            {...register("fullName", { required: "ФИО обязательно" })}
+            placeholder="ФИО"
+            fullWidth
+            error={!!errors.fullName}
+            helperText={errors.fullName?.message}
+          />
+        </Box>
 
-        <Typography variant="body1">СНИЛС</Typography>
-        <TextField
-          {...register("snils", { required: "СНИЛС обязателен" })}
-          placeholder="СНИЛС"
-          fullWidth
-          error={!!errors.snils}
-          helperText={errors.snils?.message}
-        />
+        <Box>
+          <Typography variant="body1">СНИЛС</Typography>
+          <Typography variant="caption" gutterBottom>
+            В формате XXX-XXX-XXX XX
+          </Typography>
+          <TextField
+            {...register("snils", { required: "СНИЛС обязателен" })}
+            placeholder="123-456-789 00"
+            fullWidth
+            error={!!errors.snils}
+            helperText={errors.snils?.message}
+          />
+        </Box>
 
-        <Typography variant="body1">Электронная почта</Typography>
-        <TextField
-          {...register("email")}
-          placeholder="Электронная почта"
-          type="email"
-          fullWidth
-          error={!!errors.email}
-          helperText={errors.email?.message}
-        />
+        <Box>
+          <Typography variant="body1" gutterBottom>
+            Электронная почта
+          </Typography>
+          <TextField
+            {...register("email")}
+            placeholder="Электронная почта"
+            type="email"
+            fullWidth
+            error={!!errors.email}
+            helperText={errors.email?.message}
+          />
+        </Box>
 
         <Typography variant="subtitle1" mb={"14px"}>
           Настройки доступа
@@ -144,32 +161,49 @@ export default function EditUserForm({
           }}
         />
 
-        <Typography variant="subtitle1" mb={"14px"}>
-          Пароль
-        </Typography>
-        <TextField
-          {...register("password")}
-          placeholder="Пароль"
-          fullWidth
-          error={!!errors.password}
-          helperText={errors.password?.message}
-        />
+        <Box>
+          <Typography variant="subtitle1" mb={"14px"}>
+            Пароль
+          </Typography>
+          <TextField
+            {...register("password")}
+            placeholder="Пароль"
+            fullWidth
+            error={!!errors.password}
+            helperText={errors.password?.message}
+          />
+        </Box>
 
         <Typography variant="subtitle1" mb={"14px"}>
           Дополнительная информация
         </Typography>
 
-        <Typography variant="body1">Телефон</Typography>
-        <TextField {...register("phone")} placeholder="Телефон" fullWidth />
+        <Box>
+          <Typography variant="body1">Телефон</Typography>
+          <Typography variant="caption" gutterBottom>
+            В формате +7XXXXXXXXXX
+          </Typography>
+          <TextField
+            {...register("phone")}
+            placeholder="+79781234567"
+            fullWidth
+            error={!!errors.phone}
+            helperText={errors.phone?.message}
+          />
+        </Box>
 
-        <Typography variant="body1">Комментарий</Typography>
-        <TextField
-          {...register("comment")}
-          placeholder="Комментарий"
-          fullWidth
-          multiline
-          rows={6}
-        />
+        <Box>
+          <Typography variant="body1" gutterBottom>
+            Комментарий
+          </Typography>
+          <TextField
+            {...register("comment")}
+            placeholder="Комментарий"
+            fullWidth
+            multiline
+            rows={6}
+          />
+        </Box>
       </Stack>
     </Box>
   );

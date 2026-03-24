@@ -68,13 +68,18 @@ export default function EditCoursePage() {
           </Box>
         )}
         {activeTab === "lessons" && (
-          <EditCourseLessons
-            courseId={+courseId}
-            lessons={courseInfo?.lessons || []}
-            activeLessonId={lessonId}
-            mode={mode}
-            lessonType={lessonType}
-          />
+          <Box>
+            {courseInfo !== undefined && courseInfo.course !== undefined && (
+              <EditCourseLessons
+                courseId={+courseId}
+                lessons={courseInfo?.lessons || []}
+                activeLessonId={lessonId}
+                mode={mode}
+                lessonType={lessonType}
+                courseInfo={courseInfo?.course}
+              />
+            )}
+          </Box>
         )}
       </TabNavigation>
     </Box>

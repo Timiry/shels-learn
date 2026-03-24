@@ -1,4 +1,5 @@
 import {
+  CourseDto,
   CreatePracticeLessonRequest,
   CreateTheoryLessonRequest,
   LessonDto,
@@ -29,6 +30,7 @@ interface EditCourseLessonsProps {
   activeLessonId?: string | null;
   mode?: string | null;
   lessonType?: string | null;
+  courseInfo: CourseDto;
 }
 export default function EditCourseLessons({
   lessons,
@@ -36,6 +38,7 @@ export default function EditCourseLessons({
   activeLessonId,
   mode,
   lessonType,
+  courseInfo,
 }: EditCourseLessonsProps) {
   const activeLesson = activeLessonId
     ? lessons.find((lesson) => lesson.id === +activeLessonId)
@@ -63,17 +66,18 @@ export default function EditCourseLessons({
       <LessonsList
         activeLessonId={activeLessonId ? +activeLessonId : undefined}
         lessons={lessons}
-        onLessonClik={(lessonId: number | undefined) => {
+        onLessonClick={(lessonId: number | undefined) => {
           if (lessonId)
             router.push(
               routes.admin.courses.viewCourseLesson(courseId, lessonId)
             );
         }}
-        onCreateLessonClik={() =>
+        onCreateLessonClick={() =>
           router.push(
             routes.admin.courses.editCourseByIdAndTab(courseId, "lessons")
           )
         }
+        courseInfo={courseInfo}
       />
       <Box
         flexGrow={1}
@@ -146,18 +150,42 @@ export default function EditCourseLessons({
                       updateTheoryLessonRequest:
                         lessonInfo as CreateTheoryLessonRequest,
                     })
+                      .unwrap()
+                      .then(() =>
+                        router.push(
+                          routes.admin.courses.viewCourseLesson(
+                            courseId,
+                            activeLesson.id
+                          )
+                        )
+                      )
+                      .catch((err: any) => {
+                        console.error("Ошибка редактирования урока:", err);
+                        alert(
+                          `Ошибка редактирования урока: ${err?.data?.message}`
+                        );
+                      })
                   : updatePracticeLesson({
                       courseId: activeLesson.courseId,
                       lessonId: activeLesson.id,
                       updatePracticeLessonRequest:
                         lessonInfo as CreatePracticeLessonRequest,
-                    });
-                router.push(
-                  routes.admin.courses.viewCourseLesson(
-                    courseId,
-                    activeLesson.id
-                  )
-                );
+                    })
+                      .unwrap()
+                      .then(() =>
+                        router.push(
+                          routes.admin.courses.viewCourseLesson(
+                            courseId,
+                            activeLesson.id
+                          )
+                        )
+                      )
+                      .catch((err: any) => {
+                        console.error("Ошибка редактирования урока:", err);
+                        alert(
+                          `Ошибка редактирования урока: ${err?.data?.message}`
+                        );
+                      });
               }}
               onCancel={() => {
                 router.push(
@@ -185,20 +213,37 @@ export default function EditCourseLessons({
             </Box>
             <EditLesson
               onSubmit={async (lessonInfo) => {
-                const newLesson = lessonType.startsWith("THEORY")
-                  ? await createTheoryLesson({
+                lessonInfo.lessonType.startsWith("THEORY")
+                  ? createTheoryLesson({
                       courseId: courseId,
                       createTheoryLessonRequest:
                         lessonInfo as CreateTheoryLessonRequest,
-                    }).unwrap()
-                  : await createPracticeLesson({
+                    })
+                      .unwrap()
+                      .then((l) =>
+                        router.push(
+                          routes.admin.courses.viewCourseLesson(courseId, l.id)
+                        )
+                      )
+                      .catch((err: any) => {
+                        console.error("Ошибка редактирования урока:", err);
+                        alert(`Ошибка создания урока: ${err?.data?.message}`);
+                      })
+                  : createPracticeLesson({
                       courseId: courseId,
                       createPracticeLessonRequest:
                         lessonInfo as CreatePracticeLessonRequest,
-                    }).unwrap();
-                router.push(
-                  routes.admin.courses.viewCourseLesson(courseId, newLesson.id)
-                );
+                    })
+                      .unwrap()
+                      .then((l) =>
+                        router.push(
+                          routes.admin.courses.viewCourseLesson(courseId, l.id)
+                        )
+                      )
+                      .catch((err: any) => {
+                        console.error("Ошибка редактирования урока:", err);
+                        alert(`Ошибка создания урока: ${err?.data?.message}`);
+                      });
               }}
               onCancel={() => {
                 router.push(

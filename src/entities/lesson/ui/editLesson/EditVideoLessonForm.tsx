@@ -102,7 +102,7 @@ export default function EditVideoLessonForm({
 
     // Валидация типа файла
     if (!file.type.startsWith("video/")) {
-      setSubmitError("Пожалуйста, выберите видео файл (MP4, WebM, MOV и др.)");
+      setSubmitError("Пожалуйста, выберите видео файл (mp4)");
       return;
     }
 
@@ -141,19 +141,6 @@ export default function EditVideoLessonForm({
     setSubmitError(null);
 
     try {
-      // Проверка обязательных полей
-      if (!lessonInfo.title.trim()) {
-        setSubmitError("Название урока обязательно");
-        setIsSubmitting(false);
-        return;
-      }
-
-      if (lessonInfo.fullPoints <= 0) {
-        setSubmitError("Баллы за прохождение должны быть больше 0");
-        setIsSubmitting(false);
-        return;
-      }
-
       let videoUrl = "";
 
       // Обработка режима YouTube
@@ -220,12 +207,6 @@ export default function EditVideoLessonForm({
   return (
     <Box component="form" onSubmit={handleSubmit(onSubmitForm)}>
       <Stack spacing={3}>
-        {submitError && (
-          <Alert severity="error" sx={{ mb: 2 }}>
-            {submitError}
-          </Alert>
-        )}
-
         <Box>
           <Typography variant="body1" gutterBottom>
             Название урока
@@ -341,8 +322,8 @@ export default function EditVideoLessonForm({
                   }
                   alt="Превью видео YouTube"
                   style={{
-                    maxWidth: "100%",
-                    maxHeight: 200,
+                    width: "100%",
+                    aspectRatio: "4 / 3",
                     borderRadius: 8,
                     border: "1px solid",
                     borderColor: "divider",
@@ -364,6 +345,13 @@ export default function EditVideoLessonForm({
             <Typography variant="body1" gutterBottom>
               Видео файл урока
             </Typography>
+
+            {submitError && (
+              <Alert severity="error" sx={{ mb: 2 }}>
+                {submitError}
+              </Alert>
+            )}
+
             <Paper
               variant="outlined"
               sx={{
@@ -396,7 +384,7 @@ export default function EditVideoLessonForm({
               <input
                 type="file"
                 id="video-upload"
-                accept="video/mp4,video/webm,video/quicktime,video/x-m4v"
+                accept="video/mp4"
                 onChange={handleFileChange}
                 style={{ display: "none" }}
                 disabled={isSubmitting}
@@ -533,13 +521,13 @@ export default function EditVideoLessonForm({
                       mt: 1,
                       px: 2,
                       py: 0.5,
-                      bgcolor: "primary.light",
+                      bgcolor: "primary.main",
                       color: "primary.contrastText",
                       borderRadius: 1,
                       fontSize: "0.875rem",
                     }}
                   >
-                    Поддерживаемые форматы: MP4, WebM, MOV до 100 МБ
+                    Поддерживаемый формат - mp4 до 100 МБ
                   </Box>
                 </Box>
               )}

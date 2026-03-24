@@ -82,7 +82,8 @@ const columns: GridColDef[] = [
       const value = params.value || 0;
       return (
         <Typography
-          variant="body2"
+          variant="body1"
+          color={value >= 90 ? "#49d227" : value < 70 ? "error" : "#f0c953"}
           sx={{
             height: "100%",
             display: "flex",
