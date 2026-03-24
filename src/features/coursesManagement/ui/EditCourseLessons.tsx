@@ -1,4 +1,5 @@
 import {
+  CourseDto,
   CreatePracticeLessonRequest,
   CreateTheoryLessonRequest,
   LessonDto,
@@ -29,6 +30,7 @@ interface EditCourseLessonsProps {
   activeLessonId?: string | null;
   mode?: string | null;
   lessonType?: string | null;
+  courseInfo: CourseDto;
 }
 export default function EditCourseLessons({
   lessons,
@@ -36,6 +38,7 @@ export default function EditCourseLessons({
   activeLessonId,
   mode,
   lessonType,
+  courseInfo,
 }: EditCourseLessonsProps) {
   const activeLesson = activeLessonId
     ? lessons.find((lesson) => lesson.id === +activeLessonId)
@@ -63,17 +66,18 @@ export default function EditCourseLessons({
       <LessonsList
         activeLessonId={activeLessonId ? +activeLessonId : undefined}
         lessons={lessons}
-        onLessonClik={(lessonId: number | undefined) => {
+        onLessonClick={(lessonId: number | undefined) => {
           if (lessonId)
             router.push(
               routes.admin.courses.viewCourseLesson(courseId, lessonId)
             );
         }}
-        onCreateLessonClik={() =>
+        onCreateLessonClick={() =>
           router.push(
             routes.admin.courses.editCourseByIdAndTab(courseId, "lessons")
           )
         }
+        courseInfo={courseInfo}
       />
       <Box
         flexGrow={1}
