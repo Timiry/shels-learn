@@ -165,7 +165,7 @@ export default function EditVideoLessonForm({
             throw new Error("Не получен путь к загруженному видео");
           }
 
-          videoUrl = uploadResult.link;
+          videoUrl = "http://217.26.31.189:8080" + uploadResult.link;
         } else {
           setSubmitError("Пожалуйста, загрузите видео файл");
           setIsSubmitting(false);

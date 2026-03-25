@@ -70,16 +70,18 @@ export default function EditTestLessonForm({
           shuffleOptions: false,
           stopLesson: false,
           showQuestionStatus: true,
-          showCorrectAnswersAfterCompletion: false,
+          showCorrectAnswersAfterCompletion: true,
+          attemptLimit: undefined,
+          timeLimitMinutes: undefined,
         }
       : {
           title: currentValues?.title || "",
           passingThresholdPercent: currentValues?.passingThresholdPercent || 90,
           lessonType: "PRACTICE_TEST",
           questions: currentValues?.questions || [],
-          stopLesson: currentValues?.stopLesson,
-          attemptLimit: currentValues?.attemptLimit,
-          timeLimitMinutes: currentValues?.timeLimitMinutes,
+          stopLesson: currentValues?.stopLesson || false,
+          attemptLimit: currentValues?.attemptLimit || undefined,
+          timeLimitMinutes: currentValues?.timeLimitMinutes || undefined,
           shuffleOptions: currentValues?.shuffleOnEveryAttempt,
           showQuestionStatus: true,
           showCorrectAnswersAfterCompletion:
