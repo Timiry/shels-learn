@@ -18,8 +18,6 @@ export default function VideoLessonContent<
     !isYouTube &&
     videoUrl &&
     (videoUrl.endsWith(".mp4") ||
-      videoUrl.endsWith(".webm") ||
-      videoUrl.endsWith(".mov") ||
       videoUrl.includes("/files/") ||
       videoUrl.startsWith("http"));
 
