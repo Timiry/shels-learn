@@ -36,7 +36,14 @@ export default function GroupsPage() {
     allGroups?.filter((item) => item.type === groupType) || [];
 
   return (
-    <Box>
+    <Box
+      sx={{
+        height: "100vh",
+        display: "flex",
+        flexDirection: "column",
+        overflow: "hidden",
+      }}
+    >
       <TabNavigation
         tabs={[
           { id: "GENERAL", label: "Общие" },
@@ -60,7 +67,10 @@ export default function GroupsPage() {
           </Tooltip>
         </HeaderBox>
 
-        <Box px={"28px"}>
+        <Box
+          px={"28px"}
+          sx={{ flex: 1, minHeight: 0, display: "flex", flexDirection: "column" }}
+        >
           <GroupTable groups={groupsByType} />
         </Box>
       </TabNavigation>

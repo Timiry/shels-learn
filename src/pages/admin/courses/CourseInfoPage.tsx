@@ -39,7 +39,16 @@ export default function CourseInfoPage() {
   const { currentData: courseStats } = useCourseStatsQuery(+courseId);
 
   return (
-    <Box width={"80%"} mx={"auto"}>
+    <Box
+    width={"80%"}
+    mx={"auto"}
+    sx={{
+      height: "100vh",
+      display: "flex",
+      flexDirection: "column",
+      overflow: "hidden",
+    }}
+  >
       <HeaderBox>
         <Box>
           <Typography variant="caption" color="secondary">
@@ -117,7 +126,14 @@ export default function CourseInfoPage() {
           </Box>
         )}
         {activeTab === "students" && (
-          <Box>
+          <Box
+            sx={{
+              flex: 1,
+              minHeight: 0,
+              display: "flex",
+              flexDirection: "column",
+            }}
+          >
             <Box pb={2} display={"flex"} justifyContent={"end"}>
               <Button
                 variant="outlined"

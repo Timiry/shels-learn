@@ -1,6 +1,7 @@
-import { Box, Paper, Typography, Tooltip } from "@mui/material";
+import SearchRoundedIcon from "@mui/icons-material/SearchRounded";
+import { Box, InputAdornment, Paper, TextField, Tooltip, Typography } from "@mui/material";
 import { DataGrid, GridColDef } from "@mui/x-data-grid";
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { CourseStudentStatDto } from "@/features/statisticsAndReports/api/statisticsAndReportsApi";
 import { formatDateTime } from "@/shared/lib/utils/dateTimeFormatting";
 import { useRouter } from "next/navigation";
@@ -146,14 +147,43 @@ export default function CourseStatsTable({
   loading = false,
 }: CourseStatsTableProps) {
   const rows = useMemo(() => prepareRows(stats), [stats]);
+  const [searchText, setSearchText] = useState("");
+  const quickFilterValues = searchText.trim() ? [searchText] : [];
   const router = useRouter();
 
   return (
-    <Box sx={{ height: "calc(100vh - 76px)", width: "100%" }}>
+    <Box
+      sx={{
+        flex: 1,
+        minHeight: 0,
+        width: "100%",
+        display: "flex",
+        flexDirection: "column",
+      }}
+    >
+      <TextField
+        value={searchText}
+        onChange={(event) => setSearchText(event.target.value)}
+        placeholder="Поиск"
+        size="small"
+        sx={{ mb: "20px", width: 320 }}
+        InputProps={{
+          startAdornment: (
+            <InputAdornment position="start">
+              <SearchRoundedIcon />
+            </InputAdornment>
+          ),
+        }}
+      />
+
       <DataGrid
         rows={rows}
         columns={columns}
         loading={loading}
+        filterModel={{ items: [], quickFilterValues }}
+        onFilterModelChange={(model) =>
+          setSearchText(model.quickFilterValues?.join(" ") ?? "")
+        }
         initialState={{
           pagination: {
             paginationModel: {
@@ -168,6 +198,7 @@ export default function CourseStatsTable({
         }}
         disableColumnMenu={true}
         sx={{
+          flex: 1,
           border: 0,
           "& .MuiDataGrid-columnHeader": {
             backgroundColor: "#F2F2F2",

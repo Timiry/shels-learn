@@ -25,7 +25,14 @@ export default function CheckingPage() {
   }
 
   return (
-    <Box>
+    <Box
+      sx={{
+        height: "100vh",
+        display: "flex",
+        flexDirection: "column",
+        overflow: "hidden",
+      }}
+    >
       <HeaderBox>
         <Typography variant="h1" gutterBottom>
           Ответы студентов для проверки

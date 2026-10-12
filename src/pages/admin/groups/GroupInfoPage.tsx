@@ -36,7 +36,14 @@ export default function GroupInfoPage() {
   const [deleteGroup] = useDeleteGroupMutation();
 
   return (
-    <Box>
+    <Box
+      sx={{
+        height: "100vh",
+        display: "flex",
+        flexDirection: "column",
+        overflow: "hidden",
+      }}
+    >
       <HeaderBox>
         <Box>
           <Typography variant="caption" color="secondary">
@@ -75,7 +82,10 @@ export default function GroupInfoPage() {
           }
         >
           {activeTab === "students" && (
-            <Box px={"28px"}>
+            <Box
+              px={"28px"}
+              sx={{ flex: 1, minHeight: 0, display: "flex", flexDirection: "column" }}
+            >
               <Box pb={2} display={"flex"} justifyContent={"end"}>
                 <Button
                   variant="outlined"
@@ -96,7 +106,10 @@ export default function GroupInfoPage() {
           )}
 
           {activeTab === "courses" && (
-            <Box px={"28px"}>
+            <Box
+              px={"28px"}
+              sx={{ flex: 1, minHeight: 0, display: "flex", flexDirection: "column" }}
+            >
               <Box pb={2} display={"flex"} justifyContent={"end"}>
                 <Button
                   variant="outlined"
@@ -117,7 +130,10 @@ export default function GroupInfoPage() {
           )}
 
           {activeTab === "programs" && (
-            <Box px={"28px"}>
+            <Box
+              px={"28px"}
+              sx={{ flex: 1, minHeight: 0, display: "flex", flexDirection: "column" }}
+            >
               <Box pb={2} display={"flex"} justifyContent={"end"}>
                 <Button
                   variant="outlined"

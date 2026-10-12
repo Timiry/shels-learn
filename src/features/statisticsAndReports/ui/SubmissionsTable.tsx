@@ -1,9 +1,10 @@
 // features/submissions/ui/SubmissionsTable.tsx
 import { routes } from "@/shared/config/routes";
-import { Box, Typography, Tooltip } from "@mui/material";
+import SearchRoundedIcon from "@mui/icons-material/SearchRounded";
+import { Box, InputAdornment, TextField, Tooltip, Typography } from "@mui/material";
 import { DataGrid, GridColDef } from "@mui/x-data-grid";
 import { useRouter } from "next/navigation";
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { PendingSubmissionDto } from "../api/statisticsAndReportsApi";
 
 interface SubmissionsTableProps {
@@ -98,13 +99,43 @@ export default function SubmissionsTable({
   loading = false,
 }: SubmissionsTableProps) {
   const rows = useMemo(() => prepareRows(submissions), [submissions]);
+  const [searchText, setSearchText] = useState("");
+  const quickFilterValues = searchText.trim() ? [searchText] : [];
   const router = useRouter();
 
   return (
-    <Box sx={{ height: "calc(100vh - 76px)", width: "100%", p: "28px" }}>
+    <Box
+      sx={{
+        flex: 1,
+        minHeight: 0,
+        width: "100%",
+        p: "28px",
+        display: "flex",
+        flexDirection: "column",
+      }}
+    >
+      <TextField
+        value={searchText}
+        onChange={(event) => setSearchText(event.target.value)}
+        placeholder="Поиск"
+        size="small"
+        sx={{ mb: "20px", width: 320 }}
+        InputProps={{
+          startAdornment: (
+            <InputAdornment position="start">
+              <SearchRoundedIcon />
+            </InputAdornment>
+          ),
+        }}
+      />
+
       <DataGrid
         rows={rows}
         columns={columns}
+        filterModel={{ items: [], quickFilterValues }}
+        onFilterModelChange={(model) =>
+          setSearchText(model.quickFilterValues?.join(" ") ?? "")
+        }
         onRowClick={(params, event, details) => {
           router.push(routes.admin.checking.checkTaskById(params.id));
         }}
@@ -120,6 +151,7 @@ export default function SubmissionsTable({
         disableRowSelectionOnClick
         disableColumnMenu={true}
         sx={{
+          flex: 1,
           border: 0,
           "& .MuiDataGrid-columnHeader": {
             backgroundColor: "#F2F2F2",
