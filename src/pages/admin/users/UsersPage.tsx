@@ -5,7 +5,6 @@ import { Box, IconButton, Tooltip, Typography } from "@mui/material";
 import PersonAddAltRoundedIcon from "@mui/icons-material/PersonAddAltRounded";
 import HeaderBox from "@/shared/ui/HeaderBox";
 import {
-  useDeleteUsersMutation,
   useGetUsersQuery,
   useSetUsersActivationMutation,
 } from "@/entities/user/model/usersApi";
@@ -17,10 +16,16 @@ export default function UsersPage() {
   const { currentData: usersInfo } = useGetUsersQuery();
 
   const [setUsersActivation] = useSetUsersActivationMutation();
-  const [deleteUsers] = useDeleteUsersMutation();
 
   return (
-    <Box>
+    <Box
+      sx={{
+        height: "100vh",
+        display: "flex",
+        flexDirection: "column",
+        overflow: "hidden",
+      }}
+    >
       <HeaderBox>
         <Typography variant="h1" display={"inline"}>
           Пользователи
@@ -39,7 +44,6 @@ export default function UsersPage() {
       <UserTable
         usersInfo={usersInfo || []}
         handleSetActivate={setUsersActivation}
-        handleDelete={deleteUsers}
       />
     </Box>
   );

@@ -60,6 +60,19 @@ export default function UserInfoCard({
           {formatDateTime(user.createdAt || "")}
         </Typography>
       </Stack>
+      {!user.activation && (
+        <Stack alignItems={"center"}>
+          <Typography variant="caption" color="text.secondary">
+            Деактивирован:
+          </Typography>
+          <Typography variant="caption" color="text.secondary">
+            {user.deactivatedBy}
+          </Typography>
+          <Typography variant="caption" color="text.secondary">
+            {formatDateTime(user.deactivatedAt || "")}
+          </Typography>
+        </Stack>
+      )}
       <Stack alignItems={"center"}>
         {company && (
           <Typography variant="caption" color="text.secondary">

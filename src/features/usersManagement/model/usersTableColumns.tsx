@@ -1,5 +1,7 @@
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
+import CheckRoundedIcon from "@mui/icons-material/CheckRounded";
+import CloseRoundedIcon from "@mui/icons-material/CloseRounded";
 import { GridColDef } from "@mui/x-data-grid";
 
 const usersTableColumns: GridColDef[] = [
@@ -34,6 +36,31 @@ const usersTableColumns: GridColDef[] = [
     headerName: "Электронная почта",
     width: 240,
     sortable: false,
+  },
+  {
+    field: "activation",
+    headerName: "Активен",
+    width: 100,
+    sortable: false,
+    align: "center",
+    headerAlign: "center",
+    renderCell: (params) => (
+      <Box
+        sx={{
+          width: "100%",
+          height: "100%",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+        }}
+      >
+        {params.value ? (
+          <CheckRoundedIcon color="primary" />
+        ) : (
+          <CloseRoundedIcon color="error" />
+        )}
+      </Box>
+    ),
   },
   {
     field: "lastVisit",
