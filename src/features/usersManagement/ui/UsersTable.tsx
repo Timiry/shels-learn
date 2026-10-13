@@ -1,14 +1,13 @@
 "use client";
 
 import { DataGrid } from "@mui/x-data-grid/DataGrid";
-import {
-  GridCallbackDetails,
-  GridRowId,
-  GridRowSelectionModel,
-} from "@mui/x-data-grid/models";
+import { GridRowSelectionModel } from "@mui/x-data-grid/models";
 import Paper from "@mui/material/Paper";
 import { useState } from "react";
 import Box from "@mui/material/Box";
+import SearchRoundedIcon from "@mui/icons-material/SearchRounded";
+import InputAdornment from "@mui/material/InputAdornment";
+import TextField from "@mui/material/TextField";
 import { Button, Stack, Typography } from "@mui/material";
 import { useRouter } from "next/navigation";
 import { routes } from "@/shared/config/routes";
@@ -27,6 +26,7 @@ const makeUsersRows = (users: UserDto[]) =>
       id: user.id,
       fullName: user.fullName,
       email: user.email,
+      activation: user.activation,
       role: user.role,
       company: company?.title || "-",
       department: department?.title || "-",
@@ -39,12 +39,10 @@ const makeUsersRows = (users: UserDto[]) =>
 
 const paginationModel = { page: 0, pageSize: 10 };
 
-interface UserToolBar {
-  idsCount: number;
-  idsToActivate: Set<GridRowId>;
-  idsToDeactivate: Set<GridRowId>;
-  idsToDelete: Set<GridRowId>;
-}
+const emptySelectionModel: GridRowSelectionModel = {
+  type: "include",
+  ids: new Set(),
+};
 
 interface UserTableProps {
   usersInfo: UserDto[];
@@ -55,141 +53,108 @@ interface UserTableProps {
     activate?: boolean;
     userIds: number[];
   }) => void;
-  handleDelete: ({ ids }: { ids: number[] }) => void;
 }
 
 export default function UserTable({
   usersInfo,
   handleSetActivate,
-  handleDelete,
 }: UserTableProps) {
-  const emptyToolBar: UserToolBar = {
-    idsCount: 0,
-    idsToActivate: new Set(),
-    idsToDeactivate: new Set(),
-    idsToDelete: new Set(),
-  };
-  const [toolBarState, setToolBarState] = useState<UserToolBar>(emptyToolBar);
+  const [selectionModel, setSelectionModel] =
+    useState<GridRowSelectionModel>(emptySelectionModel);
+  const [searchText, setSearchText] = useState("");
   const router = useRouter();
 
   const usersRows = makeUsersRows(usersInfo);
+  const quickFilterValues = searchText.trim() ? [searchText] : [];
 
-  const onRowSelectionModeChange = (
-    rowSelectionModel: GridRowSelectionModel,
-    details: GridCallbackDetails
-  ) => {
-    if (details.reason === "multipleRowsSelection") {
-      if (toolBarState.idsCount === usersRows.length) {
-        setToolBarState(emptyToolBar);
-      } else {
-        const allIds = details.api.getAllRowIds();
-        const toActivate = new Set<GridRowId>();
-        const toDeactivate = new Set<GridRowId>();
-        allIds.forEach((id) => {
-          if (details.api.getRow(id).enabled) {
-            toDeactivate.add(id);
-          } else {
-            toActivate.add(id);
-          }
-        });
-
-        setToolBarState((prev) => ({
-          idsCount: allIds.length,
-          idsToActivate: toActivate,
-          idsToDeactivate: toDeactivate,
-          idsToDelete: new Set(allIds),
-        }));
-      }
-    } else {
-      const id = [...rowSelectionModel.ids][0];
-
-      if (rowSelectionModel.type === "exclude") {
-        const toActivate = toolBarState.idsToActivate;
-        const toDeactivate = toolBarState.idsToDeactivate;
-        const toDelete = toolBarState.idsToDelete;
-        toActivate.delete(id);
-        toDeactivate.delete(id);
-        toDelete.delete(id);
-
-        setToolBarState((prev) => ({
-          idsCount: prev.idsCount - 1,
-          idsToActivate: toActivate,
-          idsToDeactivate: toDeactivate,
-          idsToDelete: toDelete,
-        }));
-      } else {
-        setToolBarState((prev) => ({
-          idsCount: prev.idsCount + 1,
-          idsToActivate: details.api.getRow(id).enabled
-            ? prev.idsToActivate
-            : prev.idsToActivate.add(id),
-          idsToDeactivate: details.api.getRow(id).enabled
-            ? prev.idsToDeactivate.add(id)
-            : prev.idsToDeactivate,
-          idsToDelete: prev.idsToDelete.add(id),
-        }));
-      }
-    }
-  };
+  const selectedRows = usersRows.filter((row) =>
+    selectionModel.type === "exclude"
+      ? !selectionModel.ids.has(row.id)
+      : selectionModel.ids.has(row.id)
+  );
+  const selectedActiveIds = selectedRows
+    .filter((row) => row.activation)
+    .map((row) => row.id);
+  const selectedInactiveIds = selectedRows
+    .filter((row) => !row.activation)
+    .map((row) => row.id);
 
   return (
     <Paper
       sx={{
-        minHeight: "calc(100vh - 75px)",
+        flex: 1,
+        minHeight: 0,
         width: "100%",
         p: "28px",
+        display: "flex",
+        flexDirection: "column",
       }}
     >
-      {/* /* {toolBarState?.idsCount > 0 ? (
-        <Stack direction={"row"} spacing={2} alignItems={"center"} p={"10px"}>
-          <Typography display={"inline"}>
-            Выбрано пользователей: {toolBarState?.idsCount}
-          </Typography>
+      {selectedRows.length > 0 ? (
+        <Stack
+          direction={"row"}
+          spacing={2}
+          alignItems={"center"}
+          sx={{ mb: "20px" }}
+        >
+          <Typography>Выбрано: {selectedRows.length}</Typography>
           <Button
-            variant="outlined"
+            variant="contained"
+            color="primary"
+            disabled={selectedInactiveIds.length === 0}
             onClick={() =>
               handleSetActivate({
                 activate: true,
-                userIds: [...toolBarState.idsToActivate].map((id) => +id),
+                userIds: selectedInactiveIds,
               })
             }
           >
-            Активировать ({toolBarState.idsToActivate.size})
-          </Button>
-          <Button
-            variant="outlined"
-            onClick={() =>
-              handleSetActivate({
-                activate: true,
-                userIds: [...toolBarState.idsToDeactivate].map((id) => +id),
-              })
-            }
-          >
-            Деактивировать ({toolBarState.idsToDeactivate.size})
+            Активировать ({selectedInactiveIds.length})
           </Button>
           <Button
             variant="contained"
             color="error"
+            disabled={selectedActiveIds.length === 0}
             onClick={() =>
-              handleDelete({
-                ids: [...toolBarState.idsToDelete].map((id) => +id),
-              })
+              handleSetActivate({ activate: false, userIds: selectedActiveIds })
             }
           >
-            Удалить ({toolBarState.idsToDelete.size})
+            Деактивировать ({selectedActiveIds.length})
           </Button>
         </Stack>
       ) : (
         <Box height={"57px"} />
-      )} */}
+      )}
+
+      <TextField
+        value={searchText}
+        onChange={(event) => setSearchText(event.target.value)}
+        placeholder="Поиск пользователей"
+        size="small"
+        sx={{ mb: "20px", width: 320 }}
+        InputProps={{
+          startAdornment: (
+            <InputAdornment position="start">
+              <SearchRoundedIcon />
+            </InputAdornment>
+          ),
+        }}
+      />
 
       <DataGrid
         rows={usersRows}
         columns={usersTableColumns}
         initialState={{ pagination: { paginationModel } }}
+        filterModel={{ items: [], quickFilterValues }}
+        onFilterModelChange={(model) =>
+          setSearchText(model.quickFilterValues?.join(" ") ?? "")
+        }
         pageSizeOptions={[10, 50, 100]}
-        // checkboxSelection
-        onRowSelectionModelChange={onRowSelectionModeChange}
+        checkboxSelection
+        rowSelectionModel={selectionModel}
+        onRowSelectionModelChange={(newSelection) =>
+          setSelectionModel(newSelection)
+        }
         onRowClick={(params, event, details) => {
           router.push(routes.admin.users.userByIdAndTab(params.id, "courses"));
         }}
@@ -198,6 +163,7 @@ export default function UserTable({
         hideFooterSelectedRowCount={true}
         disableRowSelectionOnClick
         sx={{
+          flex: 1,
           maxWidth: "100%",
           overflowX: "auto",
           border: 0,

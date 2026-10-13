@@ -21,8 +21,18 @@ export default function TabNavigation({
   };
 
   return (
-    <Box sx={{ width: "100%" }}>
-      <Box sx={{ borderBottom: 1, borderColor: "divider", mb: 2 }}>
+    <Box
+      sx={{
+        width: "100%",
+        display: "flex",
+        flexDirection: "column",
+        flex: 1,
+        minHeight: 0,
+      }}
+    >
+      <Box
+        sx={{ borderBottom: 1, borderColor: "divider", mb: 2, flexShrink: 0 }}
+      >
         <Tabs
           value={activeTab}
           onChange={handleChange}
@@ -41,7 +51,17 @@ export default function TabNavigation({
           ))}
         </Tabs>
       </Box>
-      {children}
+      <Box
+        sx={{
+          flex: 1,
+          minHeight: 0,
+          display: "flex",
+          flexDirection: "column",
+          overflow: "auto",
+        }}
+      >
+        {children}
+      </Box>
     </Box>
   );
 }

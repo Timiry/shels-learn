@@ -24,7 +24,7 @@ export default function ProfilePage() {
   const router = useRouter();
   return (
     userInfo && (
-      <Box display="flex">
+      <Box display="flex" sx={{ height: "100vh", overflow: "hidden" }}>
         <UserInfoCard
           user={userInfo}
           onEditClick={() =>
@@ -35,13 +35,16 @@ export default function ProfilePage() {
             )
           }
         />
-        <Box flexGrow={1}>
+        <Box
+          flexGrow={1}
+          minWidth={0}
+          sx={{ display: "flex", flexDirection: "column" }}
+        >
           <TabNavigation
             tabs={
               userInfo.role === "ADMIN"
                 ? [
                     { id: "courses", label: "Курсы" },
-                    // { id: "programs", label: "Программы" }, //TODO: добавить вкладку группы с личной стат по прграммам
                     { id: "groups", label: "Группы" },
                   ]
                 : [{ id: "courses", label: "Курсы" }]
@@ -50,7 +53,6 @@ export default function ProfilePage() {
             onTabChange={(tabId: string) => setTab(tabId)}
           >
             {tab === "courses" && <UserStatsTable stats={userStats || []} />}
-            {/* {tab === "programs" && <GroupProgramsTable />} */}
             {tab === "groups" && <GroupTable groups={userInfo.groups || []} />}
           </TabNavigation>
         </Box>
